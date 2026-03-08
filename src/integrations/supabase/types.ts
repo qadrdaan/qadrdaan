@@ -68,6 +68,163 @@ export type Database = {
         }
         Relationships: []
       }
+      competition_awards: {
+        Row: {
+          award_type: string
+          awarded_at: string
+          competition_id: string
+          entry_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          award_type?: string
+          awarded_at?: string
+          competition_id: string
+          entry_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          award_type?: string
+          awarded_at?: string
+          competition_id?: string
+          entry_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_awards_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "competition_awards_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "competition_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competition_entries: {
+        Row: {
+          competition_id: string
+          content: string
+          created_at: string
+          id: string
+          rank: number | null
+          title: string
+          user_id: string
+          votes_count: number
+        }
+        Insert: {
+          competition_id: string
+          content: string
+          created_at?: string
+          id?: string
+          rank?: number | null
+          title: string
+          user_id: string
+          votes_count?: number
+        }
+        Update: {
+          competition_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          rank?: number | null
+          title?: string
+          user_id?: string
+          votes_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_entries_competition_id_fkey"
+            columns: ["competition_id"]
+            isOneToOne: false
+            referencedRelation: "competitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competition_votes: {
+        Row: {
+          created_at: string
+          entry_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          entry_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          entry_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competition_votes_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "competition_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitions: {
+        Row: {
+          created_at: string
+          description: string | null
+          entry_deadline: string
+          id: string
+          language: string | null
+          max_entries: number | null
+          organizer_id: string
+          status: Database["public"]["Enums"]["competition_status"]
+          theme: string | null
+          title: string
+          updated_at: string
+          voting_deadline: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          entry_deadline: string
+          id?: string
+          language?: string | null
+          max_entries?: number | null
+          organizer_id: string
+          status?: Database["public"]["Enums"]["competition_status"]
+          theme?: string | null
+          title: string
+          updated_at?: string
+          voting_deadline: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          entry_deadline?: string
+          id?: string
+          language?: string | null
+          max_entries?: number | null
+          organizer_id?: string
+          status?: Database["public"]["Enums"]["competition_status"]
+          theme?: string | null
+          title?: string
+          updated_at?: string
+          voting_deadline?: string
+        }
+        Relationships: []
+      }
       event_messages: {
         Row: {
           content: string
@@ -425,6 +582,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      competition_status: "upcoming" | "active" | "voting" | "ended"
       mushaira_status: "upcoming" | "live" | "ended" | "cancelled"
       mushaira_type: "open" | "curated" | "themed" | "international"
     }
@@ -554,6 +712,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      competition_status: ["upcoming", "active", "voting", "ended"],
       mushaira_status: ["upcoming", "live", "ended", "cancelled"],
       mushaira_type: ["open", "curated", "themed", "international"],
     },

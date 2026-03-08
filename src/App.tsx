@@ -19,6 +19,9 @@ import Videos from "./pages/Videos";
 import VideoDetail from "./pages/VideoDetail";
 import UploadVideo from "./pages/UploadVideo";
 import NotFound from "./pages/NotFound";
+import Competitions from "./pages/Competitions";
+import CompetitionDetail from "./pages/CompetitionDetail";
+import CreateCompetition from "./pages/CreateCompetition";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +44,9 @@ const App = () => (
             <Route path="/mushairas" element={<Mushairas />} />
             <Route path="/mushaira/:id" element={<MushairaDetail />} />
             <Route path="/create-mushaira" element={<CreateMushaira />} />
+            <Route path="/competitions" element={<Competitions />} />
+            <Route path="/competition/:id" element={<CompetitionDetail />} />
+            <Route path="/create-competition" element={<CreateCompetition />} />
             <Route path="/videos" element={<Videos />} />
             <Route path="/video/:id" element={<VideoDetail />} />
             <Route path="/upload-video" element={<UploadVideo />} />

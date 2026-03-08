@@ -20,6 +20,7 @@ const Navbar = () => {
           <a href="/videos" className="hover:text-accent transition-colors">Videos</a>
           <a href="/poets" className="hover:text-accent transition-colors">Poets</a>
           <a href="/mushairas" className="hover:text-accent transition-colors">Mushaira</a>
+          <a href="/competitions" className="hover:text-accent transition-colors">Competitions</a>
         </div>
         <div className="flex items-center gap-3">
           {user ? (
