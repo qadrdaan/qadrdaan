@@ -22,6 +22,8 @@ const UploadBook = () => {
     description: "",
     language: "",
     category: "",
+    isFree: true,
+    price: "",
   });
 
   useEffect(() => {
