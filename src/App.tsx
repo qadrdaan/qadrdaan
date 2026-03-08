@@ -22,6 +22,10 @@ import NotFound from "./pages/NotFound";
 import Competitions from "./pages/Competitions";
 import CompetitionDetail from "./pages/CompetitionDetail";
 import CreateCompetition from "./pages/CreateCompetition";
+import AboutUs from "./pages/AboutUs";
+import Contact from "./pages/Contact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +54,10 @@ const App = () => (
             <Route path="/videos" element={<Videos />} />
             <Route path="/video/:id" element={<VideoDetail />} />
             <Route path="/upload-video" element={<UploadVideo />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -32,10 +32,10 @@ const Footer = () => (
           {
             title: "Company",
             links: [
-              { label: "About Us", to: "/" },
-              { label: "Contact", to: "/" },
-              { label: "Privacy Policy", to: "/" },
-              { label: "Terms of Service", to: "/" },
+              { label: "About Us", to: "/about" },
+              { label: "Contact", to: "/contact" },
+              { label: "Privacy Policy", to: "/privacy" },
+              { label: "Terms of Service", to: "/terms" },
             ],
           },
         ].map((col) => (
