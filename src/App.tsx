@@ -12,6 +12,9 @@ import BookDetail from "./pages/BookDetail";
 import UploadBook from "./pages/UploadBook";
 import Poets from "./pages/Poets";
 import PoetProfile from "./pages/PoetProfile";
+import Mushairas from "./pages/Mushairas";
+import MushairaDetail from "./pages/MushairaDetail";
+import CreateMushaira from "./pages/CreateMushaira";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
