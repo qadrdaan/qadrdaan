@@ -15,6 +15,9 @@ import PoetProfile from "./pages/PoetProfile";
 import Mushairas from "./pages/Mushairas";
 import MushairaDetail from "./pages/MushairaDetail";
 import CreateMushaira from "./pages/CreateMushaira";
+import Videos from "./pages/Videos";
+import VideoDetail from "./pages/VideoDetail";
+import UploadVideo from "./pages/UploadVideo";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +41,9 @@ const App = () => (
             <Route path="/mushairas" element={<Mushairas />} />
             <Route path="/mushaira/:id" element={<MushairaDetail />} />
             <Route path="/create-mushaira" element={<CreateMushaira />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/video/:id" element={<VideoDetail />} />
+            <Route path="/upload-video" element={<UploadVideo />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
