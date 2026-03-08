@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import SendGift from "@/components/SendGift";
-import { Heart, Eye, User, Calendar, Globe, Tag, Send } from "lucide-react";
+import { Heart, Eye, User, Calendar, Globe, Tag, Send, Bookmark, BookmarkPlus } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type VideoRow = Tables<"videos">;
