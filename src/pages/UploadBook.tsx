@@ -22,6 +22,8 @@ const UploadBook = () => {
     description: "",
     language: "",
     category: "",
+    isFree: true,
+    price: "",
   });
 
   useEffect(() => {
@@ -76,6 +78,7 @@ const UploadBook = () => {
       }
 
       // Insert book record
+      const bookPrice = form.isFree ? 0 : parseFloat(form.price) || 0;
       const { error: insertErr } = await supabase.from("books").insert({
         creator_id: user.id,
         title: form.title,
@@ -85,8 +88,8 @@ const UploadBook = () => {
         cover_url: coverUrl,
         file_url: bookPath,
         file_format: fileExt,
-        is_free: true,
-        price: 0,
+        is_free: form.isFree,
+        price: bookPrice,
       });
       if (insertErr) throw insertErr;
 
@@ -202,6 +205,45 @@ const UploadBook = () => {
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* Pricing */}
+            <div>
+              <label className="block font-body text-sm font-medium text-foreground mb-2">
+                Pricing
+              </label>
+              <div className="flex items-center gap-4 mb-3">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={form.isFree}
+                    onChange={() => setForm({ ...form, isFree: true, price: "" })}
+                    className="accent-secondary"
+                  />
+                  <span className="font-body text-sm text-foreground">Free</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    checked={!form.isFree}
+                    onChange={() => setForm({ ...form, isFree: false })}
+                    className="accent-secondary"
+                  />
+                  <span className="font-body text-sm text-foreground">Paid</span>
+                </label>
+              </div>
+              {!form.isFree && (
+                <input
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={form.price}
+                  onChange={(e) => setForm({ ...form, price: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Enter price (e.g. 4.99)"
+                  required
+                />
+              )}
             </div>
 
             {/* Book File */}
