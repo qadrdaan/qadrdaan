@@ -24,10 +24,18 @@ const BookDetail = () => {
   const fetchBook = async () => {
     const { data } = await supabase
       .from("books")
-      .select("*, profiles!books_creator_id_fkey(display_name, is_verified)")
+      .select("*")
       .eq("id", id!)
       .single();
-    setBook(data as Book);
+    
+    if (data) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("display_name, is_verified")
+        .eq("user_id", data.creator_id)
+        .single();
+      setBook({ ...data, creator_profile: profile } as Book);
+    }
     setLoading(false);
   };
 
