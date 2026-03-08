@@ -28,6 +28,7 @@ const VideoDetail = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
     if (id) {
