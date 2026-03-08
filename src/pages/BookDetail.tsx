@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import { BookOpen, Download, User, Calendar, Tag, Globe } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
-type Book = Tables<"books"> & { profiles?: { display_name: string | null; is_verified: boolean } | null };
+type Book = Tables<"books"> & { creator_profile?: { display_name: string | null; is_verified: boolean } | null };
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
