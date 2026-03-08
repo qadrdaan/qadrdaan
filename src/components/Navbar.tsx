@@ -7,6 +7,7 @@ const navLinks = [
   { href: "/books", label: "Books" },
   { href: "/videos", label: "Videos" },
   { href: "/poets", label: "Poets" },
+  { href: "/creators", label: "Creators" },
   { href: "/mushairas", label: "Mushaira" },
   { href: "/competitions", label: "Competitions" },
 ];
