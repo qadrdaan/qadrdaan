@@ -35,6 +35,9 @@ const App = () => (
             <Route path="/upload-book" element={<UploadBook />} />
             <Route path="/poets" element={<Poets />} />
             <Route path="/poet/:userId" element={<PoetProfile />} />
+            <Route path="/mushairas" element={<Mushairas />} />
+            <Route path="/mushaira/:id" element={<MushairaDetail />} />
+            <Route path="/create-mushaira" element={<CreateMushaira />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
