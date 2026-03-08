@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import SendGift from "@/components/SendGift";
-import { Heart, Eye, User, Calendar, Globe, Tag, Send } from "lucide-react";
+import { Heart, Eye, User, Calendar, Globe, Tag, Send, Bookmark, BookmarkPlus } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type VideoRow = Tables<"videos">;
@@ -28,6 +28,7 @@ const VideoDetail = () => {
   const [isLiked, setIsLiked] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [loading, setLoading] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -37,7 +38,7 @@ const VideoDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (user && id) checkLikeStatus();
+    if (user && id) { checkLikeStatus(); checkBookmark(); }
   }, [user, id]);
 
   const fetchVideo = async () => {
@@ -113,6 +114,25 @@ const VideoDetail = () => {
     fetchComments();
   };
 
+  const checkBookmark = async () => {
+    if (!user || !id) return;
+    const { data } = await supabase.from("bookmarks").select("id").eq("user_id", user.id).eq("content_type", "video").eq("content_id", id).maybeSingle();
+    setIsBookmarked(!!data);
+  };
+
+  const handleBookmark = async () => {
+    if (!user) { toast.error("Sign in to bookmark"); return; }
+    if (isBookmarked) {
+      await supabase.from("bookmarks").delete().eq("user_id", user.id).eq("content_type", "video").eq("content_id", id!);
+      setIsBookmarked(false);
+      toast.success("Bookmark removed");
+    } else {
+      await supabase.from("bookmarks").insert({ user_id: user.id, content_type: "video", content_id: id! });
+      setIsBookmarked(true);
+      toast.success("Bookmarked!");
+    }
+  };
+
   if (loading || !video) {
     return (
       <div className="min-h-screen bg-background">
@@ -183,6 +203,18 @@ const VideoDetail = () => {
                   recipientId={video.creator_id}
                   recipientName={creatorName}
                 />
+
+                <button
+                  onClick={handleBookmark}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-body text-sm font-medium transition-all ${
+                    isBookmarked
+                      ? "bg-secondary/10 text-secondary border border-secondary/30"
+                      : "bg-card border border-border text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {isBookmarked ? <Bookmark className="w-4 h-4 fill-current" /> : <BookmarkPlus className="w-4 h-4" />}
+                  {isBookmarked ? "Saved" : "Save"}
+                </button>
               </div>
             </div>
 
