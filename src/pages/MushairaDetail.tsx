@@ -287,12 +287,19 @@ const MushairaDetail = () => {
                           {(p.display_name || "?")[0].toUpperCase()}
                         </span>
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="font-body text-sm font-medium text-foreground truncate">
                           {p.display_name}
                         </p>
                         <p className="font-body text-xs text-muted-foreground capitalize">{p.status}</p>
                       </div>
+                      {user && user.id !== p.user_id && (
+                        <SendGift
+                          recipientId={p.user_id}
+                          recipientName={p.display_name || "this poet"}
+                          eventId={id}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>
