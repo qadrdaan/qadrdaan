@@ -62,7 +62,7 @@ const MushairaSection = () => (
           {/* Mushaira event card mockup */}
           <div className="bg-emerald-light/30 backdrop-blur-md rounded-3xl p-8 border border-gold/20">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+              <div className="w-3 h-3 rounded-full bg-destructive animate-pulse" />
               <span className="font-body text-sm text-gold font-semibold">LIVE NOW</span>
             </div>
             <h3 className="font-display text-2xl text-primary-foreground font-bold mb-2">
