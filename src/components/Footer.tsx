@@ -25,8 +25,8 @@ const Footer = () => (
             links: [
               { label: "Start Publishing", to: "/auth" },
               { label: "Creator Dashboard", to: "/profile" },
-              { label: "Upload Book", to: "/upload-book" },
-              { label: "Upload Video", to: "/upload-video" },
+              { label: "Verification", to: "/profile" },
+              { label: "Promotions", to: "/competitions" },
             ],
           },
           {
