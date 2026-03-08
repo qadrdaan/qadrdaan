@@ -16,10 +16,11 @@ const BookDetail = () => {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
   const [downloading, setDownloading] = useState(false);
+  const [isBookmarked, setIsBookmarked] = useState(false);
 
   useEffect(() => {
-    if (id) fetchBook();
-  }, [id]);
+    if (id) { fetchBook(); checkBookmark(); }
+  }, [id, user]);
 
   const fetchBook = async () => {
     const { data } = await supabase
