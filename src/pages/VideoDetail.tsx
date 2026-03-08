@@ -114,6 +114,25 @@ const VideoDetail = () => {
     fetchComments();
   };
 
+  const checkBookmark = async () => {
+    if (!user || !id) return;
+    const { data } = await supabase.from("bookmarks").select("id").eq("user_id", user.id).eq("content_type", "video").eq("content_id", id).maybeSingle();
+    setIsBookmarked(!!data);
+  };
+
+  const handleBookmark = async () => {
+    if (!user) { toast.error("Sign in to bookmark"); return; }
+    if (isBookmarked) {
+      await supabase.from("bookmarks").delete().eq("user_id", user.id).eq("content_type", "video").eq("content_id", id!);
+      setIsBookmarked(false);
+      toast.success("Bookmark removed");
+    } else {
+      await supabase.from("bookmarks").insert({ user_id: user.id, content_type: "video", content_id: id! });
+      setIsBookmarked(true);
+      toast.success("Bookmarked!");
+    }
+  };
+
   if (loading || !video) {
     return (
       <div className="min-h-screen bg-background">
