@@ -10,6 +10,7 @@ import {
   BadgeCheck, BookOpen, Users, Video, Gift, Globe, MapPin,
   UserPlus, UserMinus, Download,
 } from "lucide-react";
+import SendGift from "@/components/SendGift";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
