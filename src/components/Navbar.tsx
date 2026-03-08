@@ -16,6 +16,7 @@ const Navbar = () => {
           Qadrdaan
         </a>
         <div className="hidden md:flex items-center gap-8 font-body text-sm text-primary-foreground/80">
+          <a href="/books" className="hover:text-accent transition-colors">Books</a>
           <a href="/#features" className="hover:text-accent transition-colors">Features</a>
           <a href="/#mushaira" className="hover:text-accent transition-colors">Mushaira</a>
           <a href="/#creators" className="hover:text-accent transition-colors">Poets</a>
