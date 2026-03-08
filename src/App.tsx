@@ -41,6 +41,9 @@ const App = () => (
             <Route path="/mushairas" element={<Mushairas />} />
             <Route path="/mushaira/:id" element={<MushairaDetail />} />
             <Route path="/create-mushaira" element={<CreateMushaira />} />
+            <Route path="/videos" element={<Videos />} />
+            <Route path="/video/:id" element={<VideoDetail />} />
+            <Route path="/upload-video" element={<UploadVideo />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
