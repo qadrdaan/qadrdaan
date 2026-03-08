@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const CTASection = () => (
   <section id="community" className="py-24 bg-gradient-hero relative overflow-hidden">
