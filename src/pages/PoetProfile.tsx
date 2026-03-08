@@ -129,7 +129,11 @@ const PoetProfile = () => {
       <Navbar />
 
       {/* Hero banner */}
-      <div className="h-48 bg-gradient-hero" />
+      <div className="h-48 bg-gradient-hero overflow-hidden">
+        {(profile as any).cover_image_url && (
+          <img src={(profile as any).cover_image_url} alt="Cover" className="w-full h-full object-cover" />
+        )}
+      </div>
 
       <div className="container mx-auto px-6 max-w-4xl -mt-16 relative z-10 pb-16">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
