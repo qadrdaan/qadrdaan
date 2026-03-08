@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import { BadgeCheck, BookOpen, Users, Video, Gift } from "lucide-react";
+import { BadgeCheck, BookOpen, Users, Video, Gift, Camera, ImagePlus } from "lucide-react";
 
 const Profile = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
@@ -18,6 +18,10 @@ const Profile = () => {
     country: "",
   });
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+  const avatarRef = useRef<HTMLInputElement>(null);
+  const coverRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!loading && !user) navigate("/auth");
@@ -52,6 +56,34 @@ const Profile = () => {
     setSaving(false);
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploadingAvatar(true);
+    const path = `${user.id}/avatar-${Date.now()}`;
+    const { error } = await supabase.storage.from("cover-images").upload(path, file, { upsert: true });
+    if (error) { toast.error("Upload failed"); setUploadingAvatar(false); return; }
+    const { data: { publicUrl } } = supabase.storage.from("cover-images").getPublicUrl(path);
+    await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("user_id", user.id);
+    toast.success("Avatar updated!");
+    await refreshProfile();
+    setUploadingAvatar(false);
+  };
+
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploadingCover(true);
+    const path = `${user.id}/cover-${Date.now()}`;
+    const { error } = await supabase.storage.from("cover-images").upload(path, file, { upsert: true });
+    if (error) { toast.error("Upload failed"); setUploadingCover(false); return; }
+    const { data: { publicUrl } } = supabase.storage.from("cover-images").getPublicUrl(path);
+    await supabase.from("profiles").update({ cover_image_url: publicUrl }).eq("user_id", user.id);
+    toast.success("Cover image updated!");
+    await refreshProfile();
+    setUploadingCover(false);
+  };
+
   if (loading || !profile) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -63,7 +95,24 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="pt-24 pb-16 container mx-auto px-6 max-w-3xl">
+
+      {/* Cover Image */}
+      <div className="relative h-48 md:h-56 bg-gradient-hero overflow-hidden">
+        {(profile as any).cover_image_url && (
+          <img src={(profile as any).cover_image_url} alt="Cover" className="w-full h-full object-cover" />
+        )}
+        <button
+          onClick={() => coverRef.current?.click()}
+          disabled={uploadingCover}
+          className="absolute bottom-4 right-4 px-3 py-2 rounded-lg bg-primary/70 backdrop-blur-sm text-primary-foreground font-body text-xs font-medium flex items-center gap-1.5 hover:bg-primary/90 transition-colors disabled:opacity-50"
+        >
+          <ImagePlus className="w-3.5 h-3.5" />
+          {uploadingCover ? "Uploading..." : "Change Cover"}
+        </button>
+        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
+      </div>
+
+      <div className="container mx-auto px-6 max-w-3xl -mt-14 relative z-10 pb-16">
         <motion.div
           className="bg-card rounded-2xl border border-border p-8"
           initial={{ opacity: 0, y: 20 }}
@@ -71,10 +120,24 @@ const Profile = () => {
         >
           {/* Header */}
           <div className="flex items-start gap-6 mb-8">
-            <div className="w-24 h-24 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
-              <span className="font-display text-3xl font-bold text-primary">
-                {(profile.display_name || "?")[0].toUpperCase()}
-              </span>
+            <div className="relative shrink-0 -mt-14">
+              <div className="w-24 h-24 rounded-full bg-gradient-gold flex items-center justify-center border-4 border-card overflow-hidden">
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="font-display text-3xl font-bold text-primary">
+                    {(profile.display_name || "?")[0].toUpperCase()}
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={() => avatarRef.current?.click()}
+                disabled={uploadingAvatar}
+                className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center hover:opacity-90 transition-opacity disabled:opacity-50"
+              >
+                <Camera className="w-3.5 h-3.5" />
+              </button>
+              <input ref={avatarRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">

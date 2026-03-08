@@ -141,10 +141,14 @@ const PoetProfile = () => {
           <div className="bg-card rounded-2xl border border-border p-6 md:p-8 mb-8">
             <div className="flex flex-col sm:flex-row items-start gap-6">
               {/* Avatar */}
-              <div className="w-28 h-28 rounded-full bg-gradient-gold flex items-center justify-center shrink-0 border-4 border-card -mt-16 sm:-mt-20">
-                <span className="font-display text-4xl font-bold text-primary">
-                  {(profile.display_name || "?")[0].toUpperCase()}
-                </span>
+              <div className="w-28 h-28 rounded-full bg-gradient-gold flex items-center justify-center shrink-0 border-4 border-card -mt-16 sm:-mt-20 overflow-hidden">
+                {profile.avatar_url ? (
+                  <img src={profile.avatar_url} alt={profile.display_name || "Avatar"} className="w-full h-full object-cover" />
+                ) : (
+                  <span className="font-display text-4xl font-bold text-primary">
+                    {(profile.display_name || "?")[0].toUpperCase()}
+                  </span>
+                )}
               </div>
 
               <div className="flex-1 min-w-0">

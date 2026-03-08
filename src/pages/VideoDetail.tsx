@@ -203,6 +203,18 @@ const VideoDetail = () => {
                   recipientId={video.creator_id}
                   recipientName={creatorName}
                 />
+
+                <button
+                  onClick={handleBookmark}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-body text-sm font-medium transition-all ${
+                    isBookmarked
+                      ? "bg-secondary/10 text-secondary border border-secondary/30"
+                      : "bg-card border border-border text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {isBookmarked ? <Bookmark className="w-4 h-4 fill-current" /> : <BookmarkPlus className="w-4 h-4" />}
+                  {isBookmarked ? "Saved" : "Save"}
+                </button>
               </div>
             </div>
 

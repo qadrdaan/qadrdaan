@@ -177,19 +177,27 @@ const BookDetail = () => {
               </p>
             )}
 
-            {/* Download / Price button */}
-            <button
-              onClick={handleDownload}
-              disabled={downloading}
-              className="px-8 py-3.5 font-body font-semibold bg-gradient-gold rounded-xl text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
-            >
-              <Download className="w-5 h-5" />
-              {downloading
-                ? "Downloading..."
-                : book.is_free
-                  ? "Download Free"
-                  : `Buy for $${Number(book.price).toFixed(2)}`}
-            </button>
+            {/* Download / Price button + Bookmark */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleDownload}
+                disabled={downloading}
+                className="px-8 py-3.5 font-body font-semibold bg-gradient-gold rounded-xl text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2"
+              >
+                <Download className="w-5 h-5" />
+                {downloading
+                  ? "Downloading..."
+                  : book.is_free
+                    ? "Download Free"
+                    : `Buy for $${Number(book.price).toFixed(2)}`}
+              </button>
+              <button
+                onClick={handleBookmark}
+                className={`p-3.5 rounded-xl border transition-colors ${isBookmarked ? "bg-secondary/10 border-secondary/30 text-secondary" : "bg-card border-border text-muted-foreground hover:text-secondary"}`}
+              >
+                {isBookmarked ? <Bookmark className="w-5 h-5 fill-current" /> : <BookmarkPlus className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
         </motion.div>
       </div>
