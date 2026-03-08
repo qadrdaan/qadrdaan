@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const Footer = () => (
   <footer className="bg-primary py-16 border-t border-gold/10">
     <div className="container mx-auto px-6">
@@ -9,18 +11,42 @@ const Footer = () => (
           </p>
         </div>
         {[
-          { title: "Platform", links: ["Browse Poets", "Mushaira Events", "Book Store", "Competitions"] },
-          { title: "Creators", links: ["Start Publishing", "Creator Dashboard", "Verification", "Promotions"] },
-          { title: "Company", links: ["About Us", "Contact", "Privacy Policy", "Terms of Service"] },
+          {
+            title: "Platform",
+            links: [
+              { label: "Browse Poets", to: "/poets" },
+              { label: "Mushaira Events", to: "/mushairas" },
+              { label: "Book Store", to: "/books" },
+              { label: "Competitions", to: "/competitions" },
+            ],
+          },
+          {
+            title: "Creators",
+            links: [
+              { label: "Start Publishing", to: "/auth" },
+              { label: "Creator Dashboard", to: "/profile" },
+              { label: "Upload Book", to: "/upload-book" },
+              { label: "Upload Video", to: "/upload-video" },
+            ],
+          },
+          {
+            title: "Company",
+            links: [
+              { label: "About Us", to: "/" },
+              { label: "Contact", to: "/" },
+              { label: "Privacy Policy", to: "/" },
+              { label: "Terms of Service", to: "/" },
+            ],
+          },
         ].map((col) => (
           <div key={col.title}>
             <h4 className="font-body text-sm font-semibold text-gold uppercase tracking-wider mb-4">{col.title}</h4>
             <ul className="space-y-2.5">
               {col.links.map((link) => (
-                <li key={link}>
-                  <a href="#" className="font-body text-sm text-primary-foreground/50 hover:text-gold transition-colors">
-                    {link}
-                  </a>
+                <li key={link.label}>
+                  <Link to={link.to} className="font-body text-sm text-primary-foreground/50 hover:text-gold transition-colors">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
