@@ -15,6 +15,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
 type Book = Tables<"books">;
+type VideoRow = Tables<"videos">;
 
 const PoetProfile = () => {
   const { userId } = useParams<{ userId: string }>();
