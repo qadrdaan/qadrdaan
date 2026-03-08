@@ -23,10 +23,10 @@ const Footer = () => (
           {
             title: "Creators",
             links: [
-              { label: "Start Publishing", to: "/auth" },
-              { label: "Creator Dashboard", to: "/profile" },
-              { label: "Verification", to: "/profile" },
-              { label: "Promotions", to: "/competitions" },
+              { label: "Start Publishing", to: "/start-publishing" },
+              { label: "Creator Dashboard", to: "/dashboard" },
+              { label: "Verification", to: "/verification" },
+              { label: "Promotions", to: "/promotions" },
             ],
           },
           {
