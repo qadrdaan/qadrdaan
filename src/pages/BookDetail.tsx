@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import { BookOpen, Download, User, Calendar, Tag, Globe } from "lucide-react";
+import { BookOpen, Download, User, Calendar, Tag, Globe, Bookmark, BookmarkPlus } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Book = Tables<"books"> & { creator_profile?: { display_name: string | null; is_verified: boolean } | null };
