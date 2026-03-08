@@ -159,6 +159,47 @@ export type Database = {
         }
         Relationships: []
       }
+      gifts: {
+        Row: {
+          amount: number
+          created_at: string
+          event_id: string | null
+          gift_type: string
+          id: string
+          message: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          event_id?: string | null
+          gift_type: string
+          id?: string
+          message?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          event_id?: string | null
+          gift_type?: string
+          id?: string
+          message?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gifts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mushaira_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mushaira_events: {
         Row: {
           audience_count: number
