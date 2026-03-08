@@ -165,29 +165,36 @@ const PoetProfile = () => {
                   </p>
                 )}
 
-                {/* Follow button */}
+                {/* Follow + Gift buttons */}
                 {!isOwnProfile && (
-                  <button
-                    onClick={handleFollow}
-                    disabled={followLoading}
-                    className={`mt-4 px-6 py-2.5 rounded-lg font-body font-semibold text-sm flex items-center gap-2 transition-all disabled:opacity-50 ${
-                      isFollowing
-                        ? "border border-border text-foreground hover:bg-muted"
-                        : "bg-gradient-gold text-primary shadow-gold hover:opacity-90"
-                    }`}
-                  >
-                    {isFollowing ? (
-                      <>
-                        <UserMinus className="w-4 h-4" />
-                        Following
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-4 h-4" />
-                        Follow
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-3 mt-4">
+                    <button
+                      onClick={handleFollow}
+                      disabled={followLoading}
+                      className={`px-6 py-2.5 rounded-lg font-body font-semibold text-sm flex items-center gap-2 transition-all disabled:opacity-50 ${
+                        isFollowing
+                          ? "border border-border text-foreground hover:bg-muted"
+                          : "bg-gradient-gold text-primary shadow-gold hover:opacity-90"
+                      }`}
+                    >
+                      {isFollowing ? (
+                        <>
+                          <UserMinus className="w-4 h-4" />
+                          Following
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-4 h-4" />
+                          Follow
+                        </>
+                      )}
+                    </button>
+                    <SendGift
+                      recipientId={userId!}
+                      recipientName={profile.display_name || "this poet"}
+                      onGiftSent={() => fetchProfile()}
+                    />
+                  </div>
                 )}
 
                 {isOwnProfile && (
