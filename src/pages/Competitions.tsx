@@ -35,7 +35,7 @@ const Competitions = () => {
 
   useEffect(() => {
     const fetchCompetitions = async () => {
-      const statusFilter = tab === "active" ? ["active", "voting"] : tab === "upcoming" ? ["upcoming"] : ["ended"];
+      const statusFilter = tab === "active" ? ["active", "voting"] as const : tab === "upcoming" ? ["upcoming"] as const : ["ended"] as const;
       const { data } = await supabase
         .from("competitions")
         .select("*")
