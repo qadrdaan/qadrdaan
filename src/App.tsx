@@ -26,6 +26,11 @@ import AboutUs from "./pages/AboutUs";
 import Contact from "./pages/Contact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
+import Creators from "./pages/Creators";
+import StartPublishing from "./pages/StartPublishing";
+import CreatorDashboard from "./pages/CreatorDashboard";
+import Verification from "./pages/Verification";
+import Promotions from "./pages/Promotions";
 
 const queryClient = new QueryClient();
 
