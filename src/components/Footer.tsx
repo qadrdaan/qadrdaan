@@ -14,10 +14,14 @@ const Footer = () => (
           {
             title: "Platform",
             links: [
+              { label: "Poetry Feed", to: "/poetry" },
               { label: "Browse Poets", to: "/poets" },
               { label: "Mushaira Events", to: "/mushairas" },
               { label: "Book Store", to: "/books" },
               { label: "Competitions", to: "/competitions" },
+              { label: "Challenges", to: "/challenges" },
+              { label: "Discover", to: "/discover" },
+              { label: "Leaderboard", to: "/leaderboard" },
             ],
           },
           {
@@ -25,6 +29,8 @@ const Footer = () => (
             links: [
               { label: "Start Publishing", to: "/start-publishing" },
               { label: "Creator Dashboard", to: "/dashboard" },
+              { label: "Analytics", to: "/analytics" },
+              { label: "Invite Poets", to: "/referrals" },
               { label: "Verification", to: "/verification" },
               { label: "Promotions", to: "/promotions" },
             ],
