@@ -31,6 +31,17 @@ import StartPublishing from "./pages/StartPublishing";
 import CreatorDashboard from "./pages/CreatorDashboard";
 import Verification from "./pages/Verification";
 import Promotions from "./pages/Promotions";
+import PoetryFeed from "./pages/PoetryFeed";
+import CreatePost from "./pages/CreatePost";
+import PostDetail from "./pages/PostDetail";
+import Bookmarks from "./pages/Bookmarks";
+import Leaderboard from "./pages/Leaderboard";
+import Challenges from "./pages/Challenges";
+import CreateChallenge from "./pages/CreateChallenge";
+import ChallengeDetail from "./pages/ChallengeDetail";
+import Discover from "./pages/Discover";
+import CreatorAnalytics from "./pages/CreatorAnalytics";
+import Referrals from "./pages/Referrals";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +70,17 @@ const App = () => (
             <Route path="/videos" element={<Videos />} />
             <Route path="/video/:id" element={<VideoDetail />} />
             <Route path="/upload-video" element={<UploadVideo />} />
+            <Route path="/poetry" element={<PoetryFeed />} />
+            <Route path="/create-post" element={<CreatePost />} />
+            <Route path="/post/:id" element={<PostDetail />} />
+            <Route path="/bookmarks" element={<Bookmarks />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/challenges" element={<Challenges />} />
+            <Route path="/create-challenge" element={<CreateChallenge />} />
+            <Route path="/challenge/:id" element={<ChallengeDetail />} />
+            <Route path="/discover" element={<Discover />} />
+            <Route path="/analytics" element={<CreatorAnalytics />} />
+            <Route path="/referrals" element={<Referrals />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />

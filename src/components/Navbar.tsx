@@ -4,12 +4,13 @@ import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 const navLinks = [
+  { href: "/poetry", label: "Poetry" },
   { href: "/books", label: "Books" },
   { href: "/videos", label: "Videos" },
   { href: "/poets", label: "Poets" },
-  { href: "/creators", label: "Creators" },
   { href: "/mushairas", label: "Mushaira" },
   { href: "/competitions", label: "Competitions" },
+  { href: "/discover", label: "Discover" },
 ];
 
 const Navbar = () => {

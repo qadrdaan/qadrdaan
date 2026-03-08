@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      bookmarks: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       books: {
         Row: {
           category: string | null
@@ -67,6 +91,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      challenge_entries: {
+        Row: {
+          challenge_id: string
+          content: string
+          created_at: string
+          id: string
+          user_id: string
+          votes_count: number
+        }
+        Insert: {
+          challenge_id: string
+          content: string
+          created_at?: string
+          id?: string
+          user_id: string
+          votes_count?: number
+        }
+        Update: {
+          challenge_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+          votes_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_entries_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "poetry_challenges"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       competition_awards: {
         Row: {
@@ -435,15 +494,159 @@ export type Database = {
         }
         Relationships: []
       }
+      poetry_challenges: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          ends_at: string
+          id: string
+          language: string | null
+          starts_at: string
+          status: string
+          theme: string | null
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          ends_at: string
+          id?: string
+          language?: string | null
+          starts_at?: string
+          status?: string
+          theme?: string | null
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          ends_at?: string
+          id?: string
+          language?: string | null
+          starts_at?: string
+          status?: string
+          theme?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      poetry_posts: {
+        Row: {
+          category: string | null
+          comments_count: number
+          content: string
+          created_at: string
+          creator_id: string
+          gifts_count: number
+          id: string
+          language: string | null
+          likes_count: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          comments_count?: number
+          content: string
+          created_at?: string
+          creator_id: string
+          gifts_count?: number
+          id?: string
+          language?: string | null
+          likes_count?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          comments_count?: number
+          content?: string
+          created_at?: string
+          creator_id?: string
+          gifts_count?: number
+          id?: string
+          language?: string | null
+          likes_count?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      post_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "poetry_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      post_likes: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "poetry_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           books_count: number
           country: string | null
+          cover_image_url: string | null
           created_at: string
           display_name: string | null
           followers_count: number
+          following_count: number
           id: string
           is_creator: boolean
           is_verified: boolean
@@ -458,9 +661,11 @@ export type Database = {
           bio?: string | null
           books_count?: number
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           display_name?: string | null
           followers_count?: number
+          following_count?: number
           id?: string
           is_creator?: boolean
           is_verified?: boolean
@@ -475,9 +680,11 @@ export type Database = {
           bio?: string | null
           books_count?: number
           country?: string | null
+          cover_image_url?: string | null
           created_at?: string
           display_name?: string | null
           followers_count?: number
+          following_count?: number
           id?: string
           is_creator?: boolean
           is_verified?: boolean
@@ -486,6 +693,36 @@ export type Database = {
           updated_at?: string
           user_id?: string
           videos_count?: number
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          invite_code: string
+          invited_email: string | null
+          invited_user_id: string | null
+          inviter_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invite_code: string
+          invited_email?: string | null
+          invited_user_id?: string | null
+          inviter_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invite_code?: string
+          invited_email?: string | null
+          invited_user_id?: string | null
+          inviter_id?: string
+          status?: string
         }
         Relationships: []
       }
