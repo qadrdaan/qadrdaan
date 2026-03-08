@@ -10,6 +10,8 @@ import Profile from "./pages/Profile";
 import Books from "./pages/Books";
 import BookDetail from "./pages/BookDetail";
 import UploadBook from "./pages/UploadBook";
+import Poets from "./pages/Poets";
+import PoetProfile from "./pages/PoetProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
