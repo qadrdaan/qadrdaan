@@ -62,7 +62,7 @@ const Referrals = () => {
             <p className="font-body text-xs text-muted-foreground">Total Invites</p>
           </div>
           <div className="bg-card border border-border rounded-xl p-4 text-center">
-            <CheckCircle className="w-5 h-5 mx-auto mb-2 text-green-500" />
+            <CheckCircle className="w-5 h-5 mx-auto mb-2 text-secondary" />
             <p className="font-display text-xl font-bold text-foreground">{accepted}</p>
             <p className="font-body text-xs text-muted-foreground">Accepted</p>
           </div>
