@@ -4,23 +4,31 @@ import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
 import { Mail, MapPin, Send } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [sending, setSending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) {
       toast.error("Please fill in all fields");
       return;
     }
     setSending(true);
-    setTimeout(() => {
+    try {
+      const { error } = await supabase
+        .from("contact_messages")
+        .insert({ name: form.name, email: form.email, message: form.message });
+      if (error) throw error;
       toast.success("Message sent! We'll get back to you soon.");
       setForm({ name: "", email: "", message: "" });
+    } catch {
+      toast.error("Failed to send message. Please try again.");
+    } finally {
       setSending(false);
-    }, 1000);
+    }
   };
 
   return (
