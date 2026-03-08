@@ -31,6 +31,7 @@ const PoetProfile = () => {
     if (userId) {
       fetchProfile();
       fetchBooks();
+      fetchVideos();
       if (user) checkFollowStatus();
     }
   }, [userId, user]);
