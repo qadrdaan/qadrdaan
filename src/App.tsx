@@ -30,6 +30,8 @@ const App = () => (
             <Route path="/books" element={<Books />} />
             <Route path="/book/:id" element={<BookDetail />} />
             <Route path="/upload-book" element={<UploadBook />} />
+            <Route path="/poets" element={<Poets />} />
+            <Route path="/poet/:userId" element={<PoetProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
