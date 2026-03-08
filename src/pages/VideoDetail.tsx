@@ -38,7 +38,7 @@ const VideoDetail = () => {
   }, [id]);
 
   useEffect(() => {
-    if (user && id) checkLikeStatus();
+    if (user && id) { checkLikeStatus(); checkBookmark(); }
   }, [user, id]);
 
   const fetchVideo = async () => {
