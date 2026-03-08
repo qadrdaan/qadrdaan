@@ -78,6 +78,7 @@ const UploadBook = () => {
       }
 
       // Insert book record
+      const bookPrice = form.isFree ? 0 : parseFloat(form.price) || 0;
       const { error: insertErr } = await supabase.from("books").insert({
         creator_id: user.id,
         title: form.title,
@@ -87,8 +88,8 @@ const UploadBook = () => {
         cover_url: coverUrl,
         file_url: bookPath,
         file_format: fileExt,
-        is_free: true,
-        price: 0,
+        is_free: form.isFree,
+        price: bookPrice,
       });
       if (insertErr) throw insertErr;
 
