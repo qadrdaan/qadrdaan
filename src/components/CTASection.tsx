@@ -23,12 +23,12 @@ const CTASection = () => (
           the world's most vibrant poetry platform.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <button className="px-10 py-4 font-body font-bold text-lg bg-gradient-gold rounded-xl text-primary shadow-gold hover:opacity-90 transition-all hover:scale-105">
+          <Link to="/auth" className="px-10 py-4 font-body font-bold text-lg bg-gradient-gold rounded-xl text-primary shadow-gold hover:opacity-90 transition-all hover:scale-105">
             Create Your Profile
-          </button>
-          <button className="px-10 py-4 font-body font-semibold text-lg border-2 border-gold/30 text-primary-foreground rounded-xl hover:border-gold/60 transition-all">
+          </Link>
+          <Link to="/books" className="px-10 py-4 font-body font-semibold text-lg border-2 border-gold/30 text-primary-foreground rounded-xl hover:border-gold/60 transition-all">
             Browse Poetry
-          </button>
+          </Link>
         </div>
       </motion.div>
     </div>

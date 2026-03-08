@@ -66,12 +66,12 @@ const HeroSection = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <button className="px-8 py-4 font-body font-semibold text-base bg-gradient-gold rounded-xl text-primary shadow-gold hover:opacity-90 transition-all hover:scale-105">
+        <Link to="/auth" className="px-8 py-4 font-body font-semibold text-base bg-gradient-gold rounded-xl text-primary shadow-gold hover:opacity-90 transition-all hover:scale-105">
           Start Publishing
-        </button>
-        <button className="px-8 py-4 font-body font-semibold text-base border-2 border-gold/30 text-primary-foreground rounded-xl hover:border-gold/60 transition-all hover:bg-gold/10">
+        </Link>
+        <Link to="/books" className="px-8 py-4 font-body font-semibold text-base border-2 border-gold/30 text-primary-foreground rounded-xl hover:border-gold/60 transition-all hover:bg-gold/10">
           Explore Poetry
-        </button>
+        </Link>
       </motion.div>
 
       {/* Stats */}
