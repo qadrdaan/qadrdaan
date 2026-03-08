@@ -290,15 +290,39 @@ const PoetProfile = () => {
             )}
           </div>
 
-          {/* Videos placeholder */}
+          {/* Videos */}
           <div>
-            <h2 className="font-display text-2xl font-bold text-foreground mb-4">
-              Videos
-            </h2>
-            <div className="bg-card rounded-xl border border-border p-8 text-center">
-              <Video className="w-10 h-10 mx-auto mb-3 text-muted-foreground/40" />
-              <p className="font-body text-muted-foreground">Video uploads coming soon.</p>
-            </div>
+            <h2 className="font-display text-2xl font-bold text-foreground mb-4">Videos</h2>
+            {videos.length === 0 ? (
+              <div className="bg-card rounded-xl border border-border p-8 text-center">
+                <Video className="w-10 h-10 mx-auto mb-3 text-muted-foreground/40" />
+                <p className="font-body text-muted-foreground">No videos uploaded yet.</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                {videos.map((vid) => (
+                  <Link
+                    key={vid.id}
+                    to={`/video/${vid.id}`}
+                    className="group block bg-card rounded-xl border border-border hover:border-secondary/30 hover:shadow-gold transition-all overflow-hidden"
+                  >
+                    <div className="aspect-video bg-muted flex items-center justify-center overflow-hidden">
+                      {vid.thumbnail_url ? (
+                        <img src={vid.thumbnail_url} alt={vid.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                      ) : (
+                        <Video className="w-8 h-8 text-muted-foreground/30" />
+                      )}
+                    </div>
+                    <div className="p-3">
+                      <h3 className="font-display text-sm font-semibold text-foreground line-clamp-1">{vid.title}</h3>
+                      <p className="font-body text-xs text-muted-foreground mt-1">
+                        {vid.views_count} views · {vid.likes_count} likes
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
