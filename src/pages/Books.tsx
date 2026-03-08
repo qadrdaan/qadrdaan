@@ -21,14 +21,28 @@ const Books = () => {
     setLoading(true);
     let query = supabase
       .from("books")
-      .select("*, profiles!books_creator_id_fkey(display_name)")
+      .select("*")
       .order("created_at", { ascending: false });
 
     if (filter.language) query = query.eq("language", filter.language);
     if (filter.category) query = query.eq("category", filter.category);
 
     const { data } = await query;
-    setBooks((data as Book[]) || []);
+    
+    // Fetch creator names
+    if (data && data.length > 0) {
+      const creatorIds = [...new Set(data.map((b) => b.creator_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, display_name")
+        .in("user_id", creatorIds);
+      
+      const profileMap = new Map(profiles?.map((p) => [p.user_id, p]) || []);
+      const enriched = data.map((b) => ({ ...b, profiles: profileMap.get(b.creator_id) || null }));
+      setBooks(enriched as Book[]);
+    } else {
+      setBooks([]);
+    }
     setLoading(false);
   };
 

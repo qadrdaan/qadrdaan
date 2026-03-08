@@ -87,7 +87,7 @@ const BookDetail = () => {
     );
   }
 
-  const creator = book.profiles as any;
+  const creator = book.creator_profile;
 
   return (
     <div className="min-h-screen bg-background">
