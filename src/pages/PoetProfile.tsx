@@ -55,6 +55,15 @@ const PoetProfile = () => {
     setBooks(data || []);
   };
 
+  const fetchVideos = async () => {
+    const { data } = await supabase
+      .from("videos")
+      .select("*")
+      .eq("creator_id", userId!)
+      .order("created_at", { ascending: false });
+    setVideos(data || []);
+  };
+
   const checkFollowStatus = async () => {
     const { data } = await supabase
       .from("followers")
