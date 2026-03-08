@@ -68,6 +68,76 @@ export type Database = {
         }
         Relationships: []
       }
+      event_messages: {
+        Row: {
+          content: string
+          created_at: string
+          event_id: string
+          id: string
+          message_type: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          event_id: string
+          id?: string
+          message_type?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          message_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_messages_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mushaira_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_registrations: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          role: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          role?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          role?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_registrations_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "mushaira_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followers: {
         Row: {
           created_at: string
@@ -86,6 +156,60 @@ export type Database = {
           follower_id?: string
           following_id?: string
           id?: string
+        }
+        Relationships: []
+      }
+      mushaira_events: {
+        Row: {
+          audience_count: number
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          event_type: Database["public"]["Enums"]["mushaira_type"]
+          id: string
+          language: string | null
+          max_performers: number | null
+          organizer_id: string
+          scheduled_at: string
+          status: Database["public"]["Enums"]["mushaira_status"]
+          theme: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          audience_count?: number
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          event_type?: Database["public"]["Enums"]["mushaira_type"]
+          id?: string
+          language?: string | null
+          max_performers?: number | null
+          organizer_id: string
+          scheduled_at: string
+          status?: Database["public"]["Enums"]["mushaira_status"]
+          theme?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          audience_count?: number
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          event_type?: Database["public"]["Enums"]["mushaira_type"]
+          id?: string
+          language?: string | null
+          max_performers?: number | null
+          organizer_id?: string
+          scheduled_at?: string
+          status?: Database["public"]["Enums"]["mushaira_status"]
+          theme?: string | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -151,7 +275,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      mushaira_status: "upcoming" | "live" | "ended" | "cancelled"
+      mushaira_type: "open" | "curated" | "themed" | "international"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -278,6 +403,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      mushaira_status: ["upcoming", "live", "ended", "cancelled"],
+      mushaira_type: ["open", "curated", "themed", "international"],
+    },
   },
 } as const
