@@ -42,6 +42,7 @@ import ChallengeDetail from "./pages/ChallengeDetail";
 import Discover from "./pages/Discover";
 import CreatorAnalytics from "./pages/CreatorAnalytics";
 import Referrals from "./pages/Referrals";
+import GiftShop from "./pages/GiftShop";
 
 const queryClient = new QueryClient();
 
