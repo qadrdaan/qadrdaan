@@ -5,7 +5,9 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import { BadgeCheck, BookOpen, Users, Video, Gift, Camera, ImagePlus } from "lucide-react";
+import { BadgeCheck, BookOpen, Users, Video, Gift, Camera, ImagePlus, ArrowUpRight, ArrowDownLeft } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Profile = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
