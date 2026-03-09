@@ -43,6 +43,8 @@ import Discover from "./pages/Discover";
 import CreatorAnalytics from "./pages/CreatorAnalytics";
 import Referrals from "./pages/Referrals";
 import GiftShop from "./pages/GiftShop";
+import AdminDashboard from "./pages/AdminDashboard";
+import GiftLeaderboard from "./pages/GiftLeaderboard";
 
 const queryClient = new QueryClient();
 
