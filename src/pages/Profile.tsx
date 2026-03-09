@@ -62,6 +62,65 @@ const Profile = () => {
     }
   }, [profile]);
 
+  useEffect(() => {
+    const fetchGiftHistory = async () => {
+      if (!user) return;
+      setLoadingGifts(true);
+
+      // Fetch gifts received
+      const { data: receivedData } = await supabase
+        .from("gifts")
+        .select("*")
+        .eq("recipient_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      // Fetch sender profiles
+      if (receivedData && receivedData.length > 0) {
+        const senderIds = [...new Set(receivedData.map(g => g.sender_id))];
+        const { data: senderProfiles } = await supabase
+          .from("profiles")
+          .select("user_id, display_name, avatar_url")
+          .in("user_id", senderIds);
+
+        const profilesMap = new Map(senderProfiles?.map(p => [p.user_id, p]) || []);
+        const receivedWithProfiles = receivedData.map(gift => ({
+          ...gift,
+          sender_profile: profilesMap.get(gift.sender_id),
+        }));
+        setGiftsReceived(receivedWithProfiles);
+      }
+
+      // Fetch gifts sent
+      const { data: sentData } = await supabase
+        .from("gifts")
+        .select("*")
+        .eq("sender_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+
+      // Fetch recipient profiles
+      if (sentData && sentData.length > 0) {
+        const recipientIds = [...new Set(sentData.map(g => g.recipient_id))];
+        const { data: recipientProfiles } = await supabase
+          .from("profiles")
+          .select("user_id, display_name, avatar_url")
+          .in("user_id", recipientIds);
+
+        const profilesMap = new Map(recipientProfiles?.map(p => [p.user_id, p]) || []);
+        const sentWithProfiles = sentData.map(gift => ({
+          ...gift,
+          recipient_profile: profilesMap.get(gift.recipient_id),
+        }));
+        setGiftsSent(sentWithProfiles);
+      }
+
+      setLoadingGifts(false);
+    };
+
+    if (user) fetchGiftHistory();
+  }, [user]);
+
   const handleSave = async () => {
     if (!user) return;
     setSaving(true);
