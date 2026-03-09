@@ -42,6 +42,7 @@ import ChallengeDetail from "./pages/ChallengeDetail";
 import Discover from "./pages/Discover";
 import CreatorAnalytics from "./pages/CreatorAnalytics";
 import Referrals from "./pages/Referrals";
+import GiftShop from "./pages/GiftShop";
 
 const queryClient = new QueryClient();
 
@@ -81,6 +82,7 @@ const App = () => (
             <Route path="/discover" element={<Discover />} />
             <Route path="/analytics" element={<CreatorAnalytics />} />
             <Route path="/referrals" element={<Referrals />} />
+            <Route path="/gift-shop" element={<GiftShop />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />

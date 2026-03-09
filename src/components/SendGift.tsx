@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Gift, X } from "lucide-react";
 
 const GIFT_TYPES = [
-  { type: "rose", emoji: "🌹", label: "Rose", description: "A token of appreciation" },
-  { type: "star", emoji: "⭐", label: "Star", description: "You shine bright!" },
-  { type: "crown", emoji: "👑", label: "Crown", description: "The king/queen of poetry" },
-  { type: "diamond", emoji: "💎", label: "Diamond", description: "Truly priceless talent" },
+  { type: "rose", emoji: "🌹", label: "Rose", description: "A token of appreciation", cost: 1 },
+  { type: "star", emoji: "⭐", label: "Star", description: "You shine bright!", cost: 5 },
+  { type: "crown", emoji: "👑", label: "Crown", description: "The king/queen of poetry", cost: 10 },
+  { type: "diamond", emoji: "💎", label: "Diamond", description: "Truly priceless talent", cost: 25 },
 ];
 
 interface SendGiftProps {
@@ -25,29 +25,73 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const [balance, setBalance] = useState<number>(0);
+
+  const fetchBalance = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("user_balances")
+      .select("coins")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    setBalance(data?.coins ?? 0);
+  };
+
+  useState(() => {
+    fetchBalance();
+  });
 
   const handleSend = async () => {
     if (!user) { toast.error("Please sign in to send gifts"); return; }
     if (!selected) { toast.error("Please select a gift"); return; }
     if (user.id === recipientId) { toast.error("You can't send a gift to yourself"); return; }
 
+    const gift = GIFT_TYPES.find((g) => g.type === selected);
+    if (!gift) { toast.error("Invalid gift type"); return; }
+
+    // Check balance
+    if (balance < gift.cost) {
+      toast.error(`Insufficient coins! You need ${gift.cost} coins but have ${balance}.`);
+      return;
+    }
+
     setSending(true);
+
+    // Deduct coins from sender
+    const { error: balanceError } = await supabase
+      .from("user_balances")
+      .update({ coins: balance - gift.cost })
+      .eq("user_id", user.id);
+
+    if (balanceError) {
+      toast.error("Failed to deduct coins");
+      setSending(false);
+      return;
+    }
+
+    // Insert gift
     const { error } = await supabase.from("gifts").insert({
       sender_id: user.id,
       recipient_id: recipientId,
       event_id: eventId || null,
       gift_type: selected,
       message: message.trim() || null,
+      coin_cost: gift.cost,
     });
 
     if (error) {
       toast.error(error.message);
+      // Refund coins on error
+      await supabase
+        .from("user_balances")
+        .update({ coins: balance })
+        .eq("user_id", user.id);
     } else {
-      const gift = GIFT_TYPES.find((g) => g.type === selected);
-      toast.success(`${gift?.emoji} ${gift?.label} sent to ${recipientName}!`);
+      toast.success(`${gift.emoji} ${gift.label} sent to ${recipientName}!`);
       setOpen(false);
       setSelected(null);
       setMessage("");
+      fetchBalance();
       onGiftSent?.();
     }
     setSending(false);
@@ -91,21 +135,31 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
                 </button>
               </div>
 
+              <div className="mb-5 px-4 py-2 bg-background border border-border rounded-lg">
+                <p className="font-body text-sm text-muted-foreground">
+                  Your balance: <span className="font-semibold text-foreground">{balance} coins</span>
+                </p>
+              </div>
+
               {/* Gift types */}
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {GIFT_TYPES.map((gift) => (
                   <button
                     key={gift.type}
                     onClick={() => setSelected(gift.type)}
+                    disabled={balance < gift.cost}
                     className={`p-4 rounded-xl border-2 text-center transition-all ${
                       selected === gift.type
                         ? "border-secondary bg-secondary/10 shadow-gold"
+                        : balance < gift.cost
+                        ? "border-border opacity-50 cursor-not-allowed"
                         : "border-border hover:border-secondary/30"
                     }`}
                   >
                     <span className="text-3xl block mb-1">{gift.emoji}</span>
                     <p className="font-body text-sm font-semibold text-foreground">{gift.label}</p>
                     <p className="font-body text-xs text-muted-foreground">{gift.description}</p>
+                    <p className="font-body text-xs text-secondary font-semibold mt-1">{gift.cost} coins</p>
                   </button>
                 ))}
               </div>
