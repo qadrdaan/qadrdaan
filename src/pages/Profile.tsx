@@ -9,6 +9,25 @@ import { BadgeCheck, BookOpen, Users, Video, Gift, Camera, ImagePlus, ArrowUpRig
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+interface GiftTransaction {
+  id: string;
+  gift_type: string;
+  amount: number;
+  coin_cost: number;
+  message: string | null;
+  created_at: string;
+  sender_id: string;
+  recipient_id: string;
+  sender_profile?: {
+    display_name: string | null;
+    avatar_url: string | null;
+  };
+  recipient_profile?: {
+    display_name: string | null;
+    avatar_url: string | null;
+  };
+}
+
 const Profile = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
@@ -22,6 +41,9 @@ const Profile = () => {
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [giftsReceived, setGiftsReceived] = useState<GiftTransaction[]>([]);
+  const [giftsSent, setGiftsSent] = useState<GiftTransaction[]>([]);
+  const [loadingGifts, setLoadingGifts] = useState(false);
   const avatarRef = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
 
