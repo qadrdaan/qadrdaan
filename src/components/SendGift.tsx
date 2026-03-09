@@ -46,23 +46,52 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
     if (!selected) { toast.error("Please select a gift"); return; }
     if (user.id === recipientId) { toast.error("You can't send a gift to yourself"); return; }
 
+    const gift = GIFT_TYPES.find((g) => g.type === selected);
+    if (!gift) { toast.error("Invalid gift type"); return; }
+
+    // Check balance
+    if (balance < gift.cost) {
+      toast.error(`Insufficient coins! You need ${gift.cost} coins but have ${balance}.`);
+      return;
+    }
+
     setSending(true);
+
+    // Deduct coins from sender
+    const { error: balanceError } = await supabase
+      .from("user_balances")
+      .update({ coins: balance - gift.cost })
+      .eq("user_id", user.id);
+
+    if (balanceError) {
+      toast.error("Failed to deduct coins");
+      setSending(false);
+      return;
+    }
+
+    // Insert gift
     const { error } = await supabase.from("gifts").insert({
       sender_id: user.id,
       recipient_id: recipientId,
       event_id: eventId || null,
       gift_type: selected,
       message: message.trim() || null,
+      coin_cost: gift.cost,
     });
 
     if (error) {
       toast.error(error.message);
+      // Refund coins on error
+      await supabase
+        .from("user_balances")
+        .update({ coins: balance })
+        .eq("user_id", user.id);
     } else {
-      const gift = GIFT_TYPES.find((g) => g.type === selected);
-      toast.success(`${gift?.emoji} ${gift?.label} sent to ${recipientName}!`);
+      toast.success(`${gift.emoji} ${gift.label} sent to ${recipientName}!`);
       setOpen(false);
       setSelected(null);
       setMessage("");
+      fetchBalance();
       onGiftSent?.();
     }
     setSending(false);
