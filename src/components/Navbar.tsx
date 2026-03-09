@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/competitions", label: "Competitions" },
   { href: "/discover", label: "Discover" },
   { href: "/bookmarks", label: "Bookmarks" },
+  { href: "/gift-shop", label: "Gift Shop" },
 ];
 
 const Navbar = () => {
