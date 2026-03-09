@@ -135,6 +135,12 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
                 </button>
               </div>
 
+              <div className="mb-5 px-4 py-2 bg-background border border-border rounded-lg">
+                <p className="font-body text-sm text-muted-foreground">
+                  Your balance: <span className="font-semibold text-foreground">{balance} coins</span>
+                </p>
+              </div>
+
               {/* Gift types */}
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {GIFT_TYPES.map((gift) => (
