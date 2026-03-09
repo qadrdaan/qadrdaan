@@ -147,15 +147,19 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
                   <button
                     key={gift.type}
                     onClick={() => setSelected(gift.type)}
+                    disabled={balance < gift.cost}
                     className={`p-4 rounded-xl border-2 text-center transition-all ${
                       selected === gift.type
                         ? "border-secondary bg-secondary/10 shadow-gold"
+                        : balance < gift.cost
+                        ? "border-border opacity-50 cursor-not-allowed"
                         : "border-border hover:border-secondary/30"
                     }`}
                   >
                     <span className="text-3xl block mb-1">{gift.emoji}</span>
                     <p className="font-body text-sm font-semibold text-foreground">{gift.label}</p>
                     <p className="font-body text-xs text-muted-foreground">{gift.description}</p>
+                    <p className="font-body text-xs text-secondary font-semibold mt-1">{gift.cost} coins</p>
                   </button>
                 ))}
               </div>
