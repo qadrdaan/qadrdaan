@@ -25,6 +25,21 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
+  const [balance, setBalance] = useState<number>(0);
+
+  const fetchBalance = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("user_balances")
+      .select("coins")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    setBalance(data?.coins ?? 0);
+  };
+
+  useState(() => {
+    fetchBalance();
+  });
 
   const handleSend = async () => {
     if (!user) { toast.error("Please sign in to send gifts"); return; }
