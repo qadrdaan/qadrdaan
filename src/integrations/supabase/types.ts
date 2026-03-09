@@ -127,6 +127,39 @@ export type Database = {
           },
         ]
       }
+      coin_purchases: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_id: string | null
+          payment_method: string
+          price: number
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          payment_method?: string
+          price: number
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_id?: string | null
+          payment_method?: string
+          price?: number
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       competition_awards: {
         Row: {
           award_type: string
@@ -402,6 +435,7 @@ export type Database = {
       gifts: {
         Row: {
           amount: number
+          coin_cost: number
           created_at: string
           event_id: string | null
           gift_type: string
@@ -412,6 +446,7 @@ export type Database = {
         }
         Insert: {
           amount?: number
+          coin_cost?: number
           created_at?: string
           event_id?: string | null
           gift_type: string
@@ -422,6 +457,7 @@ export type Database = {
         }
         Update: {
           amount?: number
+          coin_cost?: number
           created_at?: string
           event_id?: string | null
           gift_type?: string
@@ -723,6 +759,30 @@ export type Database = {
           invited_user_id?: string | null
           inviter_id?: string
           status?: string
+        }
+        Relationships: []
+      }
+      user_balances: {
+        Row: {
+          coins: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          coins?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          coins?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
