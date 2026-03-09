@@ -6,10 +6,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Gift, X } from "lucide-react";
 
 const GIFT_TYPES = [
-  { type: "rose", emoji: "🌹", label: "Rose", description: "A token of appreciation" },
-  { type: "star", emoji: "⭐", label: "Star", description: "You shine bright!" },
-  { type: "crown", emoji: "👑", label: "Crown", description: "The king/queen of poetry" },
-  { type: "diamond", emoji: "💎", label: "Diamond", description: "Truly priceless talent" },
+  { type: "rose", emoji: "🌹", label: "Rose", description: "A token of appreciation", cost: 1 },
+  { type: "star", emoji: "⭐", label: "Star", description: "You shine bright!", cost: 5 },
+  { type: "crown", emoji: "👑", label: "Crown", description: "The king/queen of poetry", cost: 10 },
+  { type: "diamond", emoji: "💎", label: "Diamond", description: "Truly priceless talent", cost: 25 },
 ];
 
 interface SendGiftProps {
