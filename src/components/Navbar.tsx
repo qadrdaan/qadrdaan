@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/mushairas", label: "Mushaira" },
   { href: "/competitions", label: "Competitions" },
   { href: "/discover", label: "Discover" },
+  { href: "/bookmarks", label: "Bookmarks" },
 ];
 
 const Navbar = () => {
