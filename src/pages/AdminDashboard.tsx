@@ -64,20 +64,30 @@ const AdminDashboard = () => {
       setLoadingData(true);
       const { data, error } = await supabase
         .from("coin_purchases")
-        .select(`
-          *,
-          profiles:user_id (
-            display_name,
-            avatar_url
-          )
-        `)
+        .select("*")
         .order("created_at", { ascending: false });
 
       if (error) {
         toast.error("Failed to load purchases");
-      } else {
-        setPurchases(data || []);
+        setLoadingData(false);
+        return;
       }
+
+      // Fetch profiles separately
+      const userIds = [...new Set(data?.map(p => p.user_id) || [])];
+      const { data: profilesData } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, avatar_url")
+        .in("user_id", userIds);
+
+      const profilesMap = new Map(profilesData?.map(p => [p.user_id, p]) || []);
+      
+      const purchasesWithProfiles = (data || []).map(purchase => ({
+        ...purchase,
+        profiles: profilesMap.get(purchase.user_id) || null,
+      }));
+
+      setPurchases(purchasesWithProfiles);
       setLoadingData(false);
     };
 

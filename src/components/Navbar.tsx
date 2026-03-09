@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/discover", label: "Discover" },
   { href: "/bookmarks", label: "Bookmarks" },
   { href: "/gift-shop", label: "Gift Shop" },
+  { href: "/gift-leaderboard", label: "Leaderboard" },
 ];
 
 const Navbar = () => {
