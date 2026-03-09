@@ -309,6 +309,128 @@ const Profile = () => {
               Edit Profile
             </button>
           )}
+
+          {/* Gift History */}
+          <Card className="mt-8">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Gift className="w-5 h-5 text-secondary" />
+                Gift History
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Tabs defaultValue="received" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="received" className="flex items-center gap-2">
+                    <ArrowDownLeft className="w-4 h-4" />
+                    Received ({giftsReceived.length})
+                  </TabsTrigger>
+                  <TabsTrigger value="sent" className="flex items-center gap-2">
+                    <ArrowUpRight className="w-4 h-4" />
+                    Sent ({giftsSent.length})
+                  </TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="received">
+                  {loadingGifts ? (
+                    <p className="text-center font-body text-muted-foreground py-8">Loading...</p>
+                  ) : giftsReceived.length === 0 ? (
+                    <p className="text-center font-body text-muted-foreground py-8">No gifts received yet</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {giftsReceived.map((gift) => (
+                        <div
+                          key={gift.id}
+                          className="flex items-center gap-4 p-4 rounded-xl bg-background border border-border"
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            {gift.sender_profile?.avatar_url ? (
+                              <img
+                                src={gift.sender_profile.avatar_url}
+                                alt={gift.sender_profile.display_name || "User"}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-primary font-bold text-sm">
+                                {(gift.sender_profile?.display_name || "?")[0].toUpperCase()}
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <p className="font-body font-semibold text-foreground">
+                                {gift.sender_profile?.display_name || "Anonymous"} sent you a gift
+                              </p>
+                              <p className="font-body text-sm text-muted-foreground">
+                                {new Date(gift.created_at).toLocaleDateString()} • {gift.gift_type}
+                              </p>
+                              {gift.message && (
+                                <p className="font-body text-sm text-foreground/70 mt-1 italic">
+                                  "{gift.message}"
+                                </p>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className="font-display text-lg font-bold text-secondary">
+                                ×{gift.amount}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="sent">
+                  {loadingGifts ? (
+                    <p className="text-center font-body text-muted-foreground py-8">Loading...</p>
+                  ) : giftsSent.length === 0 ? (
+                    <p className="text-center font-body text-muted-foreground py-8">No gifts sent yet</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {giftsSent.map((gift) => (
+                        <div
+                          key={gift.id}
+                          className="flex items-center gap-4 p-4 rounded-xl bg-background border border-border"
+                        >
+                          <div className="flex items-center gap-3 flex-1">
+                            {gift.recipient_profile?.avatar_url ? (
+                              <img
+                                src={gift.recipient_profile.avatar_url}
+                                alt={gift.recipient_profile.display_name || "User"}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-primary font-bold text-sm">
+                                {(gift.recipient_profile?.display_name || "?")[0].toUpperCase()}
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <p className="font-body font-semibold text-foreground">
+                                You sent a gift to {gift.recipient_profile?.display_name || "Anonymous"}
+                              </p>
+                              <p className="font-body text-sm text-muted-foreground">
+                                {new Date(gift.created_at).toLocaleDateString()} • {gift.gift_type}
+                              </p>
+                              {gift.message && (
+                                <p className="font-body text-sm text-foreground/70 mt-1 italic">
+                                  "{gift.message}"
+                                </p>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className="font-display text-lg font-bold text-secondary">
+                                {gift.coin_cost} coins
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
     </div>
