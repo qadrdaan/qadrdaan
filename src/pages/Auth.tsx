@@ -34,11 +34,47 @@ const Auth = () => {
         navigate("/");
       }
     } else {
+      // Validate CNIC format (13 digits)
+      const cnicClean = cnic.replace(/[^0-9]/g, "");
+      if (cnicClean.length !== 13) {
+        toast.error("CNIC must be exactly 13 digits");
+        setLoading(false);
+        return;
+      }
+
+      // Validate date of birth
+      if (!dateOfBirth) {
+        toast.error("Date of birth is required");
+        setLoading(false);
+        return;
+      }
+
+      const dob = new Date(dateOfBirth);
+      const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      if (age < 13) {
+        toast.error("You must be at least 13 years old to create an account");
+        setLoading(false);
+        return;
+      }
+
+      // Check if CNIC already exists
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("cnic", cnicClean)
+        .maybeSingle();
+
+      if (existingProfile) {
+        toast.error("An account with this CNIC already exists. Only one account per CNIC is allowed.");
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { display_name: displayName },
+          data: { display_name: displayName, cnic: cnicClean, date_of_birth: dateOfBirth },
           emailRedirectTo: window.location.origin,
         },
       });
