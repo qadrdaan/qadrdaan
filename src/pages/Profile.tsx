@@ -311,6 +311,11 @@ const Profile = () => {
             </button>
           )}
 
+          {/* Promotion Obligation */}
+          <div className="mt-8">
+            <PromotionObligation />
+          </div>
+
           {/* Gift History */}
           <Card className="mt-8">
             <CardHeader>
