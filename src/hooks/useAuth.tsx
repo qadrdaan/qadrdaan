@@ -10,12 +10,16 @@ interface Profile {
   bio: string | null;
   language: string | null;
   country: string | null;
+  cnic: string | null;
+  date_of_birth: string | null;
   is_creator: boolean;
   is_verified: boolean;
   followers_count: number;
   books_count: number;
   videos_count: number;
   total_gifts_received: number;
+  promotion_obligation_met: boolean;
+  promotion_coins_spent: number;
 }
 
 interface AuthContextType {

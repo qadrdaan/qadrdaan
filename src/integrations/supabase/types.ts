@@ -677,9 +677,11 @@ export type Database = {
           avatar_url: string | null
           bio: string | null
           books_count: number
+          cnic: string | null
           country: string | null
           cover_image_url: string | null
           created_at: string
+          date_of_birth: string | null
           display_name: string | null
           followers_count: number
           following_count: number
@@ -687,6 +689,8 @@ export type Database = {
           is_creator: boolean
           is_verified: boolean
           language: string | null
+          promotion_coins_spent: number
+          promotion_obligation_met: boolean
           total_gifts_received: number
           updated_at: string
           user_id: string
@@ -696,9 +700,11 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           books_count?: number
+          cnic?: string | null
           country?: string | null
           cover_image_url?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
           followers_count?: number
           following_count?: number
@@ -706,6 +712,8 @@ export type Database = {
           is_creator?: boolean
           is_verified?: boolean
           language?: string | null
+          promotion_coins_spent?: number
+          promotion_obligation_met?: boolean
           total_gifts_received?: number
           updated_at?: string
           user_id: string
@@ -715,9 +723,11 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           books_count?: number
+          cnic?: string | null
           country?: string | null
           cover_image_url?: string | null
           created_at?: string
+          date_of_birth?: string | null
           display_name?: string | null
           followers_count?: number
           following_count?: number
@@ -725,6 +735,8 @@ export type Database = {
           is_creator?: boolean
           is_verified?: boolean
           language?: string | null
+          promotion_coins_spent?: number
+          promotion_obligation_met?: boolean
           total_gifts_received?: number
           updated_at?: string
           user_id?: string

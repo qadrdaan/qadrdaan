@@ -11,6 +11,8 @@ const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [cnic, setCnic] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { session } = useAuth();
@@ -32,11 +34,47 @@ const Auth = () => {
         navigate("/");
       }
     } else {
+      // Validate CNIC format (13 digits)
+      const cnicClean = cnic.replace(/[^0-9]/g, "");
+      if (cnicClean.length !== 13) {
+        toast.error("CNIC must be exactly 13 digits");
+        setLoading(false);
+        return;
+      }
+
+      // Validate date of birth
+      if (!dateOfBirth) {
+        toast.error("Date of birth is required");
+        setLoading(false);
+        return;
+      }
+
+      const dob = new Date(dateOfBirth);
+      const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+      if (age < 13) {
+        toast.error("You must be at least 13 years old to create an account");
+        setLoading(false);
+        return;
+      }
+
+      // Check if CNIC already exists
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("cnic", cnicClean)
+        .maybeSingle();
+
+      if (existingProfile) {
+        toast.error("An account with this CNIC already exists. Only one account per CNIC is allowed.");
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { display_name: displayName },
+          data: { display_name: displayName, cnic: cnicClean, date_of_birth: dateOfBirth },
           emailRedirectTo: window.location.origin,
         },
       });
@@ -67,19 +105,49 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <div>
-              <label className="block font-body text-sm font-medium text-foreground mb-1.5">
-                Display Name
-              </label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder="Your pen name"
-                required
-              />
-            </div>
+            <>
+              <div>
+                <label className="block font-body text-sm font-medium text-foreground mb-1.5">
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Your pen name"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-body text-sm font-medium text-foreground mb-1.5">
+                  CNIC Number
+                </label>
+                <input
+                  type="text"
+                  value={cnic}
+                  onChange={(e) => setCnic(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="3520112345678"
+                  required
+                  maxLength={15}
+                />
+                <p className="font-body text-xs text-muted-foreground mt-1">13-digit CNIC number. One account per CNIC.</p>
+              </div>
+              <div>
+                <label className="block font-body text-sm font-medium text-foreground mb-1.5">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                  required
+                  max={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+            </>
           )}
 
           <div>
