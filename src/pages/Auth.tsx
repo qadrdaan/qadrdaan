@@ -105,19 +105,49 @@ const Auth = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
-            <div>
-              <label className="block font-body text-sm font-medium text-foreground mb-1.5">
-                Display Name
-              </label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
-                placeholder="Your pen name"
-                required
-              />
-            </div>
+            <>
+              <div>
+                <label className="block font-body text-sm font-medium text-foreground mb-1.5">
+                  Display Name
+                </label>
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="Your pen name"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-body text-sm font-medium text-foreground mb-1.5">
+                  CNIC Number
+                </label>
+                <input
+                  type="text"
+                  value={cnic}
+                  onChange={(e) => setCnic(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                  placeholder="3520112345678"
+                  required
+                  maxLength={15}
+                />
+                <p className="font-body text-xs text-muted-foreground mt-1">13-digit CNIC number. One account per CNIC.</p>
+              </div>
+              <div>
+                <label className="block font-body text-sm font-medium text-foreground mb-1.5">
+                  Date of Birth
+                </label>
+                <input
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                  required
+                  max={new Date().toISOString().split("T")[0]}
+                />
+              </div>
+            </>
           )}
 
           <div>
