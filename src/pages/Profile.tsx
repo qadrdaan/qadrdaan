@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import { BadgeCheck, BookOpen, Users, Video, Gift, Camera, ImagePlus, ArrowUpRight, ArrowDownLeft } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import PromotionObligation from "@/components/PromotionObligation";
 
 interface GiftTransaction {
   id: string;
