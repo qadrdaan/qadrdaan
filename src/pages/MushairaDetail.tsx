@@ -318,7 +318,7 @@ const MushairaDetail = () => {
           {/* Live chat sidebar */}
           <div className="bg-card rounded-2xl border border-border flex flex-col h-[600px]">
             <div className="px-4 py-3 border-b border-border">
-              <h3 className="font-display text-lg font-semibold text-foreground">Live Chat</h3>
+              <h3 className="font-display text-lg font-semibold text-foreground flex items-center gap-2">Live Chat <Shield className="w-3.5 h-3.5 text-secondary" /></h3>
             </div>
 
             {/* Messages */}
