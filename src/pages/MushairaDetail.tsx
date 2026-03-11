@@ -386,8 +386,11 @@ const MushairaDetail = () => {
                 />
                 <button
                   type="submit"
-                  disabled={!user || !chatInput.trim()}
+                  disabled={!user || !chatInput.trim() || moderating}
                   className="p-2 rounded-lg bg-gradient-gold text-primary disabled:opacity-50 hover:opacity-90 transition-opacity"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
                 >
                   <Send className="w-4 h-4" />
                 </button>
