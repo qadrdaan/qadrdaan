@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SendGift from "@/components/SendGift";
-import { Heart, MessageCircle, BookmarkPlus, Bookmark, PenLine, Gift } from "lucide-react";
+import { Heart, MessageCircle, BookmarkPlus, Bookmark, PenLine, Share2, TrendingUp, Sparkles, Globe } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Post {
   id: string;
@@ -18,41 +19,85 @@ interface Post {
   language: string | null;
   likes_count: number;
   comments_count: number;
+  shares_count: number;
+  impressions_count: number;
+  engagement_score: number;
+  is_editor_pick: boolean;
   created_at: string;
   creator_name?: string;
   is_liked?: boolean;
   is_bookmarked?: boolean;
 }
 
-const CATEGORIES = ["ghazal", "nazm", "rubaai", "qita", "marsiya", "hamd", "naat", "quote"];
+const CATEGORIES = ["ghazal", "nazm", "naat", "rubaai", "qita", "marsiya", "hamd", "research", "essay", "story", "quote"];
+const LANGUAGES = ["Urdu", "Punjabi", "Hindi", "Saraiki", "Persian", "English"];
 
 const PoetryFeed = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("");
+  const [langFilter, setLangFilter] = useState("");
+  const [feedType, setFeedType] = useState("discover");
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setLoading(true);
-    let query = supabase
-      .from("poetry_posts")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(50);
+
+    let query = supabase.from("poetry_posts").select("*");
 
     if (filter) query = query.eq("category", filter);
+    if (langFilter) query = query.eq("language", langFilter);
+
+    // Different ordering based on feed type
+    if (feedType === "trending") {
+      query = query.order("engagement_score" as any, { ascending: false }).limit(50);
+    } else if (feedType === "editorpicks") {
+      query = query.eq("is_editor_pick" as any, true).order("created_at", { ascending: false }).limit(50);
+    } else {
+      // Discovery feed: mix of new posts (equal start reach) and engagement-ranked
+      // Get recent posts with <300 impressions for equal exposure + top engagement posts
+      query = query.order("created_at", { ascending: false }).limit(100);
+    }
 
     const { data } = await query;
     if (!data) { setLoading(false); return; }
 
-    const creatorIds = [...new Set(data.map((p: any) => p.creator_id))];
+    // For discovery feed, apply fair rotation algorithm
+    let processedData = data as any[];
+    if (feedType === "discover") {
+      const newPosts = processedData.filter((p: any) => (p.impressions_count || 0) < 300);
+      const establishedPosts = processedData.filter((p: any) => (p.impressions_count || 0) >= 300);
+      
+      // Sort established by engagement score
+      establishedPosts.sort((a: any, b: any) => (b.engagement_score || 0) - (a.engagement_score || 0));
+      
+      // Interleave: every 3rd post is a new/low-impression post for equal start reach
+      const merged: any[] = [];
+      let newIdx = 0, estIdx = 0;
+      for (let i = 0; i < processedData.length; i++) {
+        if (i % 3 === 0 && newIdx < newPosts.length) {
+          merged.push(newPosts[newIdx++]);
+        } else if (estIdx < establishedPosts.length) {
+          merged.push(establishedPosts[estIdx++]);
+        } else if (newIdx < newPosts.length) {
+          merged.push(newPosts[newIdx++]);
+        }
+      }
+      // Add remaining
+      while (newIdx < newPosts.length) merged.push(newPosts[newIdx++]);
+      while (estIdx < establishedPosts.length) merged.push(establishedPosts[estIdx++]);
+      processedData = merged;
+    }
+
+    // Fetch creator names
+    const creatorIds = [...new Set(processedData.map((p: any) => p.creator_id))];
     const { data: profiles } = await supabase.from("profiles").select("user_id, display_name").in("user_id", creatorIds);
     const nameMap = new Map(profiles?.map((p: any) => [p.user_id, p.display_name]) || []);
 
     let likedIds = new Set<string>();
     let bookmarkedIds = new Set<string>();
     if (user) {
-      const postIds = data.map((p: any) => p.id);
+      const postIds = processedData.map((p: any) => p.id);
       const [likes, bookmarks] = await Promise.all([
         supabase.from("post_likes").select("post_id").eq("user_id", user.id).in("post_id", postIds),
         supabase.from("bookmarks").select("content_id").eq("user_id", user.id).eq("content_type", "post").in("content_id", postIds),
@@ -61,16 +106,37 @@ const PoetryFeed = () => {
       bookmarkedIds = new Set(bookmarks.data?.map((b: any) => b.content_id) || []);
     }
 
-    setPosts(data.map((p: any) => ({
+    setPosts(processedData.map((p: any) => ({
       ...p,
+      shares_count: p.shares_count || 0,
+      impressions_count: p.impressions_count || 0,
+      engagement_score: p.engagement_score || 0,
+      is_editor_pick: p.is_editor_pick || false,
       creator_name: nameMap.get(p.creator_id) || "Unknown",
       is_liked: likedIds.has(p.id),
       is_bookmarked: bookmarkedIds.has(p.id),
     })));
     setLoading(false);
-  };
+  }, [filter, langFilter, feedType, user]);
 
-  useEffect(() => { fetchPosts(); }, [filter, user]);
+  useEffect(() => { fetchPosts(); }, [fetchPosts]);
+
+  // Record impression when posts are viewed
+  useEffect(() => {
+    if (!user || posts.length === 0) return;
+    // Record impressions for visible posts (batch)
+    const recordImpressions = async () => {
+      for (const post of posts.slice(0, 10)) {
+        await supabase
+          .from("post_impressions" as any)
+          .upsert(
+            { post_id: post.id, user_id: user.id, reading_time_seconds: 0 } as any,
+            { onConflict: "post_id,user_id" }
+          );
+      }
+    };
+    recordImpressions();
+  }, [posts, user]);
 
   const handleLike = async (post: Post) => {
     if (!user) { toast.error("Sign in to like"); return; }
@@ -94,14 +160,23 @@ const PoetryFeed = () => {
     fetchPosts();
   };
 
+  const handleShare = async (post: Post) => {
+    if (!user) { toast.error("Sign in to share"); return; }
+    await supabase.from("post_shares" as any).insert({ post_id: post.id, user_id: user.id } as any);
+    // Copy link
+    await navigator.clipboard.writeText(`${window.location.origin}/post/${post.id}`);
+    toast.success("Link copied & shared!");
+    fetchPosts();
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <section className="pt-28 pb-20 container mx-auto px-6 max-w-3xl">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="font-display text-3xl md:text-4xl font-bold text-foreground">Poetry Feed</h1>
-            <p className="font-body text-muted-foreground mt-1">Discover ghazals, nazms, and literary gems</p>
+            <p className="font-body text-muted-foreground mt-1">Fair discovery for every voice</p>
           </div>
           {user && (
             <Link to="/create-post" className="flex items-center gap-2 px-5 py-2.5 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity">
@@ -110,10 +185,30 @@ const PoetryFeed = () => {
           )}
         </div>
 
+        {/* Feed Type Tabs */}
+        <Tabs value={feedType} onValueChange={setFeedType} className="mb-6">
+          <TabsList className="bg-muted">
+            <TabsTrigger value="discover" className="gap-1.5"><Globe className="w-3.5 h-3.5" /> Discover</TabsTrigger>
+            <TabsTrigger value="trending" className="gap-1.5"><TrendingUp className="w-3.5 h-3.5" /> Trending</TabsTrigger>
+            <TabsTrigger value="editorpicks" className="gap-1.5"><Sparkles className="w-3.5 h-3.5" /> Editor Picks</TabsTrigger>
+          </TabsList>
+        </Tabs>
+
+        {/* Language Filter */}
+        <div className="flex gap-2 flex-wrap mb-3">
+          <span className="text-xs font-body text-muted-foreground self-center mr-1">Language:</span>
+          <button onClick={() => setLangFilter("")} className={`px-3 py-1 rounded-full text-xs font-body font-medium transition-colors ${!langFilter ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>All</button>
+          {LANGUAGES.map(l => (
+            <button key={l} onClick={() => setLangFilter(l)} className={`px-3 py-1 rounded-full text-xs font-body font-medium transition-colors ${langFilter === l ? "bg-accent text-accent-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>{l}</button>
+          ))}
+        </div>
+
+        {/* Genre Filter */}
         <div className="flex gap-2 flex-wrap mb-8">
-          <button onClick={() => setFilter("")} className={`px-3 py-1.5 rounded-full text-xs font-body font-medium transition-colors ${!filter ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>All</button>
+          <span className="text-xs font-body text-muted-foreground self-center mr-1">Genre:</span>
+          <button onClick={() => setFilter("")} className={`px-3 py-1 rounded-full text-xs font-body font-medium transition-colors ${!filter ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>All</button>
           {CATEGORIES.map(c => (
-            <button key={c} onClick={() => setFilter(c)} className={`px-3 py-1.5 rounded-full text-xs font-body font-medium capitalize transition-colors ${filter === c ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>{c}</button>
+            <button key={c} onClick={() => setFilter(c)} className={`px-3 py-1 rounded-full text-xs font-body font-medium capitalize transition-colors ${filter === c ? "bg-secondary text-secondary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>{c}</button>
           ))}
         </div>
 
@@ -135,10 +230,15 @@ const PoetryFeed = () => {
                   <Link to={`/poet/${post.creator_id}`} className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-sm font-bold text-primary font-display">
                     {(post.creator_name || "?")[0].toUpperCase()}
                   </Link>
-                  <div>
+                  <div className="flex-1">
                     <Link to={`/poet/${post.creator_id}`} className="font-body text-sm font-semibold text-foreground hover:text-secondary transition-colors">{post.creator_name}</Link>
-                    <p className="font-body text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()} · {post.category}</p>
+                    <p className="font-body text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()} · {post.category} {post.language ? `· ${post.language}` : ""}</p>
                   </div>
+                  {post.is_editor_pick && (
+                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-body">
+                      <Sparkles className="w-3 h-3" /> Pick
+                    </span>
+                  )}
                 </div>
 
                 <h2 className="font-display text-xl font-bold text-foreground mb-3">{post.title}</h2>
@@ -151,6 +251,9 @@ const PoetryFeed = () => {
                   <Link to={`/post/${post.id}`} className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-foreground transition-colors">
                     <MessageCircle className="w-4 h-4" /> {post.comments_count}
                   </Link>
+                  <button onClick={() => handleShare(post)} className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-secondary transition-colors">
+                    <Share2 className="w-4 h-4" /> {post.shares_count}
+                  </button>
                   <button onClick={() => handleBookmark(post)} className={`flex items-center gap-1.5 text-sm font-body transition-colors ${post.is_bookmarked ? "text-secondary" : "text-muted-foreground hover:text-secondary"}`}>
                     {post.is_bookmarked ? <Bookmark className="w-4 h-4 fill-current" /> : <BookmarkPlus className="w-4 h-4" />}
                   </button>
