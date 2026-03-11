@@ -54,6 +54,7 @@ const statusConfig: Record<string, { color: string; icon: any; label: string }> 
 const MushairaDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { checkContent, moderating } = useModeration();
   const [event, setEvent] = useState<EventData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
