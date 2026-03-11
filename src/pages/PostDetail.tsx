@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useModeration } from "@/hooks/useModeration";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SendGift from "@/components/SendGift";
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart, ArrowLeft, Shield } from "lucide-react";
 
 interface Comment {
   id: string;
@@ -20,6 +21,7 @@ interface Comment {
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { checkContent, moderating } = useModeration();
   const [post, setPost] = useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -69,6 +71,8 @@ const PostDetail = () => {
     e.preventDefault();
     if (!user) { toast.error("Sign in to comment"); return; }
     if (!newComment.trim()) return;
+    const isAllowed = await checkContent(newComment.trim(), "comment");
+    if (!isAllowed) return;
     await supabase.from("post_comments").insert({ post_id: id!, user_id: user.id, content: newComment.trim() });
     setNewComment("");
     fetchComments();
@@ -116,7 +120,7 @@ const PostDetail = () => {
           {user && (
             <form onSubmit={handleComment} className="flex gap-3 mb-6">
               <input value={newComment} onChange={e => setNewComment(e.target.value)} placeholder="Write a comment..." className="flex-1 px-4 py-3 rounded-lg bg-card border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring" />
-              <button type="submit" className="px-5 py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity">Post</button>
+              <button type="submit" disabled={moderating} className="px-5 py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50">{moderating ? "Checking..." : "Post"}</button>
             </form>
           )}
           <div className="space-y-4">

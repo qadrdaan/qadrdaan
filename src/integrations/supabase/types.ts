@@ -762,13 +762,17 @@ export type Database = {
           followers_count: number
           following_count: number
           id: string
+          is_banned: boolean
           is_creator: boolean
+          is_suspended: boolean
           is_verified: boolean
           language: string | null
           preferred_genres: string[] | null
           preferred_languages: string[] | null
           promotion_coins_spent: number
           promotion_obligation_met: boolean
+          strike_count: number
+          suspended_until: string | null
           total_gifts_received: number
           updated_at: string
           user_id: string
@@ -787,13 +791,17 @@ export type Database = {
           followers_count?: number
           following_count?: number
           id?: string
+          is_banned?: boolean
           is_creator?: boolean
+          is_suspended?: boolean
           is_verified?: boolean
           language?: string | null
           preferred_genres?: string[] | null
           preferred_languages?: string[] | null
           promotion_coins_spent?: number
           promotion_obligation_met?: boolean
+          strike_count?: number
+          suspended_until?: string | null
           total_gifts_received?: number
           updated_at?: string
           user_id: string
@@ -812,13 +820,17 @@ export type Database = {
           followers_count?: number
           following_count?: number
           id?: string
+          is_banned?: boolean
           is_creator?: boolean
+          is_suspended?: boolean
           is_verified?: boolean
           language?: string | null
           preferred_genres?: string[] | null
           preferred_languages?: string[] | null
           promotion_coins_spent?: number
           promotion_obligation_met?: boolean
+          strike_count?: number
+          suspended_until?: string | null
           total_gifts_received?: number
           updated_at?: string
           user_id?: string
@@ -898,6 +910,42 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_violations: {
+        Row: {
+          action_taken: string
+          ai_reason: string | null
+          content_text: string | null
+          content_type: string
+          created_at: string
+          id: string
+          strike_number: number
+          user_id: string
+          violation_type: string
+        }
+        Insert: {
+          action_taken?: string
+          ai_reason?: string | null
+          content_text?: string | null
+          content_type: string
+          created_at?: string
+          id?: string
+          strike_number?: number
+          user_id: string
+          violation_type?: string
+        }
+        Update: {
+          action_taken?: string
+          ai_reason?: string | null
+          content_text?: string | null
+          content_type?: string
+          created_at?: string
+          id?: string
+          strike_number?: number
+          user_id?: string
+          violation_type?: string
         }
         Relationships: []
       }

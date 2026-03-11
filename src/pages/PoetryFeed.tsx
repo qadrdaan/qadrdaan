@@ -52,7 +52,7 @@ const PoetryFeed = () => {
     if (feedType === "trending") {
       query = query.order("engagement_score" as any, { ascending: false }).limit(50);
     } else if (feedType === "editorpicks") {
-      query = query.eq("is_editor_pick" as any, true).order("created_at", { ascending: false }).limit(50);
+      query = (query as any).eq("is_editor_pick", true).order("created_at", { ascending: false }).limit(50);
     } else {
       // Discovery feed: mix of new posts (equal start reach) and engagement-ranked
       // Get recent posts with <300 impressions for equal exposure + top engagement posts

@@ -2,12 +2,13 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useModeration } from "@/hooks/useModeration";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import {
   Mic, Calendar, Users, Globe, Send, Heart, HandMetal,
-  UserPlus, Radio, Clock,
+  UserPlus, Radio, Clock, Shield,
 } from "lucide-react";
 import SendGift from "@/components/SendGift";
 import { Gift } from "lucide-react";
@@ -53,6 +54,7 @@ const statusConfig: Record<string, { color: string; icon: any; label: string }> 
 const MushairaDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { checkContent, moderating } = useModeration();
   const [event, setEvent] = useState<EventData | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -168,6 +170,12 @@ const MushairaDetail = () => {
     if (!user) { toast.error("Please sign in to chat"); return; }
     const text = content || chatInput.trim();
     if (!text) return;
+
+    // Moderate chat messages (skip reactions)
+    if (type === "chat") {
+      const isAllowed = await checkContent(text, "live_chat");
+      if (!isAllowed) return;
+    }
 
     await supabase.from("event_messages").insert({
       event_id: id!,
@@ -310,7 +318,7 @@ const MushairaDetail = () => {
           {/* Live chat sidebar */}
           <div className="bg-card rounded-2xl border border-border flex flex-col h-[600px]">
             <div className="px-4 py-3 border-b border-border">
-              <h3 className="font-display text-lg font-semibold text-foreground">Live Chat</h3>
+              <h3 className="font-display text-lg font-semibold text-foreground flex items-center gap-2">Live Chat <Shield className="w-3.5 h-3.5 text-secondary" /></h3>
             </div>
 
             {/* Messages */}
@@ -378,7 +386,7 @@ const MushairaDetail = () => {
                 />
                 <button
                   type="submit"
-                  disabled={!user || !chatInput.trim()}
+                  disabled={!user || !chatInput.trim() || moderating}
                   className="p-2 rounded-lg bg-gradient-gold text-primary disabled:opacity-50 hover:opacity-90 transition-opacity"
                 >
                   <Send className="w-4 h-4" />

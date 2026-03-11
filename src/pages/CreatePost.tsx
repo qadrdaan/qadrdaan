@@ -2,10 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useModeration } from "@/hooks/useModeration";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { Shield } from "lucide-react";
 
 const CATEGORIES = ["ghazal", "nazm", "rubaai", "qita", "marsiya", "hamd", "naat", "quote"];
 const LANGUAGES = ["Urdu", "Hindi", "Punjabi", "English", "Arabic", "Persian"];
@@ -15,6 +17,7 @@ const CreatePost = () => {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ title: "", content: "", category: "ghazal", language: "Urdu" });
+  const { checkContent, moderating } = useModeration();
 
   useEffect(() => { if (!loading && !user) navigate("/auth"); }, [loading, user, navigate]);
 
@@ -22,7 +25,16 @@ const CreatePost = () => {
     e.preventDefault();
     if (!user) return;
     if (!form.title.trim() || !form.content.trim()) { toast.error("Title and content are required"); return; }
+    
     setSubmitting(true);
+    
+    // AI moderation check
+    const isAllowed = await checkContent(`${form.title}\n\n${form.content}`, "post");
+    if (!isAllowed) {
+      setSubmitting(false);
+      return;
+    }
+
     const { error } = await supabase.from("poetry_posts").insert({
       creator_id: user.id,
       title: form.title.trim(),
@@ -39,7 +51,10 @@ const CreatePost = () => {
       <Navbar />
       <section className="pt-28 pb-20 container mx-auto px-6 max-w-2xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="font-display text-3xl font-bold text-foreground mb-8">Publish Poetry</h1>
+          <h1 className="font-display text-3xl font-bold text-foreground mb-2">Publish Poetry</h1>
+          <p className="font-body text-sm text-muted-foreground mb-8 flex items-center gap-1.5">
+            <Shield className="w-3.5 h-3.5 text-secondary" /> AI-moderated for community safety
+          </p>
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block font-body text-sm font-medium text-foreground mb-1">Title</label>
@@ -63,8 +78,8 @@ const CreatePost = () => {
                 </select>
               </div>
             </div>
-            <button type="submit" disabled={submitting} className="w-full py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50">
-              {submitting ? "Publishing..." : "Publish Poetry"}
+            <button type="submit" disabled={submitting || moderating} className="w-full py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50">
+              {moderating ? "Checking content..." : submitting ? "Publishing..." : "Publish Poetry"}
             </button>
           </form>
         </motion.div>
