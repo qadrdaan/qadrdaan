@@ -120,7 +120,7 @@ const PostDetail = () => {
           {user && (
             <form onSubmit={handleComment} className="flex gap-3 mb-6">
               <input value={newComment} onChange={e => setNewComment(e.target.value)} placeholder="Write a comment..." className="flex-1 px-4 py-3 rounded-lg bg-card border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring" />
-              <button type="submit" className="px-5 py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity">Post</button>
+              <button type="submit" disabled={moderating} className="px-5 py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50">{moderating ? "Checking..." : "Post"}</button>
             </form>
           )}
           <div className="space-y-4">
