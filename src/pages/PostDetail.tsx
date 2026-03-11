@@ -21,6 +21,7 @@ interface Comment {
 const PostDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
+  const { checkContent, moderating } = useModeration();
   const [post, setPost] = useState<any>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
