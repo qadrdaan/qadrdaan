@@ -51,8 +51,8 @@ const Auth = () => {
 
       const dob = new Date(dateOfBirth);
       const age = Math.floor((Date.now() - dob.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
-      if (age < 13) {
-        toast.error("You must be at least 13 years old to create an account");
+      if (age < 18) {
+        toast.error("You must be at least 18 years old to create an account");
         setLoading(false);
         return;
       }

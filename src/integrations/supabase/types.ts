@@ -576,11 +576,16 @@ export type Database = {
           content: string
           created_at: string
           creator_id: string
+          engagement_score: number
           gifts_count: number
           id: string
+          impressions_count: number
+          is_editor_pick: boolean
           language: string | null
           likes_count: number
+          shares_count: number
           title: string
+          total_reading_time: number
           updated_at: string
         }
         Insert: {
@@ -589,11 +594,16 @@ export type Database = {
           content: string
           created_at?: string
           creator_id: string
+          engagement_score?: number
           gifts_count?: number
           id?: string
+          impressions_count?: number
+          is_editor_pick?: boolean
           language?: string | null
           likes_count?: number
+          shares_count?: number
           title: string
+          total_reading_time?: number
           updated_at?: string
         }
         Update: {
@@ -602,11 +612,16 @@ export type Database = {
           content?: string
           created_at?: string
           creator_id?: string
+          engagement_score?: number
           gifts_count?: number
           id?: string
+          impressions_count?: number
+          is_editor_pick?: boolean
           language?: string | null
           likes_count?: number
+          shares_count?: number
           title?: string
+          total_reading_time?: number
           updated_at?: string
         }
         Relationships: []
@@ -643,6 +658,38 @@ export type Database = {
           },
         ]
       }
+      post_impressions: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          reading_time_seconds: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          reading_time_seconds?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          reading_time_seconds?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_impressions_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "poetry_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       post_likes: {
         Row: {
           created_at: string
@@ -672,6 +719,35 @@ export type Database = {
           },
         ]
       }
+      post_shares: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_shares_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "poetry_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -689,6 +765,8 @@ export type Database = {
           is_creator: boolean
           is_verified: boolean
           language: string | null
+          preferred_genres: string[] | null
+          preferred_languages: string[] | null
           promotion_coins_spent: number
           promotion_obligation_met: boolean
           total_gifts_received: number
@@ -712,6 +790,8 @@ export type Database = {
           is_creator?: boolean
           is_verified?: boolean
           language?: string | null
+          preferred_genres?: string[] | null
+          preferred_languages?: string[] | null
           promotion_coins_spent?: number
           promotion_obligation_met?: boolean
           total_gifts_received?: number
@@ -735,6 +815,8 @@ export type Database = {
           is_creator?: boolean
           is_verified?: boolean
           language?: string | null
+          preferred_genres?: string[] | null
+          preferred_languages?: string[] | null
           promotion_coins_spent?: number
           promotion_obligation_met?: boolean
           total_gifts_received?: number
@@ -939,6 +1021,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      recalculate_engagement_score: {
+        Args: { p_post_id: string }
+        Returns: undefined
       }
     }
     Enums: {
