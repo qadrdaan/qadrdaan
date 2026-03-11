@@ -391,9 +391,6 @@ const MushairaDetail = () => {
                 >
                   <Send className="w-4 h-4" />
                 </button>
-                >
-                  <Send className="w-4 h-4" />
-                </button>
               </form>
             </div>
           </div>
