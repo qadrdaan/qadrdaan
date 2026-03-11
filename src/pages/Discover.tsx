@@ -24,8 +24,8 @@ const Discover = () => {
         supabase.from("profiles").select("user_id, display_name, followers_count, is_verified, created_at").order("created_at", { ascending: false }).limit(6),
         supabase.from("books").select("id, title, downloads_count, cover_url").order("downloads_count", { ascending: false }).limit(6),
         supabase.from("videos").select("id, title, views_count, thumbnail_url").order("views_count", { ascending: false }).limit(6),
-        supabase.from("poetry_posts").select("id, title, creator_id, engagement_score, likes_count, comments_count, category, language").order("engagement_score" as any, { ascending: false }).limit(6),
-        supabase.from("poetry_posts").select("id, title, creator_id, engagement_score, likes_count, category").eq("is_editor_pick" as any, true).order("created_at", { ascending: false }).limit(6),
+        supabase.from("poetry_posts").select("id, title, creator_id, likes_count, comments_count, category, language").order("likes_count", { ascending: false }).limit(6),
+        supabase.from("poetry_posts").select("id, title, creator_id, likes_count, category").order("created_at", { ascending: false }).limit(6),
       ]);
       setTrendingPoets(tp.data || []);
       setRisingPoets(rp.data || []);
