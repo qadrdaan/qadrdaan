@@ -171,6 +171,12 @@ const MushairaDetail = () => {
     const text = content || chatInput.trim();
     if (!text) return;
 
+    // Moderate chat messages (skip reactions)
+    if (type === "chat") {
+      const isAllowed = await checkContent(text, "live_chat");
+      if (!isAllowed) return;
+    }
+
     await supabase.from("event_messages").insert({
       event_id: id!,
       user_id: user.id,
