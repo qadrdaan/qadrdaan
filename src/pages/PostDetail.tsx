@@ -2,12 +2,13 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useModeration } from "@/hooks/useModeration";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SendGift from "@/components/SendGift";
-import { Heart, ArrowLeft } from "lucide-react";
+import { Heart, ArrowLeft, Shield } from "lucide-react";
 
 interface Comment {
   id: string;
