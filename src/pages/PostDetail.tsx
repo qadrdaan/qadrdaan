@@ -71,6 +71,8 @@ const PostDetail = () => {
     e.preventDefault();
     if (!user) { toast.error("Sign in to comment"); return; }
     if (!newComment.trim()) return;
+    const isAllowed = await checkContent(newComment.trim(), "comment");
+    if (!isAllowed) return;
     await supabase.from("post_comments").insert({ post_id: id!, user_id: user.id, content: newComment.trim() });
     setNewComment("");
     fetchComments();
