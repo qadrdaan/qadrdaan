@@ -2,12 +2,13 @@ import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useModeration } from "@/hooks/useModeration";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import {
   Mic, Calendar, Users, Globe, Send, Heart, HandMetal,
-  UserPlus, Radio, Clock,
+  UserPlus, Radio, Clock, Shield,
 } from "lucide-react";
 import SendGift from "@/components/SendGift";
 import { Gift } from "lucide-react";
