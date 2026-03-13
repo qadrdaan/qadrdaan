@@ -453,6 +453,112 @@ export type Database = {
           },
         ]
       }
+      fan_club_posts: {
+        Row: {
+          content: string
+          created_at: string
+          creator_id: string
+          fan_club_id: string
+          id: string
+          title: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          creator_id: string
+          fan_club_id: string
+          id?: string
+          title: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          creator_id?: string
+          fan_club_id?: string
+          id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fan_club_posts_fan_club_id_fkey"
+            columns: ["fan_club_id"]
+            isOneToOne: false
+            referencedRelation: "fan_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fan_club_subscriptions: {
+        Row: {
+          expires_at: string
+          fan_club_id: string
+          id: string
+          status: string
+          subscribed_at: string
+          user_id: string
+        }
+        Insert: {
+          expires_at?: string
+          fan_club_id: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          user_id: string
+        }
+        Update: {
+          expires_at?: string
+          fan_club_id?: string
+          id?: string
+          status?: string
+          subscribed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fan_club_subscriptions_fan_club_id_fkey"
+            columns: ["fan_club_id"]
+            isOneToOne: false
+            referencedRelation: "fan_clubs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fan_clubs: {
+        Row: {
+          created_at: string
+          creator_id: string
+          description: string | null
+          id: string
+          is_active: boolean
+          member_count: number
+          name: string
+          price_monthly: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          member_count?: number
+          name: string
+          price_monthly?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          member_count?: number
+          name?: string
+          price_monthly?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       followers: {
         Row: {
           created_at: string
@@ -910,6 +1016,79 @@ export type Database = {
         }
         Relationships: []
       }
+      room_queue: {
+        Row: {
+          id: string
+          position: number
+          requested_at: string
+          room_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          position?: number
+          requested_at?: string
+          room_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          position?: number
+          requested_at?: string
+          room_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_queue_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "video_mushaira_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      room_seats: {
+        Row: {
+          id: string
+          is_muted: boolean
+          joined_at: string
+          room_id: string
+          score: number
+          seat_number: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          room_id: string
+          score?: number
+          seat_number: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          is_muted?: boolean
+          joined_at?: string
+          room_id?: string
+          score?: number
+          seat_number?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "room_seats_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "video_mushaira_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_balances: {
         Row: {
           coins: number
@@ -1051,6 +1230,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      video_mushaira_rooms: {
+        Row: {
+          audience_count: number
+          competition_mode: boolean
+          created_at: string
+          description: string | null
+          ended_at: string | null
+          host_id: string
+          id: string
+          max_seats: number
+          status: string
+          title: string
+        }
+        Insert: {
+          audience_count?: number
+          competition_mode?: boolean
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          host_id: string
+          id?: string
+          max_seats?: number
+          status?: string
+          title: string
+        }
+        Update: {
+          audience_count?: number
+          competition_mode?: boolean
+          created_at?: string
+          description?: string | null
+          ended_at?: string | null
+          host_id?: string
+          id?: string
+          max_seats?: number
+          status?: string
+          title?: string
+        }
+        Relationships: []
       }
       videos: {
         Row: {

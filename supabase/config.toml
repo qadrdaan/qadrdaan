@@ -2,3 +2,6 @@ project_id = "boblfnrhuztfejixsqgc"
 
 [functions.moderate-content]
 verify_jwt = false
+
+[functions.analyze-poetry]
+verify_jwt = false
