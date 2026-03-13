@@ -45,7 +45,7 @@ import Referrals from "./pages/Referrals";
 import GiftShop from "./pages/GiftShop";
 import AdminDashboard from "./pages/AdminDashboard";
 import GiftLeaderboard from "./pages/GiftLeaderboard";
-
+import Wallet from "./pages/Wallet";
 const queryClient = new QueryClient();
 
 const App = () => (
