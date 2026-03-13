@@ -46,6 +46,11 @@ import GiftShop from "./pages/GiftShop";
 import AdminDashboard from "./pages/AdminDashboard";
 import GiftLeaderboard from "./pages/GiftLeaderboard";
 import Wallet from "./pages/Wallet";
+import FanClubs from "./pages/FanClubs";
+import FanClubDetail from "./pages/FanClubDetail";
+import VideoRooms from "./pages/VideoRooms";
+import VideoRoomDetail from "./pages/VideoRoomDetail";
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -88,6 +93,10 @@ const App = () => (
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/gift-leaderboard" element={<GiftLeaderboard />} />
             <Route path="/wallet" element={<Wallet />} />
+            <Route path="/fan-clubs" element={<FanClubs />} />
+            <Route path="/fan-club/:id" element={<FanClubDetail />} />
+            <Route path="/video-rooms" element={<VideoRooms />} />
+            <Route path="/video-room/:id" element={<VideoRoomDetail />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
