@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PoetryAnalyzer from "@/components/PoetryAnalyzer";
 import { Shield } from "lucide-react";
 
 const CATEGORIES = ["ghazal", "nazm", "rubaai", "qita", "marsiya", "hamd", "naat", "quote"];
@@ -27,13 +28,8 @@ const CreatePost = () => {
     if (!form.title.trim() || !form.content.trim()) { toast.error("Title and content are required"); return; }
     
     setSubmitting(true);
-    
-    // AI moderation check
     const isAllowed = await checkContent(`${form.title}\n\n${form.content}`, "post");
-    if (!isAllowed) {
-      setSubmitting(false);
-      return;
-    }
+    if (!isAllowed) { setSubmitting(false); return; }
 
     const { error } = await supabase.from("poetry_posts").insert({
       creator_id: user.id,
@@ -78,7 +74,13 @@ const CreatePost = () => {
                 </select>
               </div>
             </div>
-            <button type="submit" disabled={submitting || moderating} className="w-full py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50">
+
+            {/* AI Poetry Analyzer */}
+            {form.content.trim().length > 10 && (
+              <PoetryAnalyzer content={form.content} language={form.language} category={form.category} />
+            )}
+
+            <button type="submit" disabled={submitting || moderating} className="w-full py-3 font-body font-semibold bg-primary text-primary-foreground rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50">
               {moderating ? "Checking content..." : submitting ? "Publishing..." : "Publish Poetry"}
             </button>
           </form>
