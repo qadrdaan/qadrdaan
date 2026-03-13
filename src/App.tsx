@@ -87,6 +87,7 @@ const App = () => (
             <Route path="/gift-shop" element={<GiftShop />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/gift-leaderboard" element={<GiftLeaderboard />} />
+            <Route path="/wallet" element={<Wallet />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
