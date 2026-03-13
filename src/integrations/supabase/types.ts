@@ -341,6 +341,48 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_wallets: {
+        Row: {
+          ad_earnings: number
+          available_balance: number
+          book_earnings: number
+          created_at: string
+          fan_club_earnings: number
+          gift_earnings: number
+          id: string
+          total_earnings: number
+          total_withdrawn: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ad_earnings?: number
+          available_balance?: number
+          book_earnings?: number
+          created_at?: string
+          fan_club_earnings?: number
+          gift_earnings?: number
+          id?: string
+          total_earnings?: number
+          total_withdrawn?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ad_earnings?: number
+          available_balance?: number
+          book_earnings?: number
+          created_at?: string
+          fan_club_earnings?: number
+          gift_earnings?: number
+          id?: string
+          total_earnings?: number
+          total_withdrawn?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       event_messages: {
         Row: {
           content: string
@@ -1055,6 +1097,72 @@ export type Database = {
           updated_at?: string
           video_url?: string
           views_count?: number
+        }
+        Relationships: []
+      }
+      wallet_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      withdrawal_requests: {
+        Row: {
+          admin_notes: string | null
+          amount: number
+          created_at: string
+          id: string
+          payment_details: Json | null
+          payment_method: string
+          processed_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          payment_details?: Json | null
+          payment_method?: string
+          processed_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_details?: Json | null
+          payment_method?: string
+          processed_at?: string | null
+          status?: string
+          user_id?: string
         }
         Relationships: []
       }

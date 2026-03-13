@@ -6,55 +6,56 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%;
-    --foreground: 150 30% 8%;
+    --background: 0 0% 100%;
+    --foreground: 215 25% 12%;
 
-    --card: 40 25% 95%;
-    --card-foreground: 150 30% 8%;
+    --card: 210 20% 98%;
+    --card-foreground: 215 25% 12%;
 
-    --popover: 40 20% 97%;
-    --popover-foreground: 150 30% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 12%;
 
-    --primary: 150 35% 18%;
-    --primary-foreground: 42 60% 90%;
+    --primary: 214 89% 52%;
+    --primary-foreground: 0 0% 100%;
 
     --secondary: 42 55% 55%;
-    --secondary-foreground: 150 30% 8%;
+    --secondary-foreground: 215 25% 12%;
 
-    --muted: 40 15% 90%;
-    --muted-foreground: 150 10% 40%;
+    --muted: 210 15% 94%;
+    --muted-foreground: 215 10% 45%;
 
     --accent: 42 70% 50%;
-    --accent-foreground: 150 30% 8%;
+    --accent-foreground: 215 25% 12%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 40 20% 85%;
-    --input: 40 20% 85%;
-    --ring: 42 55% 55%;
+    --border: 210 15% 89%;
+    --input: 210 15% 89%;
+    --ring: 214 89% 52%;
 
     --radius: 0.75rem;
 
     --gold: 42 70% 50%;
     --gold-light: 42 60% 70%;
     --gold-dark: 42 55% 35%;
-    --emerald: 150 35% 18%;
-    --emerald-light: 150 25% 30%;
-    --cream: 40 30% 95%;
-    --cream-dark: 40 20% 88%;
+    --blue: 214 89% 52%;
+    --blue-light: 214 70% 65%;
+    --blue-dark: 214 80% 35%;
+    --cream: 210 20% 98%;
+    --cream-dark: 210 15% 92%;
 
     --font-display: 'Playfair Display', serif;
     --font-body: 'Source Sans 3', sans-serif;
 
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-foreground: 215 25% 12%;
+    --sidebar-primary: 214 89% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 15% 94%;
+    --sidebar-accent-foreground: 215 25% 12%;
+    --sidebar-border: 210 15% 89%;
+    --sidebar-ring: 214 89% 52%;
   }
 }
 
@@ -79,24 +80,32 @@
     background-image: linear-gradient(135deg, hsl(var(--gold)), hsl(var(--gold-light)), hsl(var(--gold)));
   }
 
-  .bg-gradient-emerald {
-    background: linear-gradient(180deg, hsl(var(--emerald)) 0%, hsl(var(--emerald-light)) 100%);
+  .bg-gradient-blue {
+    background: linear-gradient(180deg, hsl(var(--blue)) 0%, hsl(var(--blue-dark)) 100%);
   }
 
   .bg-gradient-hero {
-    background: linear-gradient(135deg, hsl(var(--emerald)) 0%, hsl(150 30% 12%) 50%, hsl(var(--emerald-light)) 100%);
+    background: linear-gradient(135deg, hsl(var(--blue-dark)) 0%, hsl(var(--blue)) 50%, hsl(var(--blue-light)) 100%);
   }
 
   .bg-gradient-gold {
     background: linear-gradient(135deg, hsl(var(--gold-dark)), hsl(var(--gold)), hsl(var(--gold-light)));
   }
 
+  .bg-gradient-emerald {
+    background: linear-gradient(180deg, hsl(var(--blue)) 0%, hsl(var(--blue-light)) 100%);
+  }
+
   .shadow-gold {
     box-shadow: 0 4px 30px -5px hsl(var(--gold) / 0.3);
   }
 
+  .shadow-blue {
+    box-shadow: 0 10px 40px -10px hsl(var(--blue) / 0.4);
+  }
+
   .shadow-emerald {
-    box-shadow: 0 10px 40px -10px hsl(var(--emerald) / 0.4);
+    box-shadow: 0 10px 40px -10px hsl(var(--blue) / 0.4);
   }
 
   .border-gold {
