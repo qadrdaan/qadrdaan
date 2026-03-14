@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { BadgeCheck, BookOpen, Users, Search } from "lucide-react";
+import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
 
