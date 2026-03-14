@@ -124,6 +124,6 @@ const Poets = () => {
       </div>
       <Footer />
     </div>
-};
+  );
 
 export default Poets;
