@@ -1,317 +1,199 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
-import { motion } from "framer-motion";
-import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle, XCircle, Clock } from "lucide-react";
+import Footer from "@/components/Footer";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertTriangle, Users, DollarSign, Flag, CheckCircle, XCircle, BadgeCheck } from "lucide-react";
 
 interface CoinPurchase {
-  id: string;
-  user_id: string;
-  amount: number;
-  price: number;
-  status: string;
-  payment_method: string;
-  created_at: string;
-  profiles?: {
-    display_name: string | null;
-    avatar_url: string | null;
-  };
+  id: string; user_id: string; amount: number; price: number; status: string;
+  payment_method: string; created_at: string;
+  profiles?: { display_name: string | null };
 }
 
 const AdminDashboard = () => {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const [purchases, setPurchases] = useState<CoinPurchase[]>([]);
-  const [loadingData, setLoadingData] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  const [processing, setProcessing] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [purchases, setPurchases] = useState<CoinPurchase[]>([]);
+  const [reports, setReports] = useState<any[]>([]);
+  const [violations, setViolations] = useState<any[]>([]);
+  const [verificationRequests, setVerificationRequests] = useState<any[]>([]);
+  const [platformStats, setPlatformStats] = useState({ users: 0, creators: 0, posts: 0, books: 0, videos: 0 });
+
+  useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [authLoading, user, navigate]);
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate("/auth");
-    }
-  }, [loading, user, navigate]);
-
-  useEffect(() => {
+    if (!user) return;
     const checkAdmin = async () => {
-      if (!user) return;
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", user.id)
-        .eq("role", "admin")
-        .single();
-      
-      if (!data) {
-        toast.error("Access denied: Admin only");
-        navigate("/");
-        return;
-      }
+      const { data } = await supabase.from("user_roles").select("role").eq("user_id", user.id).eq("role", "admin").maybeSingle();
+      if (!data) { toast.error("Access denied"); navigate("/"); return; }
       setIsAdmin(true);
+      fetchAll();
     };
+    checkAdmin();
+  }, [user]);
 
-    if (user) checkAdmin();
-  }, [user, navigate]);
+  const fetchAll = async () => {
+    setLoading(true);
+    const [pRes, rRes, vRes, vrRes, uC, cC, pC, bC, viC] = await Promise.all([
+      supabase.from("coin_purchases").select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.from("content_reports" as any).select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.from("user_violations").select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.from("verification_requests" as any).select("*").order("created_at", { ascending: false }).limit(50),
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
+      supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_creator", true),
+      supabase.from("poetry_posts").select("id", { count: "exact", head: true }),
+      supabase.from("books").select("id", { count: "exact", head: true }),
+      supabase.from("videos").select("id", { count: "exact", head: true }),
+    ]);
+    const ids = new Set<string>();
+    [pRes, rRes, vRes, vrRes].forEach((r) => (r.data || []).forEach((d: any) => {
+      if (d.user_id) ids.add(d.user_id);
+      if (d.reporter_id) ids.add(d.reporter_id);
+      if (d.reported_user_id) ids.add(d.reported_user_id);
+    }));
+    const { data: profiles } = await supabase.from("profiles").select("user_id, display_name").in("user_id", Array.from(ids));
+    const nm = new Map((profiles || []).map((p: any) => [p.user_id, p.display_name]));
 
-  useEffect(() => {
-    const fetchPurchases = async () => {
-      if (!isAdmin) return;
-      setLoadingData(true);
-      const { data, error } = await supabase
-        .from("coin_purchases")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) {
-        toast.error("Failed to load purchases");
-        setLoadingData(false);
-        return;
-      }
-
-      // Fetch profiles separately
-      const userIds = [...new Set(data?.map(p => p.user_id) || [])];
-      const { data: profilesData } = await supabase
-        .from("profiles")
-        .select("user_id, display_name, avatar_url")
-        .in("user_id", userIds);
-
-      const profilesMap = new Map(profilesData?.map(p => [p.user_id, p]) || []);
-      
-      const purchasesWithProfiles = (data || []).map(purchase => ({
-        ...purchase,
-        profiles: profilesMap.get(purchase.user_id) || null,
-      }));
-
-      setPurchases(purchasesWithProfiles);
-      setLoadingData(false);
-    };
-
-    if (isAdmin) fetchPurchases();
-  }, [isAdmin]);
-
-  const handleApprove = async (purchase: CoinPurchase) => {
-    setProcessing(purchase.id);
-    
-    // Update purchase status
-    const { error: updateError } = await supabase
-      .from("coin_purchases")
-      .update({ status: "completed" })
-      .eq("id", purchase.id);
-
-    if (updateError) {
-      toast.error("Failed to approve purchase");
-      setProcessing(null);
-      return;
-    }
-
-    // Update user balance
-    const { data: balance } = await supabase
-      .from("user_balances")
-      .select("coins")
-      .eq("user_id", purchase.user_id)
-      .single();
-
-    if (balance) {
-      await supabase
-        .from("user_balances")
-        .update({ coins: balance.coins + purchase.amount })
-        .eq("user_id", purchase.user_id);
-    } else {
-      await supabase
-        .from("user_balances")
-        .insert({ user_id: purchase.user_id, coins: purchase.amount });
-    }
-
-    toast.success("Purchase approved!");
-    setPurchases(purchases.map(p => p.id === purchase.id ? { ...p, status: "completed" } : p));
-    setProcessing(null);
+    setPurchases((pRes.data || []).map((p: any) => ({ ...p, profiles: { display_name: nm.get(p.user_id) || null } })));
+    setReports((rRes.data || []).map((r: any) => ({ ...r, reporter_name: nm.get(r.reporter_id), reported_name: nm.get(r.reported_user_id) })));
+    setViolations((vRes.data || []).map((v: any) => ({ ...v, user_name: nm.get(v.user_id) })));
+    setVerificationRequests((vrRes.data || []).map((v: any) => ({ ...v, user_name: nm.get(v.user_id) })));
+    setPlatformStats({ users: uC.count || 0, creators: cC.count || 0, posts: pC.count || 0, books: bC.count || 0, videos: viC.count || 0 });
+    setLoading(false);
   };
 
-  const handleReject = async (purchase: CoinPurchase) => {
-    setProcessing(purchase.id);
-    
-    const { error } = await supabase
-      .from("coin_purchases")
-      .update({ status: "rejected" })
-      .eq("id", purchase.id);
-
-    if (error) {
-      toast.error("Failed to reject purchase");
-    } else {
-      toast.success("Purchase rejected");
-      setPurchases(purchases.map(p => p.id === purchase.id ? { ...p, status: "rejected" } : p));
-    }
-    setProcessing(null);
+  const approvePurchase = async (p: CoinPurchase) => {
+    await supabase.from("coin_purchases").update({ status: "completed" }).eq("id", p.id);
+    const { data: bal } = await supabase.from("user_balances").select("coins").eq("user_id", p.user_id).maybeSingle();
+    if (bal) await supabase.from("user_balances").update({ coins: bal.coins + p.amount }).eq("user_id", p.user_id);
+    else await supabase.from("user_balances").insert({ user_id: p.user_id, coins: p.amount });
+    toast.success("Approved"); fetchAll();
+  };
+  const rejectPurchase = async (p: CoinPurchase) => {
+    await supabase.from("coin_purchases").update({ status: "rejected" }).eq("id", p.id);
+    toast.success("Rejected"); fetchAll();
+  };
+  const reportAction = async (r: any, action: string) => {
+    await supabase.from("content_reports" as any).update({ status: action, reviewed_at: new Date().toISOString() } as any).eq("id", r.id);
+    toast.success(`Report ${action}`); fetchAll();
+  };
+  const handleVerif = async (v: any, ok: boolean) => {
+    await supabase.from("verification_requests" as any).update({ status: ok ? "approved" : "rejected", reviewed_at: new Date().toISOString() } as any).eq("id", v.id);
+    if (ok) await supabase.from("profiles").update({ is_verified: true }).eq("user_id", v.user_id);
+    toast.success(ok ? "Approved" : "Rejected"); fetchAll();
   };
 
-  if (loading || loadingData || !isAdmin) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="font-body text-muted-foreground">Loading...</p>
-      </div>
-    );
-  }
+  if (authLoading || loading || !isAdmin) return (
+    <div className="min-h-screen bg-background"><Navbar /><div className="pt-28 pb-20 container mx-auto px-6 text-center"><p className="font-body text-muted-foreground">Loading...</p></div><Footer /></div>
+  );
 
-  const pendingPurchases = purchases.filter(p => p.status === "pending");
-  const recentPurchases = purchases.slice(0, 20);
+  const pp = purchases.filter(p => p.status === "pending");
+  const pr = reports.filter((r: any) => r.status === "pending");
+  const pv = verificationRequests.filter((v: any) => v.status === "pending");
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
-      <div className="container mx-auto px-6 pt-28 pb-16">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="space-y-8"
-        >
-          <div>
-            <h1 className="font-display text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
-            <p className="font-body text-muted-foreground">Manage coin purchase requests</p>
-          </div>
+      <section className="pt-28 pb-20 container mx-auto px-6 max-w-6xl">
+        <h1 className="font-display text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
+        <p className="font-body text-muted-foreground mb-8">Platform management & moderation</p>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          {[{ l: "Users", v: platformStats.users }, { l: "Creators", v: platformStats.creators }, { l: "Posts", v: platformStats.posts }, { l: "Books", v: platformStats.books }, { l: "Videos", v: platformStats.videos }].map(s => (
+            <div key={s.l} className="p-4 bg-card border border-border rounded-xl text-center">
+              <p className="font-display text-2xl font-bold text-foreground">{s.v}</p>
+              <p className="font-body text-xs text-muted-foreground">{s.l}</p>
+            </div>
+          ))}
+        </div>
+        <Tabs defaultValue="reports">
+          <TabsList className="grid grid-cols-4 mb-6">
+            <TabsTrigger value="reports" className="gap-1 text-xs"><Flag className="w-3.5 h-3.5" />Reports{pr.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-destructive text-destructive-foreground rounded-full text-xs">{pr.length}</span>}</TabsTrigger>
+            <TabsTrigger value="verification" className="gap-1 text-xs"><BadgeCheck className="w-3.5 h-3.5" />Verify{pv.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-full text-xs">{pv.length}</span>}</TabsTrigger>
+            <TabsTrigger value="purchases" className="gap-1 text-xs"><DollarSign className="w-3.5 h-3.5" />Purchases{pp.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-secondary text-secondary-foreground rounded-full text-xs">{pp.length}</span>}</TabsTrigger>
+            <TabsTrigger value="violations" className="gap-1 text-xs"><AlertTriangle className="w-3.5 h-3.5" />Violations</TabsTrigger>
+          </TabsList>
 
-          {/* Pending Purchases */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="w-5 h-5 text-secondary" />
-                Pending Purchases ({pendingPurchases.length})
-              </CardTitle>
-              <CardDescription>Review and approve or reject coin purchase requests</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {pendingPurchases.length === 0 ? (
-                <p className="font-body text-muted-foreground text-center py-8">No pending purchases</p>
-              ) : (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>User</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pendingPurchases.map((purchase) => (
-                      <TableRow key={purchase.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-2">
-                            {purchase.profiles?.avatar_url ? (
-                              <img
-                                src={purchase.profiles.avatar_url}
-                                alt="Avatar"
-                                className="w-8 h-8 rounded-full"
-                              />
-                            ) : (
-                              <div className="w-8 h-8 rounded-full bg-gradient-gold flex items-center justify-center text-xs font-bold text-primary">
-                                {(purchase.profiles?.display_name || "?")[0].toUpperCase()}
-                              </div>
-                            )}
-                            <span className="font-body">{purchase.profiles?.display_name || "Unknown"}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-body font-semibold">{purchase.amount} coins</TableCell>
-                        <TableCell className="font-body">${purchase.price}</TableCell>
-                        <TableCell className="font-body text-muted-foreground">
-                          {new Date(purchase.created_at).toLocaleDateString()}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleApprove(purchase)}
-                              disabled={processing === purchase.id}
-                              className="p-2 rounded-lg bg-green-500/10 text-green-600 hover:bg-green-500/20 transition-colors disabled:opacity-50"
-                              title="Approve"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleReject(purchase)}
-                              disabled={processing === purchase.id}
-                              className="p-2 rounded-lg bg-red-500/10 text-red-600 hover:bg-red-500/20 transition-colors disabled:opacity-50"
-                              title="Reject"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </CardContent>
-          </Card>
+          <TabsContent value="reports"><div className="space-y-3">
+            {reports.length === 0 ? <p className="font-body text-muted-foreground text-center py-10">No reports</p> : reports.map((r: any) => (
+              <motion.div key={r.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 bg-card border border-border rounded-xl">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex gap-2 flex-wrap mb-1">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-body ${r.status === "pending" ? "bg-accent/20 text-accent" : r.status === "action_taken" ? "bg-destructive/20 text-destructive" : "bg-muted text-muted-foreground"}`}>{r.status}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-body bg-muted text-muted-foreground">{r.content_type}</span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-body bg-muted text-muted-foreground">{r.reason}</span>
+                    </div>
+                    <p className="font-body text-sm text-foreground">By: {r.reporter_name || "?"} → {r.reported_name || "?"}</p>
+                    {r.description && <p className="font-body text-xs text-muted-foreground mt-1">{r.description}</p>}
+                  </div>
+                  {r.status === "pending" && <div className="flex gap-2 shrink-0">
+                    <button onClick={() => reportAction(r, "action_taken")} className="px-3 py-1.5 text-xs font-body font-semibold bg-destructive text-destructive-foreground rounded-lg">Action</button>
+                    <button onClick={() => reportAction(r, "dismissed")} className="px-3 py-1.5 text-xs font-body font-semibold bg-muted text-muted-foreground rounded-lg">Dismiss</button>
+                  </div>}
+                </div>
+              </motion.div>
+            ))}
+          </div></TabsContent>
 
-          {/* Recent Purchases */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Purchases</CardTitle>
-              <CardDescription>All coin purchase history</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Date</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentPurchases.map((purchase) => (
-                    <TableRow key={purchase.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-2">
-                          {purchase.profiles?.avatar_url ? (
-                            <img
-                              src={purchase.profiles.avatar_url}
-                              alt="Avatar"
-                              className="w-8 h-8 rounded-full"
-                            />
-                          ) : (
-                            <div className="w-8 h-8 rounded-full bg-gradient-gold flex items-center justify-center text-xs font-bold text-primary">
-                              {(purchase.profiles?.display_name || "?")[0].toUpperCase()}
-                            </div>
-                          )}
-                          <span className="font-body">{purchase.profiles?.display_name || "Unknown"}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-body font-semibold">{purchase.amount} coins</TableCell>
-                      <TableCell className="font-body">${purchase.price}</TableCell>
-                      <TableCell>
-                        <span
-                          className={`inline-flex px-2 py-1 rounded-full text-xs font-body font-medium ${
-                            purchase.status === "completed"
-                              ? "bg-green-500/10 text-green-600"
-                              : purchase.status === "rejected"
-                              ? "bg-red-500/10 text-red-600"
-                              : "bg-secondary/10 text-secondary"
-                          }`}
-                        >
-                          {purchase.status}
-                        </span>
-                      </TableCell>
-                      <TableCell className="font-body text-muted-foreground">
-                        {new Date(purchase.created_at).toLocaleDateString()}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+          <TabsContent value="verification"><div className="space-y-3">
+            {verificationRequests.length === 0 ? <p className="font-body text-muted-foreground text-center py-10">No requests</p> : verificationRequests.map((v: any) => (
+              <motion.div key={v.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 bg-card border border-border rounded-xl">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-body ${v.status === "pending" ? "bg-accent/20 text-accent" : v.status === "approved" ? "bg-secondary/20 text-secondary" : "bg-destructive/20 text-destructive"}`}>{v.status}</span>
+                    <p className="font-body text-sm font-semibold text-foreground mt-1">{v.full_name}</p>
+                    <p className="font-body text-xs text-muted-foreground">User: {v.user_name || v.user_id}</p>
+                    <p className="font-body text-sm text-foreground mt-1">{v.reason}</p>
+                    {v.portfolio_links && <p className="font-body text-xs text-secondary mt-1">{v.portfolio_links}</p>}
+                  </div>
+                  {v.status === "pending" && <div className="flex gap-2 shrink-0">
+                    <button onClick={() => handleVerif(v, true)} className="px-3 py-1.5 text-xs font-body font-semibold bg-secondary text-secondary-foreground rounded-lg flex items-center gap-1"><CheckCircle className="w-3.5 h-3.5" />Approve</button>
+                    <button onClick={() => handleVerif(v, false)} className="px-3 py-1.5 text-xs font-body font-semibold bg-muted text-muted-foreground rounded-lg flex items-center gap-1"><XCircle className="w-3.5 h-3.5" />Reject</button>
+                  </div>}
+                </div>
+              </motion.div>
+            ))}
+          </div></TabsContent>
+
+          <TabsContent value="purchases"><div className="space-y-3">
+            {purchases.length === 0 ? <p className="font-body text-muted-foreground text-center py-10">No purchases</p> : purchases.map(p => (
+              <motion.div key={p.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl">
+                <div className="flex-1">
+                  <p className="font-body text-sm font-semibold text-foreground">{p.profiles?.display_name || "Unknown"}</p>
+                  <p className="font-body text-xs text-muted-foreground">{p.amount} coins · ${p.price} · {p.payment_method}</p>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-body ${p.status === "pending" ? "bg-accent/20 text-accent" : p.status === "completed" ? "bg-secondary/20 text-secondary" : "bg-destructive/20 text-destructive"}`}>{p.status}</span>
+                {p.status === "pending" && <div className="flex gap-2">
+                  <button onClick={() => approvePurchase(p)} className="px-3 py-1.5 text-xs font-body font-semibold bg-secondary text-secondary-foreground rounded-lg">Approve</button>
+                  <button onClick={() => rejectPurchase(p)} className="px-3 py-1.5 text-xs font-body font-semibold bg-muted text-muted-foreground rounded-lg">Reject</button>
+                </div>}
+              </motion.div>
+            ))}
+          </div></TabsContent>
+
+          <TabsContent value="violations"><div className="space-y-3">
+            {violations.length === 0 ? <p className="font-body text-muted-foreground text-center py-10">No violations</p> : violations.map((v: any) => (
+              <motion.div key={v.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 bg-card border border-border rounded-xl">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className={`px-2 py-0.5 rounded-full text-xs font-body ${v.action_taken === "permanent_ban" ? "bg-destructive/20 text-destructive" : v.action_taken === "temp_suspension" ? "bg-accent/20 text-accent" : "bg-muted text-muted-foreground"}`}>{v.action_taken}</span>
+                  <span className="text-xs font-body text-muted-foreground">Strike #{v.strike_number}</span>
+                </div>
+                <p className="font-body text-sm text-foreground">{v.user_name || v.user_id}</p>
+                <p className="font-body text-xs text-muted-foreground">{v.content_type} · {v.violation_type}</p>
+                {v.ai_reason && <p className="font-body text-xs text-muted-foreground mt-1">{v.ai_reason}</p>}
+              </motion.div>
+            ))}
+          </div></TabsContent>
+        </Tabs>
+      </section>
+      <Footer />
     </div>
   );
 };

@@ -341,6 +341,48 @@ export type Database = {
         }
         Relationships: []
       }
+      content_reports: {
+        Row: {
+          admin_notes: string | null
+          content_id: string
+          content_type: string
+          created_at: string
+          description: string | null
+          id: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          reviewed_at: string | null
+          status: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          content_id: string
+          content_type: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason: string
+          reported_user_id: string
+          reporter_id: string
+          reviewed_at?: string | null
+          status?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          reason?: string
+          reported_user_id?: string
+          reporter_id?: string
+          reviewed_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       creator_wallets: {
         Row: {
           ad_earnings: number
@@ -1170,6 +1212,42 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_requests: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          full_name: string
+          id: string
+          portfolio_links: string | null
+          reason: string
+          reviewed_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          full_name: string
+          id?: string
+          portfolio_links?: string | null
+          reason: string
+          reviewed_at?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          full_name?: string
+          id?: string
+          portfolio_links?: string | null
+          reason?: string
+          reviewed_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       video_comments: {
         Row: {
           content: string
@@ -1345,6 +1423,36 @@ export type Database = {
           reference_id?: string | null
           transaction_type?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      watch_time_tracking: {
+        Row: {
+          content_id: string
+          content_type: string
+          created_at: string
+          creator_id: string
+          id: string
+          viewer_id: string
+          watch_seconds: number
+        }
+        Insert: {
+          content_id: string
+          content_type: string
+          created_at?: string
+          creator_id: string
+          id?: string
+          viewer_id: string
+          watch_seconds?: number
+        }
+        Update: {
+          content_id?: string
+          content_type?: string
+          created_at?: string
+          creator_id?: string
+          id?: string
+          viewer_id?: string
+          watch_seconds?: number
         }
         Relationships: []
       }

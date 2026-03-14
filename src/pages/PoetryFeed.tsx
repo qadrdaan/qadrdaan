@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SendGift from "@/components/SendGift";
 import { Heart, MessageCircle, BookmarkPlus, Bookmark, PenLine, Share2, TrendingUp, Sparkles, Globe } from "lucide-react";
+import ReportContent from "@/components/ReportContent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Post {
@@ -257,7 +258,8 @@ const PoetryFeed = () => {
                   <button onClick={() => handleBookmark(post)} className={`flex items-center gap-1.5 text-sm font-body transition-colors ${post.is_bookmarked ? "text-secondary" : "text-muted-foreground hover:text-secondary"}`}>
                     {post.is_bookmarked ? <Bookmark className="w-4 h-4 fill-current" /> : <BookmarkPlus className="w-4 h-4" />}
                   </button>
-                  <div className="ml-auto">
+                  <div className="ml-auto flex items-center gap-3">
+                    <ReportContent contentType="post" contentId={post.id} reportedUserId={post.creator_id} />
                     <SendGift recipientId={post.creator_id} recipientName={post.creator_name || "Poet"} />
                   </div>
                 </div>
