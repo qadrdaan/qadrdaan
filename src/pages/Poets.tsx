@@ -125,5 +125,6 @@ const Poets = () => {
       <Footer />
     </div>
   );
+};
 
 export default Poets;
