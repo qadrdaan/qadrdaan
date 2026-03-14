@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SendGift from "@/components/SendGift";
 import { Heart, MessageCircle, BookmarkPlus, Bookmark, PenLine, Share2, TrendingUp, Sparkles, Globe } from "lucide-react";
+import ReportContent from "@/components/ReportContent";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Post {
