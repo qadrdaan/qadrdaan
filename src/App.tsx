@@ -50,6 +50,9 @@ import FanClubs from "./pages/FanClubs";
 import FanClubDetail from "./pages/FanClubDetail";
 import VideoRooms from "./pages/VideoRooms";
 import VideoRoomDetail from "./pages/VideoRoomDetail";
+import AdsManager from "./pages/AdsManager";
+import CreateAd from "./pages/CreateAd";
+import BoostPost from "./pages/BoostPost";
 
 const queryClient = new QueryClient();
 
