@@ -27,6 +27,7 @@ const creatorLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/analytics", label: "Analytics" },
   { href: "/wallet", label: "Wallet" },
+  { href: "/ads", label: "Ads Manager" },
   { href: "/referrals", label: "Referrals" },
   { href: "/verification", label: "Verification" },
 ];

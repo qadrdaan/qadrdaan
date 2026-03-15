@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.analyze-poetry]
 verify_jwt = false
+
+[functions.serve-ad]
+verify_jwt = false
