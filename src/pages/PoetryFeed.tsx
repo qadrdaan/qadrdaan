@@ -221,50 +221,58 @@ const PoetryFeed = () => {
         ) : (
           <div className="space-y-6">
             {posts.map((post, i) => (
-              <motion.article
-                key={post.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="bg-card border border-border rounded-2xl p-6"
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <Link to={`/poet/${post.creator_id}`} className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-sm font-bold text-primary font-display">
-                    {(post.creator_name || "?")[0].toUpperCase()}
-                  </Link>
-                  <div className="flex-1">
-                    <Link to={`/poet/${post.creator_id}`} className="font-body text-sm font-semibold text-foreground hover:text-secondary transition-colors">{post.creator_name}</Link>
-                    <p className="font-body text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()} · {post.category} {post.language ? `· ${post.language}` : ""}</p>
+              <div key={post.id}>
+                {/* Show sponsored post every 6 posts */}
+                {i > 0 && i % 6 === 0 && <SponsoredPost placement="feed" />}
+                <motion.article
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                  className="bg-card border border-border rounded-2xl p-6"
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <Link to={`/poet/${post.creator_id}`} className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center text-sm font-bold text-primary font-display">
+                      {(post.creator_name || "?")[0].toUpperCase()}
+                    </Link>
+                    <div className="flex-1">
+                      <Link to={`/poet/${post.creator_id}`} className="font-body text-sm font-semibold text-foreground hover:text-secondary transition-colors">{post.creator_name}</Link>
+                      <p className="font-body text-xs text-muted-foreground">{new Date(post.created_at).toLocaleDateString()} · {post.category} {post.language ? `· ${post.language}` : ""}</p>
+                    </div>
+                    {post.is_editor_pick && (
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-body">
+                        <Sparkles className="w-3 h-3" /> Pick
+                      </span>
+                    )}
                   </div>
-                  {post.is_editor_pick && (
-                    <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-accent/20 text-accent text-xs font-body">
-                      <Sparkles className="w-3 h-3" /> Pick
-                    </span>
-                  )}
-                </div>
 
-                <h2 className="font-display text-xl font-bold text-foreground mb-3">{post.title}</h2>
-                <p className="font-body text-foreground/85 whitespace-pre-line leading-relaxed mb-5">{post.content}</p>
+                  <h2 className="font-display text-xl font-bold text-foreground mb-3">{post.title}</h2>
+                  <p className="font-body text-foreground/85 whitespace-pre-line leading-relaxed mb-5">{post.content}</p>
 
-                <div className="flex items-center gap-4 pt-3 border-t border-border">
-                  <button onClick={() => handleLike(post)} className={`flex items-center gap-1.5 text-sm font-body transition-colors ${post.is_liked ? "text-destructive" : "text-muted-foreground hover:text-destructive"}`}>
-                    <Heart className={`w-4 h-4 ${post.is_liked ? "fill-current" : ""}`} /> {post.likes_count}
-                  </button>
-                  <Link to={`/post/${post.id}`} className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-foreground transition-colors">
-                    <MessageCircle className="w-4 h-4" /> {post.comments_count}
-                  </Link>
-                  <button onClick={() => handleShare(post)} className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-secondary transition-colors">
-                    <Share2 className="w-4 h-4" /> {post.shares_count}
-                  </button>
-                  <button onClick={() => handleBookmark(post)} className={`flex items-center gap-1.5 text-sm font-body transition-colors ${post.is_bookmarked ? "text-secondary" : "text-muted-foreground hover:text-secondary"}`}>
-                    {post.is_bookmarked ? <Bookmark className="w-4 h-4 fill-current" /> : <BookmarkPlus className="w-4 h-4" />}
-                  </button>
-                  <div className="ml-auto flex items-center gap-3">
-                    <ReportContent contentType="post" contentId={post.id} reportedUserId={post.creator_id} />
-                    <SendGift recipientId={post.creator_id} recipientName={post.creator_name || "Poet"} />
+                  <div className="flex items-center gap-4 pt-3 border-t border-border">
+                    <button onClick={() => handleLike(post)} className={`flex items-center gap-1.5 text-sm font-body transition-colors ${post.is_liked ? "text-destructive" : "text-muted-foreground hover:text-destructive"}`}>
+                      <Heart className={`w-4 h-4 ${post.is_liked ? "fill-current" : ""}`} /> {post.likes_count}
+                    </button>
+                    <Link to={`/post/${post.id}`} className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-foreground transition-colors">
+                      <MessageCircle className="w-4 h-4" /> {post.comments_count}
+                    </Link>
+                    <button onClick={() => handleShare(post)} className="flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-secondary transition-colors">
+                      <Share2 className="w-4 h-4" /> {post.shares_count}
+                    </button>
+                    <button onClick={() => handleBookmark(post)} className={`flex items-center gap-1.5 text-sm font-body transition-colors ${post.is_bookmarked ? "text-secondary" : "text-muted-foreground hover:text-secondary"}`}>
+                      {post.is_bookmarked ? <Bookmark className="w-4 h-4 fill-current" /> : <BookmarkPlus className="w-4 h-4" />}
+                    </button>
+                    <div className="ml-auto flex items-center gap-3">
+                      {user && post.creator_id === user.id && (
+                        <Link to={`/boost-post?post=${post.id}`} className="p-1.5 rounded-lg text-muted-foreground hover:text-accent hover:bg-muted transition-colors" title="Boost post">
+                          <Rocket className="w-4 h-4" />
+                        </Link>
+                      )}
+                      <ReportContent contentType="post" contentId={post.id} reportedUserId={post.creator_id} />
+                      <SendGift recipientId={post.creator_id} recipientName={post.creator_name || "Poet"} />
+                    </div>
                   </div>
-                </div>
-              </motion.article>
+                </motion.article>
+              </div>
             ))}
           </div>
         )}
