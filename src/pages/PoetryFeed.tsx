@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SendGift from "@/components/SendGift";
-import { Heart, MessageCircle, BookmarkPlus, Bookmark, PenLine, Share2, TrendingUp, Sparkles, Globe } from "lucide-react";
+import { Heart, MessageCircle, BookmarkPlus, Bookmark, PenLine, Share2, TrendingUp, Sparkles, Globe, Rocket } from "lucide-react";
 import ReportContent from "@/components/ReportContent";
+import SponsoredPost from "@/components/SponsoredPost";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface Post {
