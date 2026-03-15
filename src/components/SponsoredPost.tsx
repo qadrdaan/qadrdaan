@@ -39,7 +39,7 @@ const SponsoredPost = ({ placement = "feed" }: SponsoredPostProps) => {
             placement,
             user_id: user?.id || null,
             language: profile?.language || null,
-            interests: profile?.preferred_genres || [],
+            interests: [],
           },
         });
         if (!error && data?.ad) {
