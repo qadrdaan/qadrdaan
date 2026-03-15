@@ -14,6 +14,345 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_campaigns: {
+        Row: {
+          ad_type: Database["public"]["Enums"]["ad_type"]
+          advertiser_id: string
+          bid_amount: number
+          clicks_count: number
+          conversions_count: number
+          created_at: string
+          daily_budget: number
+          end_date: string | null
+          engagement_rate: number
+          id: string
+          impressions_count: number
+          lifetime_budget: number | null
+          name: string
+          placements: Database["public"]["Enums"]["ad_placement"][]
+          pricing_model: Database["public"]["Enums"]["ad_pricing_model"]
+          quality_score: number
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          start_date: string
+          status: Database["public"]["Enums"]["ad_status"]
+          target_categories: string[] | null
+          target_follower_of: string[] | null
+          target_interests: string[] | null
+          target_languages: string[] | null
+          target_locations: string[] | null
+          total_spent: number
+          updated_at: string
+        }
+        Insert: {
+          ad_type?: Database["public"]["Enums"]["ad_type"]
+          advertiser_id: string
+          bid_amount?: number
+          clicks_count?: number
+          conversions_count?: number
+          created_at?: string
+          daily_budget?: number
+          end_date?: string | null
+          engagement_rate?: number
+          id?: string
+          impressions_count?: number
+          lifetime_budget?: number | null
+          name: string
+          placements?: Database["public"]["Enums"]["ad_placement"][]
+          pricing_model?: Database["public"]["Enums"]["ad_pricing_model"]
+          quality_score?: number
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["ad_status"]
+          target_categories?: string[] | null
+          target_follower_of?: string[] | null
+          target_interests?: string[] | null
+          target_languages?: string[] | null
+          target_locations?: string[] | null
+          total_spent?: number
+          updated_at?: string
+        }
+        Update: {
+          ad_type?: Database["public"]["Enums"]["ad_type"]
+          advertiser_id?: string
+          bid_amount?: number
+          clicks_count?: number
+          conversions_count?: number
+          created_at?: string
+          daily_budget?: number
+          end_date?: string | null
+          engagement_rate?: number
+          id?: string
+          impressions_count?: number
+          lifetime_budget?: number | null
+          name?: string
+          placements?: Database["public"]["Enums"]["ad_placement"][]
+          pricing_model?: Database["public"]["Enums"]["ad_pricing_model"]
+          quality_score?: number
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          start_date?: string
+          status?: Database["public"]["Enums"]["ad_status"]
+          target_categories?: string[] | null
+          target_follower_of?: string[] | null
+          target_interests?: string[] | null
+          target_languages?: string[] | null
+          target_locations?: string[] | null
+          total_spent?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ad_clicks: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          creative_id: string | null
+          id: string
+          ip_address: string | null
+          is_fraud: boolean
+          user_id: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          creative_id?: string | null
+          id?: string
+          ip_address?: string | null
+          is_fraud?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          creative_id?: string | null
+          id?: string
+          ip_address?: string | null
+          is_fraud?: boolean
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_clicks_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_clicks_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "ad_creatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_conversions: {
+        Row: {
+          action_type: string
+          campaign_id: string
+          created_at: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          action_type?: string
+          campaign_id: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          campaign_id?: string
+          created_at?: string
+          id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_conversions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_creatives: {
+        Row: {
+          body_text: string | null
+          campaign_id: string
+          carousel_slides: Json | null
+          created_at: string
+          cta_link: string | null
+          cta_text: string | null
+          headline: string | null
+          id: string
+          image_url: string | null
+          promoted_event_id: string | null
+          promoted_post_id: string | null
+          promoted_profile_id: string | null
+          video_url: string | null
+        }
+        Insert: {
+          body_text?: string | null
+          campaign_id: string
+          carousel_slides?: Json | null
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          headline?: string | null
+          id?: string
+          image_url?: string | null
+          promoted_event_id?: string | null
+          promoted_post_id?: string | null
+          promoted_profile_id?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          body_text?: string | null
+          campaign_id?: string
+          carousel_slides?: Json | null
+          created_at?: string
+          cta_link?: string | null
+          cta_text?: string | null
+          headline?: string | null
+          id?: string
+          image_url?: string | null
+          promoted_event_id?: string | null
+          promoted_post_id?: string | null
+          promoted_profile_id?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_creatives_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_impressions: {
+        Row: {
+          campaign_id: string
+          created_at: string
+          creative_id: string | null
+          id: string
+          ip_address: string | null
+          placement: Database["public"]["Enums"]["ad_placement"]
+          user_id: string | null
+        }
+        Insert: {
+          campaign_id: string
+          created_at?: string
+          creative_id?: string | null
+          id?: string
+          ip_address?: string | null
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          user_id?: string | null
+        }
+        Update: {
+          campaign_id?: string
+          created_at?: string
+          creative_id?: string | null
+          id?: string
+          ip_address?: string | null
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_impressions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_impressions_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "ad_creatives"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_transactions: {
+        Row: {
+          amount: number
+          campaign_id: string | null
+          created_at: string
+          description: string | null
+          id: string
+          transaction_type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          campaign_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          transaction_type?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          campaign_id?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          transaction_type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_transactions_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "ad_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      advertiser_balances: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          total_deposited: number
+          total_spent: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          total_deposited?: number
+          total_spent?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          total_deposited?: number
+          total_spent?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bookmarks: {
         Row: {
           content_id: string
@@ -1510,6 +1849,30 @@ export type Database = {
       }
     }
     Enums: {
+      ad_placement:
+        | "feed"
+        | "story"
+        | "video_between"
+        | "search_results"
+        | "profile"
+        | "marketplace"
+        | "live_room"
+      ad_pricing_model: "cpc" | "cpm" | "cpa"
+      ad_status:
+        | "draft"
+        | "pending_review"
+        | "active"
+        | "paused"
+        | "completed"
+        | "rejected"
+      ad_type:
+        | "sponsored_post"
+        | "single_image"
+        | "carousel"
+        | "video"
+        | "search"
+        | "profile_promotion"
+        | "event_promotion"
       app_role: "admin" | "moderator" | "user"
       competition_status: "upcoming" | "active" | "voting" | "ended"
       mushaira_status: "upcoming" | "live" | "ended" | "cancelled"
@@ -1641,6 +2004,33 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      ad_placement: [
+        "feed",
+        "story",
+        "video_between",
+        "search_results",
+        "profile",
+        "marketplace",
+        "live_room",
+      ],
+      ad_pricing_model: ["cpc", "cpm", "cpa"],
+      ad_status: [
+        "draft",
+        "pending_review",
+        "active",
+        "paused",
+        "completed",
+        "rejected",
+      ],
+      ad_type: [
+        "sponsored_post",
+        "single_image",
+        "carousel",
+        "video",
+        "search",
+        "profile_promotion",
+        "event_promotion",
+      ],
       app_role: ["admin", "moderator", "user"],
       competition_status: ["upcoming", "active", "voting", "ended"],
       mushaira_status: ["upcoming", "live", "ended", "cancelled"],
