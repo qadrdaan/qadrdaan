@@ -24,7 +24,7 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [violations, setViolations] = useState<any[]>([]);
   const [verificationRequests, setVerificationRequests] = useState<any[]>([]);
-  const [platformStats, setPlatformStats] = useState({ users: 0, creators: 0, posts: 0, books: 0, videos: 0 });
+  const [platformStats, setPlatformStats] = useState({ users: 0, creators: 0, posts: 0, books: 0, videos: 0, totalAdSpend: 0, activeAds: 0 });
 
   useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [authLoading, user, navigate]);
 
