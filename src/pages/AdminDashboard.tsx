@@ -107,10 +107,18 @@ const AdminDashboard = () => {
       <section className="pt-28 pb-20 container mx-auto px-6 max-w-6xl">
         <h1 className="font-display text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
         <p className="font-body text-muted-foreground mb-8">Platform management & moderation</p>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          {[{ l: "Users", v: platformStats.users }, { l: "Creators", v: platformStats.creators }, { l: "Posts", v: platformStats.posts }, { l: "Books", v: platformStats.books }, { l: "Videos", v: platformStats.videos }].map(s => (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+          {[
+            { l: "Users", v: platformStats.users },
+            { l: "Creators", v: platformStats.creators },
+            { l: "Posts", v: platformStats.posts },
+            { l: "Books", v: platformStats.books },
+            { l: "Videos", v: platformStats.videos },
+            { l: "Ad Revenue", v: `$${platformStats.totalAdSpend.toFixed(2)}` },
+            { l: "Active Ads", v: platformStats.activeAds },
+          ].map(s => (
             <div key={s.l} className="p-4 bg-card border border-border rounded-xl text-center">
-              <p className="font-display text-2xl font-bold text-foreground">{s.v}</p>
+              <p className="font-display text-xl font-bold text-foreground">{s.v}</p>
               <p className="font-body text-xs text-muted-foreground">{s.l}</p>
             </div>
           ))}
