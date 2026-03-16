@@ -41,7 +41,7 @@ const AdminDashboard = () => {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [pRes, rRes, vRes, vrRes, uC, cC, pC, bC, viC] = await Promise.all([
+    const [pRes, rRes, vRes, vrRes, uC, cC, pC, bC, viC, adSpend, activeAds] = await Promise.all([
       supabase.from("coin_purchases").select("*").order("created_at", { ascending: false }).limit(50),
       supabase.from("content_reports" as any).select("*").order("created_at", { ascending: false }).limit(50),
       supabase.from("user_violations").select("*").order("created_at", { ascending: false }).limit(50),
@@ -51,6 +51,8 @@ const AdminDashboard = () => {
       supabase.from("poetry_posts").select("id", { count: "exact", head: true }),
       supabase.from("books").select("id", { count: "exact", head: true }),
       supabase.from("videos").select("id", { count: "exact", head: true }),
+      supabase.from("ad_campaigns").select("total_spent"),
+      supabase.from("ad_campaigns").select("id", { count: "exact", head: true }).eq("status", "active"),
     ]);
     const ids = new Set<string>();
     [pRes, rRes, vRes, vrRes].forEach((r) => (r.data || []).forEach((d: any) => {
@@ -65,7 +67,8 @@ const AdminDashboard = () => {
     setReports((rRes.data || []).map((r: any) => ({ ...r, reporter_name: nm.get(r.reporter_id), reported_name: nm.get(r.reported_user_id) })));
     setViolations((vRes.data || []).map((v: any) => ({ ...v, user_name: nm.get(v.user_id) })));
     setVerificationRequests((vrRes.data || []).map((v: any) => ({ ...v, user_name: nm.get(v.user_id) })));
-    setPlatformStats({ users: uC.count || 0, creators: cC.count || 0, posts: pC.count || 0, books: bC.count || 0, videos: viC.count || 0 });
+    const totalAdSpend = ((adSpend.data as any[]) || []).reduce((s: number, c: any) => s + (c.total_spent || 0), 0);
+    setPlatformStats({ users: uC.count || 0, creators: cC.count || 0, posts: pC.count || 0, books: bC.count || 0, videos: viC.count || 0, totalAdSpend, activeAds: activeAds.count || 0 });
     setLoading(false);
   };
 
