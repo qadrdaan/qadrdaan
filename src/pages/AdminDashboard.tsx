@@ -190,6 +190,26 @@ const AdminDashboard = () => {
             ))}
           </div></TabsContent>
 
+          <TabsContent value="ads">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="font-display text-lg font-bold text-foreground mb-4">Ad Platform Overview</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-background border border-border rounded-xl text-center">
+                  <p className="font-display text-xl font-bold text-foreground">{platformStats.activeAds}</p>
+                  <p className="font-body text-xs text-muted-foreground">Active Campaigns</p>
+                </div>
+                <div className="p-4 bg-background border border-border rounded-xl text-center">
+                  <p className="font-display text-xl font-bold text-secondary">${platformStats.totalAdSpend.toFixed(2)}</p>
+                  <p className="font-body text-xs text-muted-foreground">Total Revenue</p>
+                </div>
+                <div className="p-4 bg-background border border-border rounded-xl text-center">
+                  <p className="font-display text-xl font-bold text-accent">${(platformStats.totalAdSpend * 0.35).toFixed(2)}</p>
+                  <p className="font-body text-xs text-muted-foreground">Platform Share (35%)</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
+
           <TabsContent value="violations"><div className="space-y-3">
             {violations.length === 0 ? <p className="font-body text-muted-foreground text-center py-10">No violations</p> : violations.map((v: any) => (
               <motion.div key={v.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-4 bg-card border border-border rounded-xl">
