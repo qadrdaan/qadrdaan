@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Users, DollarSign, Flag, CheckCircle, XCircle, BadgeCheck } from "lucide-react";
+import { AlertTriangle, Users, DollarSign, Flag, CheckCircle, XCircle, BadgeCheck, Megaphone } from "lucide-react";
 
 interface CoinPurchase {
   id: string; user_id: string; amount: number; price: number; status: string;
@@ -24,7 +24,7 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState<any[]>([]);
   const [violations, setViolations] = useState<any[]>([]);
   const [verificationRequests, setVerificationRequests] = useState<any[]>([]);
-  const [platformStats, setPlatformStats] = useState({ users: 0, creators: 0, posts: 0, books: 0, videos: 0 });
+  const [platformStats, setPlatformStats] = useState({ users: 0, creators: 0, posts: 0, books: 0, videos: 0, totalAdSpend: 0, activeAds: 0 });
 
   useEffect(() => { if (!authLoading && !user) navigate("/auth"); }, [authLoading, user, navigate]);
 
@@ -41,7 +41,7 @@ const AdminDashboard = () => {
 
   const fetchAll = async () => {
     setLoading(true);
-    const [pRes, rRes, vRes, vrRes, uC, cC, pC, bC, viC] = await Promise.all([
+    const [pRes, rRes, vRes, vrRes, uC, cC, pC, bC, viC, adSpend, activeAds] = await Promise.all([
       supabase.from("coin_purchases").select("*").order("created_at", { ascending: false }).limit(50),
       supabase.from("content_reports" as any).select("*").order("created_at", { ascending: false }).limit(50),
       supabase.from("user_violations").select("*").order("created_at", { ascending: false }).limit(50),
@@ -51,6 +51,8 @@ const AdminDashboard = () => {
       supabase.from("poetry_posts").select("id", { count: "exact", head: true }),
       supabase.from("books").select("id", { count: "exact", head: true }),
       supabase.from("videos").select("id", { count: "exact", head: true }),
+      supabase.from("ad_campaigns").select("total_spent"),
+      supabase.from("ad_campaigns").select("id", { count: "exact", head: true }).eq("status", "active"),
     ]);
     const ids = new Set<string>();
     [pRes, rRes, vRes, vrRes].forEach((r) => (r.data || []).forEach((d: any) => {
@@ -65,7 +67,8 @@ const AdminDashboard = () => {
     setReports((rRes.data || []).map((r: any) => ({ ...r, reporter_name: nm.get(r.reporter_id), reported_name: nm.get(r.reported_user_id) })));
     setViolations((vRes.data || []).map((v: any) => ({ ...v, user_name: nm.get(v.user_id) })));
     setVerificationRequests((vrRes.data || []).map((v: any) => ({ ...v, user_name: nm.get(v.user_id) })));
-    setPlatformStats({ users: uC.count || 0, creators: cC.count || 0, posts: pC.count || 0, books: bC.count || 0, videos: viC.count || 0 });
+    const totalAdSpend = ((adSpend.data as any[]) || []).reduce((s: number, c: any) => s + (c.total_spent || 0), 0);
+    setPlatformStats({ users: uC.count || 0, creators: cC.count || 0, posts: pC.count || 0, books: bC.count || 0, videos: viC.count || 0, totalAdSpend, activeAds: activeAds.count || 0 });
     setLoading(false);
   };
 
@@ -104,19 +107,28 @@ const AdminDashboard = () => {
       <section className="pt-28 pb-20 container mx-auto px-6 max-w-6xl">
         <h1 className="font-display text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
         <p className="font-body text-muted-foreground mb-8">Platform management & moderation</p>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          {[{ l: "Users", v: platformStats.users }, { l: "Creators", v: platformStats.creators }, { l: "Posts", v: platformStats.posts }, { l: "Books", v: platformStats.books }, { l: "Videos", v: platformStats.videos }].map(s => (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
+          {[
+            { l: "Users", v: platformStats.users },
+            { l: "Creators", v: platformStats.creators },
+            { l: "Posts", v: platformStats.posts },
+            { l: "Books", v: platformStats.books },
+            { l: "Videos", v: platformStats.videos },
+            { l: "Ad Revenue", v: `$${platformStats.totalAdSpend.toFixed(2)}` },
+            { l: "Active Ads", v: platformStats.activeAds },
+          ].map(s => (
             <div key={s.l} className="p-4 bg-card border border-border rounded-xl text-center">
-              <p className="font-display text-2xl font-bold text-foreground">{s.v}</p>
+              <p className="font-display text-xl font-bold text-foreground">{s.v}</p>
               <p className="font-body text-xs text-muted-foreground">{s.l}</p>
             </div>
           ))}
         </div>
         <Tabs defaultValue="reports">
-          <TabsList className="grid grid-cols-4 mb-6">
+          <TabsList className="grid grid-cols-5 mb-6">
             <TabsTrigger value="reports" className="gap-1 text-xs"><Flag className="w-3.5 h-3.5" />Reports{pr.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-destructive text-destructive-foreground rounded-full text-xs">{pr.length}</span>}</TabsTrigger>
             <TabsTrigger value="verification" className="gap-1 text-xs"><BadgeCheck className="w-3.5 h-3.5" />Verify{pv.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-full text-xs">{pv.length}</span>}</TabsTrigger>
             <TabsTrigger value="purchases" className="gap-1 text-xs"><DollarSign className="w-3.5 h-3.5" />Purchases{pp.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-secondary text-secondary-foreground rounded-full text-xs">{pp.length}</span>}</TabsTrigger>
+            <TabsTrigger value="ads" className="gap-1 text-xs"><Megaphone className="w-3.5 h-3.5" />Ads</TabsTrigger>
             <TabsTrigger value="violations" className="gap-1 text-xs"><AlertTriangle className="w-3.5 h-3.5" />Violations</TabsTrigger>
           </TabsList>
 
@@ -177,6 +189,26 @@ const AdminDashboard = () => {
               </motion.div>
             ))}
           </div></TabsContent>
+
+          <TabsContent value="ads">
+            <div className="bg-card border border-border rounded-xl p-6">
+              <h3 className="font-display text-lg font-bold text-foreground mb-4">Ad Platform Overview</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-background border border-border rounded-xl text-center">
+                  <p className="font-display text-xl font-bold text-foreground">{platformStats.activeAds}</p>
+                  <p className="font-body text-xs text-muted-foreground">Active Campaigns</p>
+                </div>
+                <div className="p-4 bg-background border border-border rounded-xl text-center">
+                  <p className="font-display text-xl font-bold text-secondary">${platformStats.totalAdSpend.toFixed(2)}</p>
+                  <p className="font-body text-xs text-muted-foreground">Total Revenue</p>
+                </div>
+                <div className="p-4 bg-background border border-border rounded-xl text-center">
+                  <p className="font-display text-xl font-bold text-accent">${(platformStats.totalAdSpend * 0.35).toFixed(2)}</p>
+                  <p className="font-body text-xs text-muted-foreground">Platform Share (35%)</p>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
 
           <TabsContent value="violations"><div className="space-y-3">
             {violations.length === 0 ? <p className="font-body text-muted-foreground text-center py-10">No violations</p> : violations.map((v: any) => (
