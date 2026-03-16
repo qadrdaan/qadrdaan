@@ -124,10 +124,11 @@ const AdminDashboard = () => {
           ))}
         </div>
         <Tabs defaultValue="reports">
-          <TabsList className="grid grid-cols-4 mb-6">
+          <TabsList className="grid grid-cols-5 mb-6">
             <TabsTrigger value="reports" className="gap-1 text-xs"><Flag className="w-3.5 h-3.5" />Reports{pr.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-destructive text-destructive-foreground rounded-full text-xs">{pr.length}</span>}</TabsTrigger>
             <TabsTrigger value="verification" className="gap-1 text-xs"><BadgeCheck className="w-3.5 h-3.5" />Verify{pv.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-accent text-accent-foreground rounded-full text-xs">{pv.length}</span>}</TabsTrigger>
             <TabsTrigger value="purchases" className="gap-1 text-xs"><DollarSign className="w-3.5 h-3.5" />Purchases{pp.length > 0 && <span className="ml-1 px-1.5 py-0.5 bg-secondary text-secondary-foreground rounded-full text-xs">{pp.length}</span>}</TabsTrigger>
+            <TabsTrigger value="ads" className="gap-1 text-xs"><Megaphone className="w-3.5 h-3.5" />Ads</TabsTrigger>
             <TabsTrigger value="violations" className="gap-1 text-xs"><AlertTriangle className="w-3.5 h-3.5" />Violations</TabsTrigger>
           </TabsList>
 
