@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertTriangle, Users, DollarSign, Flag, CheckCircle, XCircle, BadgeCheck } from "lucide-react";
+import { AlertTriangle, Users, DollarSign, Flag, CheckCircle, XCircle, BadgeCheck, Megaphone } from "lucide-react";
 
 interface CoinPurchase {
   id: string; user_id: string; amount: number; price: number; status: string;
