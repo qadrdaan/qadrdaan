@@ -38,9 +38,9 @@ const GiftShop = () => {
     setBalance(data?.coins ?? 0);
   };
 
-  useState(() => {
+  useEffect(() => {
     fetchBalance();
-  });
+  }, [user]);
 
   const handlePurchase = async (pkg: typeof COIN_PACKAGES[0]) => {
     if (!user) {
