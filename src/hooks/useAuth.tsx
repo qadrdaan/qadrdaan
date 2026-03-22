@@ -7,6 +7,7 @@ interface Profile {
   user_id: string;
   display_name: string | null;
   avatar_url: string | null;
+  cover_image_url: string | null;
   bio: string | null;
   language: string | null;
   country: string | null;
@@ -15,6 +16,7 @@ interface Profile {
   is_creator: boolean;
   is_verified: boolean;
   followers_count: number;
+  following_count: number;
   books_count: number;
   videos_count: number;
   total_gifts_received: number;
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .select("*")
       .eq("user_id", userId)
       .single();
-    setProfile(data);
+    setProfile(data as Profile | null);
   };
 
   const refreshProfile = async () => {
