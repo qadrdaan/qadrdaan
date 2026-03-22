@@ -56,10 +56,10 @@ const FeaturesSection = () => (
       >
         <p className="font-body text-sm tracking-[0.2em] uppercase text-secondary mb-3">Platform Features</p>
         <h2 className="font-display text-4xl md:text-5xl font-bold text-foreground">
-          Everything a Poet <span className="text-gradient-gold">Needs</span>
+          Everything a Poet <span className="text-gradient-brand">Needs</span>
         </h2>
         <p className="font-body text-muted-foreground mt-4 max-w-xl mx-auto">
-          From publishing to performing, Qadrdaan gives creators every tool to share their art with the world.
+          From publishing to performing, qadrdaan gives creators every tool to share their art with the world.
         </p>
       </motion.div>
 
@@ -74,10 +74,10 @@ const FeaturesSection = () => (
           <motion.div
             key={feature.title}
             variants={item}
-            className="group p-8 rounded-2xl bg-card border border-border hover:border-gold/30 transition-all duration-300 hover:shadow-gold"
+            className="group p-8 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all duration-300 hover:shadow-brand"
           >
-            <div className="w-12 h-12 rounded-xl bg-gradient-gold flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
-              <feature.icon className="w-6 h-6 text-primary" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-brand flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+              <feature.icon className="w-6 h-6 text-white" />
             </div>
             <h3 className="font-display text-xl font-semibold text-foreground mb-3">{feature.title}</h3>
             <p className="font-body text-muted-foreground text-sm leading-relaxed">{feature.description}</p>
