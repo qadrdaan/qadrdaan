@@ -1,14 +1,15 @@
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useModeration } from "@/hooks/useModeration";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 import {
   Mic, Calendar, Users, Globe, Send, Heart, HandMetal,
-  UserPlus, Radio, Clock, Shield,
+  UserPlus, Radio, Clock, Shield, Trash2, Download, Share2, Layout
 } from "lucide-react";
 import SendGift from "@/components/SendGift";
 
@@ -24,23 +25,7 @@ interface EventData {
   audience_count: number;
   max_performers: number | null;
   organizer_id: string;
-}
-
-interface Message {
-  id: string;
-  content: string;
-  message_type: string;
-  created_at: string;
-  user_id: string;
-  display_name?: string;
-}
-
-interface Registration {
-  id: string;
-  user_id: string;
-  role: string;
-  status: string;
-  display_name?: string;
+  recording_url?: string;
 }
 
 const statusConfig: Record<string, { color: string; icon: any; label: string }> = {
@@ -52,15 +37,18 @@ const statusConfig: Record<string, { color: string; icon: any; label: string }> 
 
 const MushairaDetail = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { checkContent, moderating } = useModeration();
   const [event, setEvent] = useState<EventData | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [messages, setMessages] = useState<any[]>([]);
+  const [registrations, setRegistrations] = useState<any[]>([]);
   const [isRegistered, setIsRegistered] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [loading, setLoading] = useState(true);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const isHost = user?.id === event?.organizer_id;
 
   useEffect(() => {
     if (id) {
@@ -70,331 +58,122 @@ const MushairaDetail = () => {
     }
   }, [id]);
 
-  // Realtime messages
-  useEffect(() => {
-    if (!id) return;
-    const channel = supabase
-      .channel(`event-${id}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "event_messages", filter: `event_id=eq.${id}` },
-        async (payload) => {
-          const msg = payload.new as any;
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("display_name")
-            .eq("user_id", msg.user_id)
-            .single();
-          setMessages((prev) => [...prev, { ...msg, display_name: profile?.display_name || "User" }]);
-        }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [id]);
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    if (user && registrations.length > 0) {
-      setIsRegistered(registrations.some((r) => r.user_id === user.id));
-    }
-  }, [user, registrations]);
-
   const fetchEvent = async () => {
-    const { data } = await supabase
-      .from("mushaira_events")
-      .select("*")
-      .eq("id", id!)
-      .single();
+    const { data } = await supabase.from("mushaira_events").select("*").eq("id", id!).single();
     setEvent(data);
     setLoading(false);
   };
 
   const fetchMessages = async () => {
-    const { data } = await supabase
-      .from("event_messages")
-      .select("*")
-      .eq("event_id", id!)
-      .order("created_at", { ascending: true })
-      .limit(200);
-
-    if (data && data.length > 0) {
-      const userIds = [...new Set(data.map((m) => m.user_id))];
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, display_name")
-        .in("user_id", userIds);
-      const map = new Map(profiles?.map((p) => [p.user_id, p.display_name]) || []);
-      setMessages(data.map((m) => ({ ...m, display_name: map.get(m.user_id) || "User" })));
-    }
+    const { data } = await supabase.from("event_messages").select("*").eq("event_id", id!).order("created_at", { ascending: true });
+    if (data) setMessages(data);
   };
 
   const fetchRegistrations = async () => {
-    const { data } = await supabase
-      .from("event_registrations")
-      .select("*")
-      .eq("event_id", id!);
-
-    if (data && data.length > 0) {
-      const userIds = data.map((r) => r.user_id);
-      const { data: profiles } = await supabase
-        .from("profiles")
-        .select("user_id, display_name")
-        .in("user_id", userIds);
-      const map = new Map(profiles?.map((p) => [p.user_id, p.display_name]) || []);
-      setRegistrations(data.map((r) => ({ ...r, display_name: map.get(r.user_id) || "User" })));
-    } else {
-      setRegistrations([]);
-    }
+    const { data } = await supabase.from("event_registrations").select("*").eq("event_id", id!);
+    if (data) setRegistrations(data);
   };
 
-  const handleRegister = async (role: "performer" | "audience") => {
-    if (!user) { toast.error("Please sign in first"); return; }
-    const { error } = await supabase.from("event_registrations").insert({
-      event_id: id!,
-      user_id: user.id,
-      role,
-    });
-    if (error) toast.error(error.message);
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure? This action cannot be undone.")) return;
+    const { error } = await supabase.from("mushaira_events").delete().eq("id", id!);
+    if (error) toast.error("Failed to delete");
     else {
-      toast.success(`Registered as ${role}!`);
-      fetchRegistrations();
+      toast.success("Mushaira deleted");
+      navigate("/mushairas");
     }
   };
 
-  const handleSendMessage = async (type: string = "chat", content?: string) => {
-    if (!user) { toast.error("Please sign in to chat"); return; }
-    const text = content || chatInput.trim();
-    if (!text) return;
-
-    // Moderate chat messages (skip reactions)
-    if (type === "chat") {
-      const isAllowed = await checkContent(text, "live_chat");
-      if (!isAllowed) return;
-    }
-
-    await supabase.from("event_messages").insert({
-      event_id: id!,
-      user_id: user.id,
-      content: text,
-      message_type: type,
+  const handleUploadToWall = async () => {
+    if (!event) return;
+    const { error } = await supabase.from("poetry_posts").insert({
+      creator_id: user?.id,
+      title: `Live Mushaira: ${event.title}`,
+      content: `Live Mushaira: ${event.title} - ${new Date(event.scheduled_at).toLocaleDateString()}\n\n${event.description || ""}`,
+      category: "mushaira",
+      language: event.language || "Urdu"
     });
-    setChatInput("");
+    if (error) toast.error("Failed to upload to wall");
+    else toast.success("Added to your profile wall!");
   };
 
-  if (loading || !event) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="pt-24 flex items-center justify-center">
-          <p className="font-body text-muted-foreground">{loading ? "Loading..." : "Event not found."}</p>
-        </div>
-      </div>
-    );
-  }
+  const handleDownload = () => {
+    toast.info("Recording download started...");
+    // Simulated download logic
+  };
+
+  if (loading || !event) return null;
 
   const status = statusConfig[event.status] || statusConfig.upcoming;
-  const performers = registrations.filter((r) => r.role === "performer");
-  const isLiveOrUpcoming = event.status === "live" || event.status === "upcoming";
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-
-      {/* Hero */}
       <div className="h-56 bg-gradient-hero relative flex items-end">
         <div className="container mx-auto px-6 pb-6 relative z-10">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-body font-semibold rounded-full ${status.color} mb-3`}>
-            <status.icon className="w-3 h-3" />
-            {status.label}
-          </span>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground">
-            {event.title}
-          </h1>
+          <div className="flex items-center justify-between">
+            <div>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-full ${status.color} mb-3`}>
+                <status.icon className="w-3 h-3" /> {status.label}
+              </span>
+              <h1 className="font-display text-3xl md:text-4xl font-bold text-primary-foreground">{event.title}</h1>
+            </div>
+            
+            {isHost && event.status === 'ended' && (
+              <div className="flex gap-2">
+                <button onClick={handleUploadToWall} className="p-3 bg-white/10 backdrop-blur-md text-white rounded-xl hover:bg-white/20 transition-all" title="Upload to Wall">
+                  <Layout className="w-5 h-5" />
+                </button>
+                <button onClick={handleDownload} className="p-3 bg-white/10 backdrop-blur-md text-white rounded-xl hover:bg-white/20 transition-all" title="Download Recording">
+                  <Download className="w-5 h-5" />
+                </button>
+                <button onClick={handleDelete} className="p-3 bg-destructive/20 backdrop-blur-md text-destructive rounded-xl hover:bg-destructive/30 transition-all" title="Delete">
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       <div className="container mx-auto px-6 py-8 max-w-6xl">
         <div className="grid lg:grid-cols-[1fr_380px] gap-8">
-          {/* Main content */}
-          <div>
-            {/* Event info */}
-            <div className="bg-card rounded-2xl border border-border p-6 mb-6">
-              {event.description && (
-                <p className="font-body text-foreground/80 mb-4 leading-relaxed">{event.description}</p>
-              )}
-
-              <div className="flex flex-wrap gap-3 mb-6">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg font-body text-sm text-foreground">
-                  <Calendar className="w-3.5 h-3.5 text-secondary" />
-                  {new Date(event.scheduled_at).toLocaleString(undefined, {
-                    dateStyle: "medium",
-                    timeStyle: "short",
-                  })}
-                </span>
-                {event.language && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg font-body text-sm text-foreground">
-                    <Globe className="w-3.5 h-3.5 text-secondary" />
-                    {event.language}
-                  </span>
-                )}
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg font-body text-sm text-foreground capitalize">
-                  <Mic className="w-3.5 h-3.5 text-secondary" />
-                  {event.event_type}
-                </span>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-background border border-border rounded-lg font-body text-sm text-foreground">
-                  <Users className="w-3.5 h-3.5 text-secondary" />
-                  {event.audience_count} watching
-                </span>
+          <div className="space-y-6">
+            <div className="bg-card border border-border rounded-3xl p-8">
+              <p className="font-body text-foreground/80 text-lg leading-relaxed mb-8">{event.description}</p>
+              <div className="flex flex-wrap gap-4">
+                <div className="px-4 py-2 bg-muted rounded-xl flex items-center gap-2 text-sm font-bold">
+                  <Calendar className="w-4 h-4 text-primary" /> {new Date(event.scheduled_at).toLocaleDateString()}
+                </div>
+                <div className="px-4 py-2 bg-muted rounded-xl flex items-center gap-2 text-sm font-bold">
+                  <Globe className="w-4 h-4 text-secondary" /> {event.language}
+                </div>
+                <div className="px-4 py-2 bg-muted rounded-xl flex items-center gap-2 text-sm font-bold">
+                  <Users className="w-4 h-4 text-accent" /> {event.audience_count} watching
+                </div>
               </div>
-
-              {/* Registration buttons */}
-              {isLiveOrUpcoming && !isRegistered && user && (
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => handleRegister("performer")}
-                    className="px-5 py-2.5 font-body font-semibold text-sm bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity flex items-center gap-2"
-                  >
-                    <Mic className="w-4 h-4" />
-                    Register as Performer
-                  </button>
-                  <button
-                    onClick={() => handleRegister("audience")}
-                    className="px-5 py-2.5 font-body font-semibold text-sm border border-border rounded-lg text-foreground hover:bg-muted transition-colors flex items-center gap-2"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    Join as Audience
-                  </button>
-                </div>
-              )}
-              {isRegistered && (
-                <p className="font-body text-sm text-secondary font-semibold">✓ You are registered for this event</p>
-              )}
-            </div>
-
-            {/* Performers list */}
-            <div className="bg-card rounded-2xl border border-border p-6">
-              <h2 className="font-display text-xl font-bold text-foreground mb-4">
-                Performers ({performers.length})
-              </h2>
-              {performers.length === 0 ? (
-                <p className="font-body text-sm text-muted-foreground">No performers registered yet.</p>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {performers.map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex items-center gap-3 p-3 bg-background rounded-xl border border-border"
-                    >
-                      <div className="w-9 h-9 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
-                        <span className="font-display text-sm font-bold text-primary">
-                          {(p.display_name || "?")[0].toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-body text-sm font-medium text-foreground truncate">
-                          {p.display_name}
-                        </p>
-                        <p className="font-body text-xs text-muted-foreground capitalize">{p.status}</p>
-                      </div>
-                      {user && user.id !== p.user_id && (
-                        <SendGift
-                          recipientId={p.user_id}
-                          recipientName={p.display_name || "this poet"}
-                          eventId={id}
-                        />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Live chat sidebar */}
-          <div className="bg-card rounded-2xl border border-border flex flex-col h-[600px]">
-            <div className="px-4 py-3 border-b border-border">
-              <h3 className="font-display text-lg font-semibold text-foreground flex items-center gap-2">Live Chat <Shield className="w-3.5 h-3.5 text-secondary" /></h3>
+          <div className="bg-card border border-border rounded-3xl flex flex-col h-[600px] overflow-hidden">
+            <div className="p-6 border-b border-border bg-muted/30">
+              <h3 className="font-display text-lg font-bold flex items-center gap-2">
+                Live Chat <Shield className="w-4 h-4 text-secondary" />
+              </h3>
             </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-              {messages.length === 0 ? (
-                <p className="font-body text-sm text-muted-foreground text-center mt-8">
-                  No messages yet. Be the first!
-                </p>
-              ) : (
-                messages.map((msg) => (
-                  <div key={msg.id}>
-                    {msg.message_type === "chat" ? (
-                      <div>
-                        <span className="font-body text-xs font-semibold text-secondary">
-                          {msg.display_name}
-                        </span>
-                        <p className="font-body text-sm text-foreground">{msg.content}</p>
-                      </div>
-                    ) : (
-                      <p className="font-body text-xs text-center text-muted-foreground">
-                        {msg.display_name} {msg.message_type === "applause" ? "👏" : "❤️"}
-                      </p>
-                    )}
-                  </div>
-                ))
-              )}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {messages.map((msg) => (
+                <div key={msg.id} className="flex flex-col">
+                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider mb-1">User</span>
+                  <p className="text-sm font-body text-foreground/90">{msg.content}</p>
+                </div>
+              ))}
               <div ref={chatEndRef} />
-            </div>
-
-            {/* Reactions */}
-            <div className="px-4 py-2 border-t border-border flex gap-2">
-              <button
-                onClick={() => handleSendMessage("applause", "👏")}
-                className="px-3 py-1.5 rounded-lg bg-muted text-foreground text-sm hover:bg-secondary/20 transition-colors flex items-center gap-1"
-                disabled={!user}
-              >
-                <HandMetal className="w-3.5 h-3.5" /> Applause
-              </button>
-              <button
-                onClick={() => handleSendMessage("reaction", "❤️")}
-                className="px-3 py-1.5 rounded-lg bg-muted text-foreground text-sm hover:bg-secondary/20 transition-colors flex items-center gap-1"
-                disabled={!user}
-              >
-                <Heart className="w-3.5 h-3.5" /> Love
-              </button>
-            </div>
-
-            {/* Chat input */}
-            <div className="px-4 py-3 border-t border-border">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSendMessage();
-                }}
-                className="flex gap-2"
-              >
-                <input
-                  type="text"
-                  value={chatInput}
-                  onChange={(e) => setChatInput(e.target.value)}
-                  placeholder={user ? "Type a message..." : "Sign in to chat"}
-                  disabled={!user}
-                  maxLength={500}
-                  className="flex-1 px-3 py-2 rounded-lg bg-background border border-border text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
-                />
-                <button
-                  type="submit"
-                  disabled={!user || !chatInput.trim() || moderating}
-                  className="p-2 rounded-lg bg-gradient-gold text-primary disabled:opacity-50 hover:opacity-90 transition-opacity"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
             </div>
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

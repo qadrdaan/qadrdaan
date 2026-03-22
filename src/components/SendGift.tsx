@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Gift, X } from "lucide-react";
+import { Gift, X, PlusCircle, Coins } from "lucide-react";
+import CoinPurchaseModal from "./CoinPurchaseModal";
 
 const GIFT_TYPES = [
   { type: "rose", emoji: "🌹", label: "Rose", description: "A token of appreciation", cost: 1 },
@@ -22,6 +23,7 @@ interface SendGiftProps {
 const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftProps) => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [purchaseOpen, setPurchaseOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
@@ -37,9 +39,9 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
     setBalance(data?.coins ?? 0);
   };
 
-  useState(() => {
-    fetchBalance();
-  });
+  useEffect(() => {
+    if (open) fetchBalance();
+  }, [open, user]);
 
   const handleSend = async () => {
     if (!user) { toast.error("Please sign in to send gifts"); return; }
@@ -49,15 +51,14 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
     const gift = GIFT_TYPES.find((g) => g.type === selected);
     if (!gift) { toast.error("Invalid gift type"); return; }
 
-    // Check balance
     if (balance < gift.cost) {
-      toast.error(`Insufficient coins! You need ${gift.cost} coins but have ${balance}.`);
+      toast.error(`Insufficient coins! You need ${gift.cost} coins.`);
+      setPurchaseOpen(true);
       return;
     }
 
     setSending(true);
 
-    // Deduct coins from sender
     const { error: balanceError } = await supabase
       .from("user_balances")
       .update({ coins: balance - gift.cost })
@@ -69,7 +70,6 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
       return;
     }
 
-    // Insert gift
     const { error } = await supabase.from("gifts").insert({
       sender_id: user.id,
       recipient_id: recipientId,
@@ -81,11 +81,7 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
 
     if (error) {
       toast.error(error.message);
-      // Refund coins on error
-      await supabase
-        .from("user_balances")
-        .update({ coins: balance })
-        .eq("user_id", user.id);
+      await supabase.from("user_balances").update({ coins: balance }).eq("user_id", user.id);
     } else {
       toast.success(`${gift.emoji} ${gift.label} sent to ${recipientName}!`);
       setOpen(false);
@@ -110,6 +106,12 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
         Send Gift
       </button>
 
+      <CoinPurchaseModal 
+        isOpen={purchaseOpen} 
+        onClose={() => setPurchaseOpen(false)} 
+        onSuccess={(newBal) => setBalance(newBal)} 
+      />
+
       <AnimatePresence>
         {open && (
           <motion.div
@@ -120,7 +122,7 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
             onClick={() => setOpen(false)}
           >
             <motion.div
-              className="bg-card rounded-2xl border border-border p-6 w-full max-w-md shadow-emerald"
+              className="bg-card rounded-3xl border border-border p-6 w-full max-w-md shadow-2xl"
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
@@ -135,38 +137,44 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
                 </button>
               </div>
 
-              <div className="mb-5 px-4 py-2 bg-background border border-border rounded-lg">
-                <p className="font-body text-sm text-muted-foreground">
-                  Your balance: <span className="font-semibold text-foreground">{balance} coins</span>
-                </p>
+              <div className="mb-5 px-4 py-3 bg-muted/50 border border-border rounded-2xl flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Coins className="w-5 h-5 text-accent" />
+                  <p className="font-body text-sm text-muted-foreground">
+                    Balance: <span className="font-bold text-foreground">{balance} coins</span>
+                  </p>
+                </div>
+                <button 
+                  onClick={() => setPurchaseOpen(true)}
+                  className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1 hover:underline"
+                >
+                  <PlusCircle className="w-3.5 h-3.5" /> Buy Coins
+                </button>
               </div>
 
-              {/* Gift types */}
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {GIFT_TYPES.map((gift) => (
                   <button
                     key={gift.type}
                     onClick={() => setSelected(gift.type)}
-                    disabled={balance < gift.cost}
-                    className={`p-4 rounded-xl border-2 text-center transition-all ${
+                    className={`p-4 rounded-2xl border-2 text-center transition-all ${
                       selected === gift.type
-                        ? "border-secondary bg-secondary/10 shadow-gold"
-                        : balance < gift.cost
-                        ? "border-border opacity-50 cursor-not-allowed"
+                        ? "border-secondary bg-secondary/5 shadow-lg shadow-secondary/5"
                         : "border-border hover:border-secondary/30"
                     }`}
                   >
                     <span className="text-3xl block mb-1">{gift.emoji}</span>
-                    <p className="font-body text-sm font-semibold text-foreground">{gift.label}</p>
-                    <p className="font-body text-xs text-muted-foreground">{gift.description}</p>
-                    <p className="font-body text-xs text-secondary font-semibold mt-1">{gift.cost} coins</p>
+                    <p className="font-body text-sm font-bold text-foreground">{gift.label}</p>
+                    <p className="font-body text-[10px] text-muted-foreground mb-2">{gift.description}</p>
+                    <p className={`font-body text-xs font-bold ${balance < gift.cost ? 'text-destructive' : 'text-secondary'}`}>
+                      {gift.cost} coins
+                    </p>
                   </button>
                 ))}
               </div>
 
-              {/* Optional message */}
               <div className="mb-5">
-                <label className="block font-body text-sm font-medium text-foreground mb-1.5">
+                <label className="block font-body text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">
                   Message (optional)
                 </label>
                 <input
@@ -175,16 +183,16 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
                   onChange={(e) => setMessage(e.target.value)}
                   maxLength={200}
                   placeholder="Your words of appreciation..."
-                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border text-foreground font-body text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
                 />
               </div>
 
               <button
                 onClick={handleSend}
                 disabled={!selected || sending}
-                className="w-full py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-4 font-body font-bold bg-gradient-brand rounded-2xl text-white shadow-brand hover:opacity-90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                <Gift className="w-4 h-4" />
+                <Gift className="w-5 h-5" />
                 {sending ? "Sending..." : "Send Gift"}
               </button>
             </motion.div>

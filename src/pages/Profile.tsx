@@ -6,14 +6,16 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { BadgeCheck, BookOpen, Users, Video, Gift, Camera, ImagePlus } from "lucide-react";
+import { BadgeCheck, Camera, ImagePlus } from "lucide-react";
 import ProfileWall from "@/components/ProfileWall";
 import PromotionObligation from "@/components/PromotionObligation";
+import ProfilePhotoDialog from "@/components/ProfilePhotoDialog";
 
 const Profile = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
+  const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
   const [form, setForm] = useState({
     display_name: "",
     bio: "",
@@ -21,9 +23,7 @@ const Profile = () => {
     country: "",
   });
   const [saving, setSaving] = useState(false);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
-  const avatarRef = useRef<HTMLInputElement>(null);
   const coverRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -54,26 +54,23 @@ const Profile = () => {
     setSaving(false);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'avatar' | 'cover') => {
+  const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     
-    const isAvatar = type === 'avatar';
-    if (isAvatar) setUploadingAvatar(true); else setUploadingCover(true);
-
-    const path = `${user.id}/${type}-${Date.now()}`;
+    setUploadingCover(true);
+    const path = `${user.id}/cover-${Date.now()}`;
     const { error } = await supabase.storage.from("cover-images").upload(path, file, { upsert: true });
     
     if (error) {
       toast.error("Upload failed");
     } else {
       const { data: { publicUrl } } = supabase.storage.from("cover-images").getPublicUrl(path);
-      await supabase.from("profiles").update({ [isAvatar ? 'avatar_url' : 'cover_image_url']: publicUrl }).eq("user_id", user.id);
-      toast.success(`${isAvatar ? 'Avatar' : 'Cover'} updated!`);
+      await supabase.from("profiles").update({ cover_image_url: publicUrl }).eq("user_id", user.id);
+      toast.success("Cover updated!");
       await refreshProfile();
     }
-    
-    if (isAvatar) setUploadingAvatar(false); else setUploadingCover(false);
+    setUploadingCover(false);
   };
 
   if (loading || !profile) return null;
@@ -82,7 +79,6 @@ const Profile = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Cover Photo */}
       <div className="relative h-64 md:h-80 bg-gradient-hero overflow-hidden">
         {profile.cover_image_url ? (
           <img src={profile.cover_image_url} alt="Cover" className="w-full h-full object-cover" />
@@ -99,15 +95,14 @@ const Profile = () => {
           <ImagePlus className="w-4 h-4" />
           {uploadingCover ? "Uploading..." : "Update Cover"}
         </button>
-        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'cover')} />
+        <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverUpload} />
       </div>
 
       <div className="container mx-auto px-6 max-w-5xl -mt-20 relative z-10 pb-20">
         <div className="grid lg:grid-cols-[320px_1fr] gap-8">
-          {/* Sidebar Info */}
           <div className="space-y-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-3xl border border-border p-8 shadow-xl">
-              <div className="relative w-32 h-32 mx-auto mb-6">
+              <div className="relative w-32 h-32 mx-auto mb-6 group cursor-pointer" onClick={() => setPhotoDialogOpen(true)}>
                 <div className="w-full h-full rounded-full bg-gradient-brand flex items-center justify-center border-4 border-card overflow-hidden shadow-lg">
                   {profile.avatar_url ? (
                     <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
@@ -115,14 +110,9 @@ const Profile = () => {
                     <span className="font-display text-4xl font-bold text-white">{(profile.display_name || "?")[0].toUpperCase()}</span>
                   )}
                 </div>
-                <button
-                  onClick={() => avatarRef.current?.click()}
-                  disabled={uploadingAvatar}
-                  className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-secondary text-white flex items-center justify-center shadow-lg hover:scale-110 transition-transform border-4 border-card"
-                >
-                  <Camera className="w-4 h-4" />
-                </button>
-                <input ref={avatarRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleFileUpload(e, 'avatar')} />
+                <div className="absolute inset-0 rounded-full bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <Camera className="w-8 h-8 text-white" />
+                </div>
               </div>
 
               <div className="text-center mb-6">
@@ -161,12 +151,21 @@ const Profile = () => {
             <PromotionObligation />
           </div>
 
-          {/* Main Wall */}
           <div className="space-y-8">
             <ProfileWall userId={user.id} isOwnProfile={true} />
           </div>
         </div>
       </div>
+
+      <ProfilePhotoDialog 
+        isOpen={photoDialogOpen}
+        onClose={() => setPhotoDialogOpen(false)}
+        photoUrl={profile.avatar_url}
+        displayName={profile.display_name || "Poet"}
+        isOwnProfile={true}
+        userId={user.id}
+        onUpdate={refreshProfile}
+      />
       <Footer />
     </div>
   );
