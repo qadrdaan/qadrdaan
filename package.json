@@ -1,7 +1,8 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "qadrdaan",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Global Poetry & Literature Platform",
   "type": "module",
   "scripts": {
     "dev": "vite",
