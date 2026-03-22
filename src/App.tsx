@@ -53,6 +53,7 @@ import VideoRoomDetail from "./pages/VideoRoomDetail";
 import AdsManager from "./pages/AdsManager";
 import CreateAd from "./pages/CreateAd";
 import BoostPost from "./pages/BoostPost";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -112,6 +113,7 @@ const App = () => (
             <Route path="/ads" element={<AdsManager />} />
             <Route path="/create-ad" element={<CreateAd />} />
             <Route path="/boost-post" element={<BoostPost />} />
+            <Route path="/notifications" element={<Notifications />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
