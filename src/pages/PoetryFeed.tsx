@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PostCard from "@/components/PostCard";
+import SponsoredPost from "@/components/SponsoredPost";
 import { TrendingUp, Sparkles, Globe, PenLine, Users, BadgeCheck } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -97,8 +98,12 @@ const PoetryFeed = () => {
               </div>
             ) : (
               <div className="space-y-6">
-                {posts.map((post) => (
-                  <PostCard key={post.id} post={post} onUpdate={fetchPosts} />
+                {posts.map((post, index) => (
+                  <div key={post.id} className="space-y-6">
+                    <PostCard post={post} onUpdate={fetchPosts} />
+                    {/* Inject ad every 5 posts */}
+                    {(index + 1) % 5 === 0 && <SponsoredPost placement="feed" />}
+                  </div>
                 ))}
               </div>
             )}
