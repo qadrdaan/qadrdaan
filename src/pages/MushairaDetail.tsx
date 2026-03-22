@@ -11,7 +11,6 @@ import {
   UserPlus, Radio, Clock, Shield,
 } from "lucide-react";
 import SendGift from "@/components/SendGift";
-import { Gift } from "lucide-react";
 
 interface EventData {
   id: string;
