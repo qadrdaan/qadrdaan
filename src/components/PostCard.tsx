@@ -1,9 +1,9 @@
 "use client";
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Share2, Bookmark, BookmarkPlus, Trash2, Sparkles } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, BookmarkPlus, Trash2, Sparkles, Rocket } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -18,6 +18,7 @@ interface PostCardProps {
 
 const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleLike = async () => {
     if (!user) { toast.error("Sign in to like"); return; }
@@ -62,11 +63,22 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
             <Sparkles className="w-3 h-3" /> Pick
           </span>
         )}
-        {showDelete && user?.id === post.creator_id && (
-          <button onClick={handleDelete} className="p-2 text-muted-foreground hover:text-destructive transition-colors">
-            <Trash2 className="w-4 h-4" />
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {user?.id === post.creator_id && (
+            <button 
+              onClick={() => navigate(`/boost-post?post=${post.id}`)}
+              className="p-2 text-muted-foreground hover:text-accent transition-colors"
+              title="Boost Post"
+            >
+              <Rocket className="w-4 h-4" />
+            </button>
+          )}
+          {showDelete && user?.id === post.creator_id && (
+            <button onClick={handleDelete} className="p-2 text-muted-foreground hover:text-destructive transition-colors">
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
 
       <Link to={`/post/${post.id}`} className="block group">

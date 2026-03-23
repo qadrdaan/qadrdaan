@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import PostCard from './PostCard';
 import CreatePostBox from './CreatePostBox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { PenLine, Video, Image as ImageIcon, Mic, Loader2, Calendar } from 'lucide-react';
+import { PenLine, Video, Image as ImageIcon, Mic, Loader2, Calendar, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 interface ProfileWallProps {
@@ -17,6 +17,7 @@ const ProfileWall = ({ userId, isOwnProfile }: ProfileWallProps) => {
   const [posts, setPosts] = useState<any[]>([]);
   const [videos, setVideos] = useState<any[]>([]);
   const [mushairas, setMushairas] = useState<any[]>([]);
+  const [books, setBooks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("posts");
 
@@ -49,11 +50,19 @@ const ProfileWall = ({ userId, isOwnProfile }: ProfileWallProps) => {
     setLoading(false);
   }, [userId]);
 
+  const fetchBooks = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase.from("books").select("*").eq("creator_id", userId).order("created_at", { ascending: false });
+    setBooks(data || []);
+    setLoading(false);
+  }, [userId]);
+
   useEffect(() => {
     if (activeTab === "posts") fetchPosts();
     else if (activeTab === "videos") fetchVideos();
     else if (activeTab === "mushairas") fetchMushairas();
-  }, [userId, activeTab, fetchPosts, fetchVideos, fetchMushairas]);
+    else if (activeTab === "books") fetchBooks();
+  }, [userId, activeTab, fetchPosts, fetchVideos, fetchMushairas, fetchBooks]);
 
   return (
     <div className="space-y-6">
@@ -63,17 +72,17 @@ const ProfileWall = ({ userId, isOwnProfile }: ProfileWallProps) => {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-4 bg-muted/50 p-1 rounded-xl">
-          <TabsTrigger value="posts" className="gap-2 text-xs font-bold uppercase tracking-wider">
+          <TabsTrigger value="posts" className="gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
             <PenLine className="w-3.5 h-3.5" /> Posts
           </TabsTrigger>
-          <TabsTrigger value="videos" className="gap-2 text-xs font-bold uppercase tracking-wider">
+          <TabsTrigger value="videos" className="gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
             <Video className="w-3.5 h-3.5" /> Videos
           </TabsTrigger>
-          <TabsTrigger value="photos" className="gap-2 text-xs font-bold uppercase tracking-wider">
-            <ImageIcon className="w-3.5 h-3.5" /> Photos
+          <TabsTrigger value="books" className="gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+            <BookOpen className="w-3.5 h-3.5" /> Books
           </TabsTrigger>
-          <TabsTrigger value="mushairas" className="gap-2 text-xs font-bold uppercase tracking-wider">
-            <Mic className="w-3.5 h-3.5" /> Mushairas
+          <TabsTrigger value="mushairas" className="gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+            <Mic className="w-3.5 h-3.5" /> Events
           </TabsTrigger>
         </TabsList>
 
@@ -120,11 +129,28 @@ const ProfileWall = ({ userId, isOwnProfile }: ProfileWallProps) => {
           )}
         </TabsContent>
 
-        <TabsContent value="photos" className="mt-6">
-          <div className="text-center py-20 bg-card border border-dashed border-border rounded-2xl">
-            <ImageIcon className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-            <p className="font-body text-muted-foreground">Photos feature coming soon.</p>
-          </div>
+        <TabsContent value="books" className="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-4">
+          {loading ? (
+            <div className="col-span-full flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>
+          ) : books.length === 0 ? (
+            <div className="col-span-full text-center py-20 bg-card border border-dashed border-border rounded-2xl">
+              <BookOpen className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+              <p className="font-body text-muted-foreground">No books published yet.</p>
+            </div>
+          ) : (
+            books.map((book) => (
+              <Link key={book.id} to={`/book/${book.id}`} className="group bg-card border border-border rounded-2xl overflow-hidden hover:shadow-md transition-all">
+                <div className="aspect-[3/4] bg-muted relative">
+                  {book.cover_url && <img src={book.cover_url} className="w-full h-full object-cover" />}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
+                </div>
+                <div className="p-3">
+                  <h4 className="font-body font-bold text-xs truncate">{book.title}</h4>
+                  <p className="font-body text-[10px] text-muted-foreground uppercase mt-1">{book.downloads_count} downloads</p>
+                </div>
+              </Link>
+            ))
+          )}
         </TabsContent>
 
         <TabsContent value="mushairas" className="mt-6 space-y-4">
