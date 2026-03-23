@@ -8,7 +8,8 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Users, Crown, Plus, Layout, TrendingUp, Gift, ShieldAlert, BadgeCheck, Loader2, Search } from 'lucide-react';
+import { Users, Crown, Plus, Layout, TrendingUp, Gift, ShieldAlert, BadgeCheck, Loader2, Search, MessageSquare, Trophy } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const CreatorHub = () => {
   const { user, profile, loading: authLoading } = useAuth();
@@ -16,6 +17,7 @@ const CreatorHub = () => {
   const [hub, setHub] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [publicHubs, setPublicHubs] = useState<any[]>([]);
+  const [topHubs, setTopHubs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [joining, setJoining] = useState<string | null>(null);
@@ -27,13 +29,15 @@ const CreatorHub = () => {
   }, [authLoading, user, navigate]);
 
   useEffect(() => {
-    if (user) fetchHubData();
+    if (user) {
+      fetchHubData();
+      fetchLeaderboard();
+    }
   }, [user]);
 
   const fetchHubData = async () => {
     setLoading(true);
     try {
-      // Check if user is a leader or member of a hub
       const { data: hubMember } = await (supabase
         .from("hub_members" as any)
         .select("hub_id, role")
@@ -56,7 +60,6 @@ const CreatorHub = () => {
         
         setMembers(memberData || []);
       } else {
-        // Fetch public hubs to join
         const { data: hubs } = await (supabase
           .from("creator_hubs" as any)
           .select("*, profiles:leader_id(display_name)")
@@ -68,6 +71,15 @@ const CreatorHub = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchLeaderboard = async () => {
+    const { data } = await (supabase
+      .from("creator_hubs" as any)
+      .select("*, profiles:leader_id(display_name)")
+      .order("total_score" as any, { ascending: false })
+      .limit(5) as any);
+    setTopHubs(data || []);
   };
 
   const handleCreateHub = async () => {
@@ -149,7 +161,7 @@ const CreatorHub = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8 max-w-5xl">
+      <div className="container mx-auto px-6 py-8 max-w-6xl">
         {!hub ? (
           <div className="space-y-12">
             <div className="max-w-2xl mx-auto text-center space-y-8 py-6">
@@ -201,7 +213,6 @@ const CreatorHub = () => {
               )}
             </div>
 
-            {/* Public Hubs List */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <h2 className="font-display text-2xl font-bold">Discover Families</h2>
@@ -237,7 +248,6 @@ const CreatorHub = () => {
         ) : (
           <div className="grid lg:grid-cols-[1fr_320px] gap-8">
             <div className="space-y-8">
-              {/* Hub Header */}
               <div className="bg-card border border-border rounded-3xl p-8 flex items-center gap-6 shadow-sm">
                 <div className="w-20 h-20 rounded-2xl bg-gradient-brand flex items-center justify-center text-3xl font-bold text-white">
                   {hub.name[0]}
@@ -248,11 +258,10 @@ const CreatorHub = () => {
                 </div>
               </div>
 
-              {/* Team Stats */}
               <div className="grid grid-cols-3 gap-4">
                 <div className="bg-card border border-border rounded-2xl p-6 text-center">
                   <TrendingUp className="w-5 h-5 text-primary mx-auto mb-2" />
-                  <p className="font-display text-xl font-bold text-foreground">12.4K</p>
+                  <p className="font-display text-xl font-bold text-foreground">{hub.total_score || 0}</p>
                   <p className="font-body text-[10px] text-muted-foreground uppercase font-bold">Team Score</p>
                 </div>
                 <div className="bg-card border border-border rounded-2xl p-6 text-center">
@@ -267,41 +276,87 @@ const CreatorHub = () => {
                 </div>
               </div>
 
-              {/* Members List */}
-              <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
-                <div className="p-6 border-b border-border bg-muted/30 flex items-center justify-between">
-                  <h3 className="font-display text-lg font-bold">Team Members</h3>
-                  <button className="px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-bold uppercase tracking-widest">Invite Poet</button>
-                </div>
-                <div className="divide-y divide-border">
-                  {members.map((m) => (
-                    <div key={m.id} className="p-4 flex items-center justify-between hover:bg-muted/20 transition-colors">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-muted overflow-hidden">
-                          {m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-brand text-white text-xs font-bold">{m.profiles?.display_name[0]}</div>}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-1">
-                            <p className="font-body text-sm font-bold text-foreground">{m.profiles?.display_name}</p>
-                            {m.profiles?.is_verified && <BadgeCheck className="w-3.5 h-3.5 text-secondary" />}
+              <Tabs defaultValue="members" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 bg-muted/50 p-1 rounded-xl">
+                  <TabsTrigger value="members" className="gap-2 text-xs font-bold uppercase"><Users className="w-3.5 h-3.5" /> Members</TabsTrigger>
+                  <TabsTrigger value="wall" className="gap-2 text-xs font-bold uppercase"><MessageSquare className="w-3.5 h-3.5" /> Family Wall</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="members" className="mt-6">
+                  <div className="bg-card border border-border rounded-3xl overflow-hidden shadow-sm">
+                    <div className="p-6 border-b border-border bg-muted/30 flex items-center justify-between">
+                      <h3 className="font-display text-lg font-bold">Team Members</h3>
+                      <button className="px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-bold uppercase tracking-widest">Invite Poet</button>
+                    </div>
+                    <div className="divide-y divide-border">
+                      {members.map((m) => (
+                        <div key={m.id} className="p-4 flex items-center justify-between hover:bg-muted/20 transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-muted overflow-hidden">
+                              {m.profiles?.avatar_url ? <img src={m.profiles.avatar_url} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center bg-gradient-brand text-white text-xs font-bold">{m.profiles?.display_name[0]}</div>}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-1">
+                                <p className="font-body text-sm font-bold text-foreground">{m.profiles?.display_name}</p>
+                                {m.profiles?.is_verified && <BadgeCheck className="w-3.5 h-3.5 text-secondary" />}
+                              </div>
+                              <p className="font-body text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{m.role}</p>
+                            </div>
                           </div>
-                          <p className="font-body text-[10px] text-muted-foreground uppercase font-bold tracking-wider">{m.role}</p>
+                          <div className="text-right">
+                            <p className="font-display text-sm font-bold text-secondary">2.1K Gems</p>
+                          </div>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-display text-sm font-bold text-secondary">2.1K Gems</p>
+                      ))}
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="wall" className="mt-6">
+                  <div className="bg-card border border-border rounded-3xl p-8 text-center">
+                    <MessageSquare className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <h3 className="font-display text-xl font-bold mb-2">Family Wall</h3>
+                    <p className="font-body text-muted-foreground mb-6">Internal messages and announcements for your family.</p>
+                    <div className="space-y-4 text-left">
+                      <div className="p-4 bg-muted/30 rounded-2xl border border-border">
+                        <p className="font-body text-sm text-foreground/80">Welcome to our new Poetry Family! Let's grow together. 🌹</p>
+                        <p className="font-body text-[10px] text-muted-foreground mt-2 uppercase font-bold">Leader · Just now</p>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
 
             <aside className="space-y-6">
+              <div className="bg-card border border-border rounded-3xl p-6 shadow-sm">
+                <h3 className="font-display text-lg font-bold mb-4 flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-accent" /> Top Families
+                </h3>
+                <div className="space-y-4">
+                  {topHubs.map((h, i) => (
+                    <div key={h.id} className="flex items-center justify-between group">
+                      <div className="flex items-center gap-3">
+                        <span className="font-display text-sm font-bold text-muted-foreground w-4">{i + 1}</span>
+                        <div className="w-8 h-8 rounded-lg bg-gradient-brand flex items-center justify-center text-xs font-bold text-white">
+                          {h.name[0]}
+                        </div>
+                        <p className="font-body text-sm font-bold text-foreground group-hover:text-primary transition-colors truncate max-w-[120px]">{h.name}</p>
+                      </div>
+                      <span className="font-display text-xs font-bold text-secondary">{h.total_score || 0}</span>
+                    </div>
+                  ))}
+                </div>
+                <button className="w-full mt-6 py-2 bg-muted text-foreground rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-muted/80 transition-all">View All Rankings</button>
+              </div>
+
               <div className="bg-gradient-brand rounded-3xl p-6 text-white shadow-brand">
-                <h3 className="font-display text-lg font-bold mb-2">Hub Leaderboard</h3>
-                <p className="font-body text-xs text-white/80 mb-4">Your hub is currently ranked <strong>#12</strong> globally.</p>
-                <button className="w-full py-2 bg-white text-primary rounded-xl text-[10px] font-bold uppercase tracking-widest">View Rankings</button>
+                <h3 className="font-display text-lg font-bold mb-2">Hub Perks</h3>
+                <ul className="space-y-2">
+                  <li className="font-body text-[10px] flex items-center gap-2"><BadgeCheck className="w-3 h-3" /> Shared Earnings</li>
+                  <li className="font-body text-[10px] flex items-center gap-2"><BadgeCheck className="w-3 h-3" /> Exclusive Rooms</li>
+                  <li className="font-body text-[10px] flex items-center gap-2"><BadgeCheck className="w-3 h-3" /> Family Badge</li>
+                </ul>
               </div>
             </aside>
           </div>
