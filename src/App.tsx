@@ -54,6 +54,7 @@ import AdsManager from "./pages/AdsManager";
 import CreateAd from "./pages/CreateAd";
 import BoostPost from "./pages/BoostPost";
 import CreatorHub from "./pages/CreatorHub";
+import Shorts from "./pages/Shorts";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +83,7 @@ const App = () => (
             <Route path="/videos" element={<Videos />} />
             <Route path="/video/:id" element={<VideoDetail />} />
             <Route path="/upload-video" element={<UploadVideo />} />
+            <Route path="/shorts" element={<Shorts />} />
             <Route path="/poetry" element={<PoetryFeed />} />
             <Route path="/create-post" element={<CreatePost />} />
             <Route path="/post/:id" element={<PostDetail />} />

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Menu, X, ChevronDown } from "lucide-react";
+import { Menu, X, ChevronDown, Play } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
 import SearchBar from "@/components/SearchBar";
@@ -8,6 +8,7 @@ import Logo from "@/components/Logo";
 
 const mainLinks = [
   { href: "/poetry", label: "Poetry" },
+  { href: "/shorts", label: "Shorts" },
   { href: "/books", label: "Books" },
   { href: "/videos", label: "Videos" },
   { href: "/poets", label: "Poets" },
@@ -33,6 +34,7 @@ const creatorLinks = [
   { href: "/ads", label: "Ads Manager" },
   { href: "/referrals", label: "Referrals" },
   { href: "/verification", label: "Verification" },
+  { href: "/creator-hub", label: "Creator Hub" },
 ];
 
 const Navbar = () => {

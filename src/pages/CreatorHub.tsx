@@ -8,15 +8,17 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Users, Crown, Plus, Layout, TrendingUp, Gift, ShieldAlert, BadgeCheck, Loader2 } from 'lucide-react';
+import { Users, Crown, Plus, Layout, TrendingUp, Gift, ShieldAlert, BadgeCheck, Loader2, Search } from 'lucide-react';
 
 const CreatorHub = () => {
   const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [hub, setHub] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
+  const [publicHubs, setPublicHubs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [joining, setJoining] = useState<string | null>(null);
   
   const [form, setForm] = useState({ name: "", description: "" });
 
@@ -32,7 +34,7 @@ const CreatorHub = () => {
     setLoading(true);
     try {
       // Check if user is a leader or member of a hub
-      const { data: hubMember, error: memberError } = await (supabase
+      const { data: hubMember } = await (supabase
         .from("hub_members" as any)
         .select("hub_id, role")
         .eq("user_id", user!.id)
@@ -53,6 +55,13 @@ const CreatorHub = () => {
           .eq("hub_id", hubMember.hub_id) as any);
         
         setMembers(memberData || []);
+      } else {
+        // Fetch public hubs to join
+        const { data: hubs } = await (supabase
+          .from("creator_hubs" as any)
+          .select("*, profiles:leader_id(display_name)")
+          .limit(10) as any);
+        setPublicHubs(hubs || []);
       }
     } catch (err) {
       console.error("Error fetching hub data:", err);
@@ -73,7 +82,6 @@ const CreatorHub = () => {
 
     setCreating(true);
     try {
-      // 1. Create the Hub
       const { data: newHub, error: hubError } = await (supabase
         .from("creator_hubs" as any)
         .insert({
@@ -86,8 +94,7 @@ const CreatorHub = () => {
 
       if (hubError) throw hubError;
 
-      // 2. Add leader as the first member
-      const { error: memberError } = await (supabase
+      await (supabase
         .from("hub_members" as any)
         .insert({
           hub_id: newHub.id,
@@ -95,14 +102,34 @@ const CreatorHub = () => {
           role: 'leader'
         }) as any);
 
-      if (memberError) throw memberError;
-
       toast.success("Poetry Family created successfully!");
       fetchHubData();
     } catch (error: any) {
       toast.error("Failed to create hub: " + error.message);
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleJoinHub = async (hubId: string) => {
+    setJoining(hubId);
+    try {
+      const { error } = await (supabase
+        .from("hub_members" as any)
+        .insert({
+          hub_id: hubId,
+          user_id: user!.id,
+          role: 'member'
+        }) as any);
+
+      if (error) throw error;
+
+      toast.success("Joined the family!");
+      fetchHubData();
+    } catch (error: any) {
+      toast.error("Failed to join: " + error.message);
+    } finally {
+      setJoining(null);
     }
   };
 
@@ -124,52 +151,88 @@ const CreatorHub = () => {
 
       <div className="container mx-auto px-6 py-8 max-w-5xl">
         {!hub ? (
-          <div className="max-w-2xl mx-auto text-center space-y-8 py-12">
-            <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-              <Users className="w-12 h-12 text-primary" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="font-display text-3xl font-bold text-foreground">Start Your Poetry Family</h2>
-              <p className="font-body text-muted-foreground">
-                Creator Hubs (Families) allow top poets to mentor others, host exclusive rooms, and share earnings.
-              </p>
+          <div className="space-y-12">
+            <div className="max-w-2xl mx-auto text-center space-y-8 py-6">
+              <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <Users className="w-12 h-12 text-primary" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="font-display text-3xl font-bold text-foreground">Join a Poetry Family</h2>
+                <p className="font-body text-muted-foreground">
+                  Creator Hubs (Families) allow top poets to mentor others, host exclusive rooms, and share earnings.
+                </p>
+              </div>
+
+              {!isEligible ? (
+                <div className="p-6 bg-accent/5 border border-accent/20 rounded-3xl flex flex-col items-center gap-4">
+                  <ShieldAlert className="w-10 h-10 text-accent" />
+                  <p className="font-body text-sm text-foreground/80 max-w-md">
+                    Only <strong>Verified Creators (Blue Badge)</strong> can lead a Hub. Apply for verification to unlock this feature.
+                  </p>
+                  <button onClick={() => navigate('/verification')} className="px-8 py-3 bg-accent text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-brand">Apply for Verification</button>
+                </div>
+              ) : (
+                <div className="bg-card border border-border rounded-3xl p-8 shadow-sm space-y-6">
+                  <h3 className="font-display text-xl font-bold">Start Your Own Family</h3>
+                  <div className="space-y-4">
+                    <input 
+                      placeholder="Hub Name (e.g. The Ghazal Masters)" 
+                      value={form.name}
+                      onChange={(e) => setForm({...form, name: e.target.value})}
+                      className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body" 
+                    />
+                    <textarea 
+                      placeholder="Hub Description" 
+                      value={form.description}
+                      onChange={(e) => setForm({...form, description: e.target.value})}
+                      rows={3} 
+                      className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body resize-none" 
+                    />
+                  </div>
+                  <button 
+                    onClick={handleCreateHub}
+                    disabled={creating}
+                    className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                    Create Hub (Free for Blue Badge)
+                  </button>
+                </div>
+              )}
             </div>
 
-            {!isEligible ? (
-              <div className="p-6 bg-accent/5 border border-accent/20 rounded-3xl flex flex-col items-center gap-4">
-                <ShieldAlert className="w-10 h-10 text-accent" />
-                <p className="font-body text-sm text-foreground/80 max-w-md">
-                  Only <strong>Verified Creators (Blue Badge)</strong> can lead a Hub. Apply for verification to unlock this feature.
-                </p>
-                <button onClick={() => navigate('/verification')} className="px-8 py-3 bg-accent text-white rounded-xl font-bold uppercase text-xs tracking-widest shadow-brand">Apply for Verification</button>
-              </div>
-            ) : (
-              <div className="bg-card border border-border rounded-3xl p-8 shadow-sm space-y-6">
-                <div className="space-y-4">
-                  <input 
-                    placeholder="Hub Name (e.g. The Ghazal Masters)" 
-                    value={form.name}
-                    onChange={(e) => setForm({...form, name: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body" 
-                  />
-                  <textarea 
-                    placeholder="Hub Description" 
-                    value={form.description}
-                    onChange={(e) => setForm({...form, description: e.target.value})}
-                    rows={3} 
-                    className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body resize-none" 
-                  />
+            {/* Public Hubs List */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="font-display text-2xl font-bold">Discover Families</h2>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <input placeholder="Search hubs..." className="pl-10 pr-4 py-2 rounded-xl bg-muted/50 border-none text-sm font-body focus:ring-2 focus:ring-primary/20" />
                 </div>
-                <button 
-                  onClick={handleCreateHub}
-                  disabled={creating}
-                  className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                >
-                  {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
-                  Create Hub (Free for Blue Badge)
-                </button>
               </div>
-            )}
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {publicHubs.map((h) => (
+                  <motion.div key={h.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card border border-border rounded-3xl p-6 shadow-sm hover:shadow-md transition-all">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-brand flex items-center justify-center text-xl font-bold text-white mb-4">
+                      {h.name[0]}
+                    </div>
+                    <h3 className="font-display text-lg font-bold mb-1">{h.name}</h3>
+                    <p className="font-body text-xs text-muted-foreground mb-4 line-clamp-2">{h.description || "A community of passionate poets."}</p>
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <span className="font-body text-[10px] text-muted-foreground uppercase font-bold">Leader: {h.profiles?.display_name}</span>
+                      <button 
+                        onClick={() => handleJoinHub(h.id)}
+                        disabled={joining === h.id}
+                        className="px-4 py-1.5 bg-primary/10 text-primary rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-white transition-all"
+                      >
+                        {joining === h.id ? "Joining..." : "Join"}
+                      </button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid lg:grid-cols-[1fr_320px] gap-8">
