@@ -6,16 +6,18 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { BadgeCheck, Camera, ImagePlus } from "lucide-react";
+import { BadgeCheck, Camera, ImagePlus, Sparkles } from "lucide-react";
 import ProfileWall from "@/components/ProfileWall";
 import PromotionObligation from "@/components/PromotionObligation";
 import ProfilePhotoDialog from "@/components/ProfilePhotoDialog";
+import DPFilter from "@/components/DPFilter";
 
 const Profile = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
+  const [currentFilter, setCurrentFilter] = useState('none');
   const [form, setForm] = useState({
     display_name: "",
     bio: "",
@@ -75,6 +77,13 @@ const Profile = () => {
 
   if (loading || !profile) return null;
 
+  const filterClasses: Record<string, string> = {
+    none: '',
+    gold: 'ring-4 ring-accent ring-offset-4',
+    silver: 'ring-4 ring-muted-foreground/30 ring-offset-4',
+    poetry: 'border-4 border-double border-primary p-1.5',
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -103,7 +112,7 @@ const Profile = () => {
           <div className="space-y-6">
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-card rounded-3xl border border-border p-8 shadow-xl">
               <div className="relative w-32 h-32 mx-auto mb-6 group cursor-pointer" onClick={() => setPhotoDialogOpen(true)}>
-                <div className="w-full h-full rounded-full bg-gradient-brand flex items-center justify-center border-4 border-card overflow-hidden shadow-lg">
+                <div className={`w-full h-full rounded-full bg-gradient-brand flex items-center justify-center border-4 border-card overflow-hidden shadow-lg transition-all ${filterClasses[currentFilter]}`}>
                   {profile.avatar_url ? (
                     <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                   ) : (
@@ -133,7 +142,18 @@ const Profile = () => {
                   </div>
                 </div>
               ) : (
-                <button onClick={() => setEditing(true)} className="w-full py-3 bg-muted text-foreground rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-muted/80 transition-colors">Edit Profile</button>
+                <div className="space-y-6">
+                  <button onClick={() => setEditing(true)} className="w-full py-3 bg-muted text-foreground rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-muted/80 transition-colors">Edit Profile</button>
+                  
+                  <div className="pt-6 border-t border-border">
+                    <DPFilter 
+                      currentFilter={currentFilter} 
+                      onSelect={setCurrentFilter} 
+                      avatarUrl={profile.avatar_url} 
+                      displayName={profile.display_name || "P"} 
+                    />
+                  </div>
+                </div>
               )}
 
               <div className="grid grid-cols-2 gap-4 mt-8">

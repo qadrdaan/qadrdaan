@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import {
   Wallet as WalletIcon, TrendingUp, Gift, BookOpen,
   ArrowDownToLine, Clock, CheckCircle, XCircle, DollarSign,
-  PlusCircle, History, CreditCard
+  PlusCircle, History, CreditCard, Info, BadgeCheck
 } from "lucide-react";
 
 interface WalletData {
@@ -34,7 +34,7 @@ interface Transaction {
 const COIN_RATE = 100; // 100 coins = $1
 
 const Wallet = () => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -63,21 +63,18 @@ const Wallet = () => {
   const fetchHistory = async () => {
     if (!user) return;
     
-    // Fetch earnings transactions
     const { data: txs } = await supabase
       .from("wallet_transactions")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    // Fetch coin purchases
     const { data: purchases } = await supabase
       .from("coin_purchases")
       .select("*")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
-    // Combine and sort
     const combined: Transaction[] = [
       ...(txs || []).map(t => ({ ...t, is_purchase: false })),
       ...(purchases || []).map(p => ({ 
@@ -92,12 +89,25 @@ const Wallet = () => {
 
     setTransactions(combined);
 
-    // Fetch withdrawals
     const { data: wds } = await supabase.from("withdrawal_requests").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
     setWithdrawals(wds || []);
   };
 
   const toDollars = (coins: number) => (coins / COIN_RATE).toFixed(2);
+
+  // Tiered Fee Logic
+  const getFeePercentage = () => {
+    if (profile?.is_verified) return 12;
+    const accountAgeDays = profile?.created_at 
+      ? Math.floor((Date.now() - new Date(profile.created_at).getTime()) / (1000 * 60 * 60 * 24)) 
+      : 0;
+    return accountAgeDays < 30 ? 18 : 15;
+  };
+
+  const feePercent = getFeePercentage();
+  const amountNum = parseFloat(withdrawAmount) || 0;
+  const feeAmount = (amountNum * feePercent) / 100;
+  const finalAmount = Math.max(0, amountNum - feeAmount);
 
   if (authLoading || loading) return <div className="min-h-screen bg-background"><Navbar /><div className="pt-28 text-center">Loading Wallet...</div></div>;
 
@@ -208,21 +218,56 @@ const Wallet = () => {
         )}
 
         {tab === "withdraw" && (
-          <div className="max-w-md mx-auto bg-card border border-border rounded-3xl p-8 shadow-sm">
-            <h3 className="font-display text-xl font-bold mb-2">Withdraw Funds</h3>
-            <p className="font-body text-sm text-muted-foreground mb-6">Minimum withdrawal is $5.00 (500 coins).</p>
-            <div className="space-y-4">
-              <div>
-                <label className="block font-body text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Amount (USD)</label>
-                <input 
-                  type="number" 
-                  value={withdrawAmount} 
-                  onChange={e => setWithdrawAmount(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-display text-lg font-bold"
-                  placeholder="0.00"
-                />
+          <div className="max-w-md mx-auto space-y-6">
+            <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
+              <h3 className="font-display text-xl font-bold mb-2">Withdraw Funds</h3>
+              <p className="font-body text-sm text-muted-foreground mb-6">Minimum withdrawal is $5.00 (500 coins).</p>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block font-body text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Amount (USD)</label>
+                  <input 
+                    type="number" 
+                    value={withdrawAmount} 
+                    onChange={e => setWithdrawAmount(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-display text-lg font-bold"
+                    placeholder="0.00"
+                  />
+                </div>
+
+                <div className="p-4 bg-muted/30 rounded-2xl space-y-2">
+                  <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                    <span className="text-muted-foreground">Withdrawal Fee ({feePercent}%)</span>
+                    <span className="text-destructive">-${feeAmount.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-bold">
+                    <span className="text-foreground">You Receive</span>
+                    <span className="text-green-600">${finalAmount.toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all">Request Withdrawal</button>
               </div>
-              <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all">Request Withdrawal</button>
+            </div>
+
+            <div className="bg-accent/5 border border-accent/20 rounded-2xl p-4 flex gap-3">
+              <Info className="w-5 h-5 text-accent shrink-0" />
+              <div className="space-y-2">
+                <p className="text-xs font-body text-foreground/80 leading-relaxed">
+                  <strong>Tiered Fee System:</strong> We reward our verified creators with lower fees.
+                </p>
+                <div className="grid grid-cols-1 gap-1">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase">
+                    <BadgeCheck className="w-3 h-3 text-secondary" /> Blue Badge: 12% Fee
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground">
+                    Standard: 15% Fee
+                  </div>
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground">
+                    New User (<30 days): 18% Fee
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}

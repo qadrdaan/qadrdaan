@@ -22,6 +22,7 @@ interface Profile {
   total_gifts_received: number;
   promotion_obligation_met: boolean;
   promotion_coins_spent: number;
+  created_at: string;
 }
 
 interface AuthContextType {
