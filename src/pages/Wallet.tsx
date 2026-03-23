@@ -251,7 +251,9 @@ const Wallet = () => {
             </div>
 
             <div className="bg-accent/5 border border-accent/20 rounded-2xl p-4 flex gap-3">
-              <Info className="w-5 h-5 text-accent shrink-0" />
+              <div className="w-5 h-5 text-accent shrink-0">
+                <Info className="w-full h-full" />
+              </div>
               <div className="space-y-2">
                 <p className="text-xs font-body text-foreground/80 leading-relaxed">
                   <strong>Tiered Fee System:</strong> We reward our verified creators with lower fees.

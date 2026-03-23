@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import SendGift from "@/components/SendGift";
 import {
   Video, Mic, MicOff, Hand, Trophy, Users, Crown,
-  UserPlus, UserMinus, Radio, Send, Gift, Sparkles
+  UserPlus, UserMinus, Radio, Send, Gift, Sparkles, LogOut, Loader2
 } from "lucide-react";
 
 interface Seat {
@@ -26,10 +26,26 @@ const VideoRoomDetail = () => {
   const [room, setRoom] = useState<any>(null);
   const [seats, setSeats] = useState<Seat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [joining, setJoining] = useState(false);
   const [activeSpeaker, setActiveSpeaker] = useState<string | null>(null);
 
+  const userOnStage = seats.find(s => s.user_id === user?.id);
+
   useEffect(() => {
-    if (id) { fetchRoom(); fetchSeats(); }
+    if (id) { 
+      fetchRoom(); 
+      fetchSeats();
+      
+      // Realtime subscription for seat changes
+      const channel = supabase
+        .channel(`room-${id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'room_seats', filter: `room_id=eq.${id}` }, () => {
+          fetchSeats();
+        })
+        .subscribe();
+
+      return () => { supabase.removeChannel(channel); };
+    }
   }, [id]);
 
   const fetchRoom = async () => {
@@ -46,14 +62,44 @@ const VideoRoomDetail = () => {
       const map = new Map(profiles?.map((p) => [p.user_id, p.display_name]) || []);
       setSeats(data.map((s: any) => ({ ...s, display_name: map.get(s.user_id) || "Poet" })));
       
-      // Simulate active speaker for UI demo
       if (!activeSpeaker && data.length > 0) setActiveSpeaker(data[0].user_id);
     } else {
       setSeats([]);
     }
   };
 
-  if (loading || !room) return null;
+  const handleJoinStage = async () => {
+    if (!user) { toast.error("Sign in to join the stage"); return; }
+    if (seats.length >= (room?.max_seats || 30)) { toast.error("Stage is full"); return; }
+    
+    setJoining(true);
+    try {
+      const { error } = await supabase.from("room_seats").insert({
+        room_id: id!,
+        user_id: user.id,
+        seat_number: seats.length + 1
+      });
+      if (error) throw error;
+      toast.success("You are now on stage!");
+    } catch (err: any) {
+      toast.error("Failed to join stage: " + err.message);
+    } finally {
+      setJoining(false);
+    }
+  };
+
+  const handleLeaveStage = async () => {
+    if (!userOnStage) return;
+    try {
+      const { error } = await supabase.from("room_seats").delete().eq("id", userOnStage.id);
+      if (error) throw error;
+      toast.success("You left the stage");
+    } catch (err: any) {
+      toast.error("Failed to leave stage");
+    }
+  };
+
+  if (loading || !room) return <div className="min-h-screen bg-slate-950 flex items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
 
   return (
     <div className="min-h-screen bg-slate-950 text-white">
@@ -71,15 +117,25 @@ const VideoRoomDetail = () => {
             </p>
           </div>
           <div className="flex gap-3">
-            <button className="px-6 py-2.5 bg-white/10 backdrop-blur-md rounded-xl font-bold text-sm hover:bg-white/20 transition-all">
-              <Hand className="w-4 h-4 inline mr-2" /> Raise Hand
-            </button>
+            {userOnStage ? (
+              <button onClick={handleLeaveStage} className="px-6 py-2.5 bg-destructive/20 text-destructive border border-destructive/30 rounded-xl font-bold text-sm hover:bg-destructive/30 transition-all">
+                <LogOut className="w-4 h-4 inline mr-2" /> Leave Stage
+              </button>
+            ) : (
+              <button 
+                onClick={handleJoinStage} 
+                disabled={joining}
+                className="px-6 py-2.5 bg-primary text-white rounded-xl font-bold text-sm hover:opacity-90 transition-all shadow-brand flex items-center gap-2"
+              >
+                {joining ? <Loader2 className="w-4 h-4 animate-spin" /> : <Hand className="w-4 h-4" />}
+                Join Stage
+              </button>
+            )}
           </div>
         </div>
 
         {/* The Stage */}
         <div className="relative bg-slate-900 rounded-[40px] border border-white/10 p-8 mb-8 overflow-hidden shadow-2xl">
-          {/* Spotlight Effect */}
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-primary/20 blur-[120px] rounded-full pointer-events-none" />
           
           <div className="relative z-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
@@ -121,7 +177,6 @@ const VideoRoomDetail = () => {
                     </div>
                   </div>
 
-                  {/* Quick Gift Overlay */}
                   <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
                     <SendGift recipientId={seat.user_id} recipientName={seat.display_name || "Poet"} eventId={id} />
                   </div>
@@ -129,7 +184,6 @@ const VideoRoomDetail = () => {
               );
             })}
             
-            {/* Empty Seats */}
             {Array.from({ length: Math.max(0, 5 - seats.length) }).map((_, i) => (
               <div key={i} className="aspect-square rounded-3xl border-2 border-dashed border-white/5 flex items-center justify-center text-white/10">
                 <UserPlus className="w-8 h-8" />

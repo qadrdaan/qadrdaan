@@ -8,7 +8,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Users, Crown, Plus, Layout, TrendingUp, Gift, ShieldAlert, BadgeCheck } from 'lucide-react';
+import { Users, Crown, Plus, Layout, TrendingUp, Gift, ShieldAlert, BadgeCheck, Loader2 } from 'lucide-react';
 
 const CreatorHub = () => {
   const { user, profile, loading: authLoading } = useAuth();
@@ -16,6 +16,9 @@ const CreatorHub = () => {
   const [hub, setHub] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [creating, setCreating] = useState(false);
+  
+  const [form, setForm] = useState({ name: "", description: "" });
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
@@ -27,33 +30,83 @@ const CreatorHub = () => {
 
   const fetchHubData = async () => {
     setLoading(true);
-    // Check if user is a leader or member of a hub
-    const { data: hubMember } = await (supabase
-      .from("hub_members" as any)
-      .select("hub_id, role")
-      .eq("user_id", user!.id)
-      .maybeSingle() as any);
-
-    if (hubMember) {
-      const { data: hubData } = await (supabase
-        .from("creator_hubs" as any)
-        .select("*")
-        .eq("id", hubMember.hub_id)
-        .single() as any);
-      
-      setHub(hubData);
-
-      const { data: memberData } = await (supabase
+    try {
+      // Check if user is a leader or member of a hub
+      const { data: hubMember, error: memberError } = await (supabase
         .from("hub_members" as any)
-        .select("*, profiles:user_id(display_name, avatar_url, is_verified)")
-        .eq("hub_id", hubMember.hub_id) as any);
-      
-      setMembers(memberData || []);
+        .select("hub_id, role")
+        .eq("user_id", user!.id)
+        .maybeSingle() as any);
+
+      if (hubMember) {
+        const { data: hubData } = await (supabase
+          .from("creator_hubs" as any)
+          .select("*")
+          .eq("id", hubMember.hub_id)
+          .single() as any);
+        
+        setHub(hubData);
+
+        const { data: memberData } = await (supabase
+          .from("hub_members" as any)
+          .select("*, profiles:user_id(display_name, avatar_url, is_verified)")
+          .eq("hub_id", hubMember.hub_id) as any);
+        
+        setMembers(memberData || []);
+      }
+    } catch (err) {
+      console.error("Error fetching hub data:", err);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
-  if (authLoading || loading) return <div className="min-h-screen bg-background"><Navbar /><div className="pt-28 text-center">Loading Hub...</div></div>;
+  const handleCreateHub = async () => {
+    if (!profile?.is_verified) {
+      toast.error("Only verified creators can lead a Hub.");
+      return;
+    }
+    if (!form.name.trim()) {
+      toast.error("Hub name is required.");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      // 1. Create the Hub
+      const { data: newHub, error: hubError } = await (supabase
+        .from("creator_hubs" as any)
+        .insert({
+          leader_id: user!.id,
+          name: form.name.trim(),
+          description: form.description.trim() || null,
+        })
+        .select()
+        .single() as any);
+
+      if (hubError) throw hubError;
+
+      // 2. Add leader as the first member
+      const { error: memberError } = await (supabase
+        .from("hub_members" as any)
+        .insert({
+          hub_id: newHub.id,
+          user_id: user!.id,
+          role: 'leader'
+        }) as any);
+
+      if (memberError) throw memberError;
+
+      toast.success("Poetry Family created successfully!");
+      fetchHubData();
+    } catch (error: any) {
+      toast.error("Failed to create hub: " + error.message);
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  if (authLoading || loading) return <div className="min-h-screen bg-background"><Navbar /><div className="pt-28 text-center"><Loader2 className="w-8 h-8 animate-spin mx-auto text-primary" /></div></div>;
 
   const isEligible = profile?.is_verified;
 
@@ -93,11 +146,27 @@ const CreatorHub = () => {
             ) : (
               <div className="bg-card border border-border rounded-3xl p-8 shadow-sm space-y-6">
                 <div className="space-y-4">
-                  <input placeholder="Hub Name (e.g. The Ghazal Masters)" className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body" />
-                  <textarea placeholder="Hub Description" rows={3} className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body resize-none" />
+                  <input 
+                    placeholder="Hub Name (e.g. The Ghazal Masters)" 
+                    value={form.name}
+                    onChange={(e) => setForm({...form, name: e.target.value})}
+                    className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body" 
+                  />
+                  <textarea 
+                    placeholder="Hub Description" 
+                    value={form.description}
+                    onChange={(e) => setForm({...form, description: e.target.value})}
+                    rows={3} 
+                    className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-body resize-none" 
+                  />
                 </div>
-                <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all flex items-center justify-center gap-2">
-                  <Plus className="w-5 h-5" /> Create Hub (Free for Blue Badge)
+                <button 
+                  onClick={handleCreateHub}
+                  disabled={creating}
+                  className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                >
+                  {creating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                  Create Hub (Free for Blue Badge)
                 </button>
               </div>
             )}
