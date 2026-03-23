@@ -12,6 +12,7 @@ import {
   UserPlus, Radio, Clock, Shield, Trash2, Download, Share2, Layout
 } from "lucide-react";
 import SendGift from "@/components/SendGift";
+import ShareMushairaModal from "@/components/ShareMushairaModal";
 
 interface EventData {
   id: string;
@@ -39,13 +40,10 @@ const MushairaDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { checkContent, moderating } = useModeration();
   const [event, setEvent] = useState<EventData | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
-  const [registrations, setRegistrations] = useState<any[]>([]);
-  const [isRegistered, setIsRegistered] = useState(false);
-  const [chatInput, setChatInput] = useState("");
   const [loading, setLoading] = useState(true);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   const isHost = user?.id === event?.organizer_id;
@@ -54,7 +52,6 @@ const MushairaDetail = () => {
     if (id) {
       fetchEvent();
       fetchMessages();
-      fetchRegistrations();
     }
   }, [id]);
 
@@ -69,11 +66,6 @@ const MushairaDetail = () => {
     if (data) setMessages(data);
   };
 
-  const fetchRegistrations = async () => {
-    const { data } = await supabase.from("event_registrations").select("*").eq("event_id", id!);
-    if (data) setRegistrations(data);
-  };
-
   const handleDelete = async () => {
     if (!window.confirm("Are you sure? This action cannot be undone.")) return;
     const { error } = await supabase.from("mushaira_events").delete().eq("id", id!);
@@ -84,22 +76,8 @@ const MushairaDetail = () => {
     }
   };
 
-  const handleUploadToWall = async () => {
-    if (!event) return;
-    const { error } = await supabase.from("poetry_posts").insert({
-      creator_id: user?.id,
-      title: `Live Mushaira: ${event.title}`,
-      content: `Live Mushaira: ${event.title} - ${new Date(event.scheduled_at).toLocaleDateString()}\n\n${event.description || ""}`,
-      category: "mushaira",
-      language: event.language || "Urdu"
-    });
-    if (error) toast.error("Failed to upload to wall");
-    else toast.success("Added to your profile wall!");
-  };
-
   const handleDownload = () => {
     toast.info("Recording download started...");
-    // Simulated download logic
   };
 
   if (loading || !event) return null;
@@ -121,7 +99,7 @@ const MushairaDetail = () => {
             
             {isHost && event.status === 'ended' && (
               <div className="flex gap-2">
-                <button onClick={handleUploadToWall} className="p-3 bg-white/10 backdrop-blur-md text-white rounded-xl hover:bg-white/20 transition-all" title="Upload to Wall">
+                <button onClick={() => setShareModalOpen(true)} className="p-3 bg-white/10 backdrop-blur-md text-white rounded-xl hover:bg-white/20 transition-all" title="Upload to Wall">
                   <Layout className="w-5 h-5" />
                 </button>
                 <button onClick={handleDownload} className="p-3 bg-white/10 backdrop-blur-md text-white rounded-xl hover:bg-white/20 transition-all" title="Download Recording">
@@ -173,6 +151,12 @@ const MushairaDetail = () => {
           </div>
         </div>
       </div>
+
+      <ShareMushairaModal 
+        isOpen={shareModalOpen}
+        onClose={() => setShareModalOpen(false)}
+        event={event}
+      />
       <Footer />
     </div>
   );
