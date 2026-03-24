@@ -266,7 +266,7 @@ const Wallet = () => {
                     Standard: 15% Fee
                   </div>
                   <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-muted-foreground">
-                    New User (<30 days): 18% Fee
+                    {"New User (<30 days): 18% Fee"}
                   </div>
                 </div>
               </div>
