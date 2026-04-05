@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import heroBg from "@/assets/hero-bg.jpg";
 
-const HeroSection = () => (
+const HeroSection = () => {
+  const { user } = useAuth();
+  return (
   <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
     {/* Background */}
     <div className="absolute inset-0">
@@ -41,7 +44,7 @@ const HeroSection = () => (
       </motion.div>
 
       <motion.h1
-        className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white leading-tight mb-6"
+        className="font-display text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold text-white leading-tight mb-4 sm:mb-6"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2 }}
@@ -51,7 +54,7 @@ const HeroSection = () => (
       </motion.h1>
 
       <motion.p
-        className="font-body text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-10 leading-relaxed"
+        className="font-body text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.4 }}
@@ -66,17 +69,17 @@ const HeroSection = () => (
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
       >
-        <Link to="/auth" className="px-10 py-4 font-body font-bold text-base bg-primary text-white rounded-full shadow-brand hover:opacity-90 transition-all hover:scale-105">
+        <Link to={user ? "/start-publishing" : "/auth"} className="px-8 sm:px-10 py-3 sm:py-4 font-body font-bold text-sm sm:text-base bg-primary text-white rounded-full shadow-brand hover:opacity-90 transition-all hover:scale-105">
           Start Publishing
         </Link>
-        <Link to="/books" className="px-10 py-4 font-body font-bold text-base border-2 border-white/20 text-white rounded-full hover:bg-white/10 transition-all">
+        <Link to="/books" className="px-8 sm:px-10 py-3 sm:py-4 font-body font-bold text-sm sm:text-base border-2 border-white/20 text-white rounded-full hover:bg-white/10 transition-all">
           Explore Poetry
         </Link>
       </motion.div>
 
       {/* Stats */}
       <motion.div
-        className="mt-20 grid grid-cols-3 max-w-lg mx-auto gap-8"
+        className="mt-12 sm:mt-20 grid grid-cols-3 max-w-lg mx-auto gap-4 sm:gap-8"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.9 }}
@@ -97,6 +100,7 @@ const HeroSection = () => (
     {/* Bottom fade */}
     <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
   </section>
-);
+  );
+};
 
 export default HeroSection;

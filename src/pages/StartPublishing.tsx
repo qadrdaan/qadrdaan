@@ -14,9 +14,9 @@ const features = [
 const StartPublishing = () => (
   <div className="min-h-screen bg-background">
     <Navbar />
-    <section className="pt-28 pb-20 container mx-auto px-6 max-w-5xl">
+    <section className="pt-24 sm:pt-28 pb-16 sm:pb-20 container mx-auto px-4 sm:px-6 max-w-5xl">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="text-center mb-14">
-        <h1 className="font-display text-4xl md:text-5xl font-bold text-foreground mb-4">
+        <h1 className="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
           Start <span className="text-gradient-gold">Publishing</span>
         </h1>
         <p className="font-body text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -24,14 +24,14 @@ const StartPublishing = () => (
         </p>
       </motion.div>
 
-      <div className="grid sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {features.map((f, i) => (
           <motion.div
             key={f.title}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="p-8 bg-card border border-border rounded-2xl flex flex-col"
+            className="p-6 sm:p-8 bg-card border border-border rounded-2xl flex flex-col"
           >
             <f.icon className="w-10 h-10 text-secondary mb-4" />
             <h2 className="font-display text-xl font-bold text-foreground mb-2">{f.title}</h2>
