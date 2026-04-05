@@ -14,7 +14,7 @@ const CTASection = () => (
         viewport={{ once: true }}
         transition={{ duration: 0.7 }}
       >
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
+        <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
           Your Poetry Deserves <br />
           <span className="text-gradient-brand">A Global Stage</span>
         </h2>
