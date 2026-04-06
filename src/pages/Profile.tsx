@@ -5,11 +5,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import DashboardLayout from "@/components/layouts/DashboardLayout";
-import { BadgeCheck, Camera, ImagePlus } from "lucide-react";
+import { BadgeCheck, Camera, ImagePlus, Settings } from "lucide-react";
 import ProfileWall from "@/components/ProfileWall";
 import PromotionObligation from "@/components/PromotionObligation";
 import ProfilePhotoDialog from "@/components/ProfilePhotoDialog";
 import DPFilter from "@/components/DPFilter";
+import ProfileAboutSection from "@/components/ProfileAboutSection";
+import FeaturedPosts from "@/components/FeaturedPosts";
 
 const Profile = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
@@ -115,6 +117,9 @@ const Profile = () => {
           </div>
 
           <div className="flex gap-3">
+            <button onClick={() => navigate("/settings")} className="p-2 bg-muted text-foreground rounded-xl hover:bg-muted/80 transition-colors">
+              <Settings className="w-4 h-4" />
+            </button>
             {editing ? (
               <>
                 <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-bold">Save</button>
@@ -148,6 +153,10 @@ const Profile = () => {
           ))}
         </div>
       </motion.div>
+
+      <ProfileAboutSection profile={profile} isOwnProfile={true} onUpdate={refreshProfile} />
+
+      <FeaturedPosts userId={user.id} isOwnProfile={true} />
 
       <DPFilter currentFilter={currentFilter} onSelect={setCurrentFilter} avatarUrl={profile.avatar_url} displayName={profile.display_name || "P"} />
       <div className="mt-6">
