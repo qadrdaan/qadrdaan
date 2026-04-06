@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import SponsoredPost from "@/components/SponsoredPost";
 import {
   LayoutDashboard, FileText, Image, BookOpen, Wallet, BarChart3,
-  Users, Bell, Settings, BadgeCheck, UserPlus, UserMinus, Gift
+  Users, Bell, Settings, BadgeCheck, MessageCircle
 } from "lucide-react";
 
 const profileNavLinks = [
@@ -17,7 +17,9 @@ const profileNavLinks = [
   { href: "/wallet", label: "Wallet", icon: Wallet },
   { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/poets", label: "Followers", icon: Users },
+  { href: "/messages", label: "Messages", icon: MessageCircle },
   { href: "/bookmarks", label: "Notifications", icon: Bell },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 interface DashboardLayoutProps {

@@ -55,6 +55,8 @@ import CreateAd from "./pages/CreateAd";
 import BoostPost from "./pages/BoostPost";
 import CreatorHub from "./pages/CreatorHub";
 import Shorts from "./pages/Shorts";
+import Messages from "./pages/Messages";
+import ProfileSettings from "./pages/ProfileSettings";
 
 const queryClient = new QueryClient();
 
@@ -116,6 +118,8 @@ const App = () => (
             <Route path="/create-ad" element={<CreateAd />} />
             <Route path="/boost-post" element={<BoostPost />} />
             <Route path="/creator-hub" element={<CreatorHub />} />
+            <Route path="/messages" element={<Messages />} />
+            <Route path="/settings" element={<ProfileSettings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

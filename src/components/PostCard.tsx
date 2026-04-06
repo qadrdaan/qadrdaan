@@ -3,12 +3,13 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Share2, Bookmark, BookmarkPlus, Trash2, Sparkles, Rocket } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Sparkles, Rocket } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import SendGift from './SendGift';
 import ReportContent from './ReportContent';
+import PostContextMenu from './PostContextMenu';
 
 interface PostCardProps {
   post: any;
@@ -73,11 +74,7 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
               <Rocket className="w-4 h-4" />
             </button>
           )}
-          {showDelete && user?.id === post.creator_id && (
-            <button onClick={handleDelete} className="p-2 text-muted-foreground hover:text-destructive transition-colors">
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
+          <PostContextMenu postId={post.id} creatorId={post.creator_id} onUpdate={onUpdate} />
         </div>
       </div>
 
