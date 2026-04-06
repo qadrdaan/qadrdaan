@@ -722,6 +722,56 @@ export type Database = {
         }
         Relationships: []
       }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          id: string
+          joined_at: string
+          last_read_at: string | null
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          id?: string
+          joined_at?: string
+          last_read_at?: string | null
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          id?: string
+          joined_at?: string
+          last_read_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conversation_participants_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      conversations: {
+        Row: {
+          created_at: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       creator_wallets: {
         Row: {
           ad_earnings: number
@@ -940,6 +990,38 @@ export type Database = {
         }
         Relationships: []
       }
+      featured_posts: {
+        Row: {
+          created_at: string
+          display_order: number
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_order?: number
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "poetry_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       followers: {
         Row: {
           created_at: string
@@ -1001,6 +1083,76 @@ export type Database = {
             columns: ["event_id"]
             isOneToOne: false
             referencedRelation: "mushaira_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hidden_posts: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hidden_posts_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "poetry_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          is_read: boolean
+          media_url: string | null
+          message_type: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          media_url?: string | null
+          message_type?: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          media_url?: string | null
+          message_type?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "conversations"
             referencedColumns: ["id"]
           },
         ]
@@ -1313,17 +1465,70 @@ export type Database = {
           },
         ]
       }
+      profile_settings: {
+        Row: {
+          allow_messages_from: string
+          created_at: string
+          followers_visibility: string
+          following_visibility: string
+          id: string
+          notify_comments: boolean
+          notify_follows: boolean
+          notify_gifts: boolean
+          notify_likes: boolean
+          notify_mentions: boolean
+          notify_messages: boolean
+          show_activity_status: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allow_messages_from?: string
+          created_at?: string
+          followers_visibility?: string
+          following_visibility?: string
+          id?: string
+          notify_comments?: boolean
+          notify_follows?: boolean
+          notify_gifts?: boolean
+          notify_likes?: boolean
+          notify_mentions?: boolean
+          notify_messages?: boolean
+          show_activity_status?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allow_messages_from?: string
+          created_at?: string
+          followers_visibility?: string
+          following_visibility?: string
+          id?: string
+          notify_comments?: boolean
+          notify_follows?: boolean
+          notify_gifts?: boolean
+          notify_likes?: boolean
+          notify_mentions?: boolean
+          notify_messages?: boolean
+          show_activity_status?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           books_count: number
+          category: string | null
           cnic: string | null
           country: string | null
           cover_image_url: string | null
           created_at: string
           date_of_birth: string | null
           display_name: string | null
+          external_links: Json | null
           followers_count: number
           following_count: number
           id: string
@@ -1341,18 +1546,21 @@ export type Database = {
           total_gifts_received: number
           updated_at: string
           user_id: string
+          username: string | null
           videos_count: number
         }
         Insert: {
           avatar_url?: string | null
           bio?: string | null
           books_count?: number
+          category?: string | null
           cnic?: string | null
           country?: string | null
           cover_image_url?: string | null
           created_at?: string
           date_of_birth?: string | null
           display_name?: string | null
+          external_links?: Json | null
           followers_count?: number
           following_count?: number
           id?: string
@@ -1370,18 +1578,21 @@ export type Database = {
           total_gifts_received?: number
           updated_at?: string
           user_id: string
+          username?: string | null
           videos_count?: number
         }
         Update: {
           avatar_url?: string | null
           bio?: string | null
           books_count?: number
+          category?: string | null
           cnic?: string | null
           country?: string | null
           cover_image_url?: string | null
           created_at?: string
           date_of_birth?: string | null
           display_name?: string | null
+          external_links?: Json | null
           followers_count?: number
           following_count?: number
           id?: string
@@ -1399,6 +1610,7 @@ export type Database = {
           total_gifts_received?: number
           updated_at?: string
           user_id?: string
+          username?: string | null
           videos_count?: number
         }
         Relationships: []
