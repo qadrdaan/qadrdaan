@@ -47,7 +47,7 @@ const ProfileAboutSection = ({ profile, isOwnProfile, onUpdate }: ProfileAboutSe
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
-      .update({ category, external_links: links as unknown as Record<string, unknown>[] })
+      .update({ category, external_links: JSON.parse(JSON.stringify(links)) })
       .eq("user_id", user.id);
     if (error) toast.error("Failed to save");
     else { toast.success("Profile updated!"); onUpdate?.(); setEditing(false); }
