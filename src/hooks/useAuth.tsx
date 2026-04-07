@@ -6,13 +6,17 @@ interface Profile {
   id: string;
   user_id: string;
   display_name: string | null;
+  username: string | null;
   avatar_url: string | null;
   cover_image_url: string | null;
   bio: string | null;
   language: string | null;
   country: string | null;
+  category: string | null;
   cnic: string | null;
   date_of_birth: string | null;
+  external_links: any;
+  preferred_languages: string[] | null;
   is_creator: boolean;
   is_verified: boolean;
   followers_count: number;
