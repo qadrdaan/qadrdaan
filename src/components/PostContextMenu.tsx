@@ -88,7 +88,7 @@ const PostContextMenu = ({ postId, creatorId, onUpdate, onEdit, allowDownload = 
               <BarChart3 className="w-4 h-4" /> View Insights
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onToggleDownload} className="gap-2.5 font-body text-sm">
-              {allowDownload ? <DownloadOff className="w-4 h-4" /> : <Download className="w-4 h-4" />}
+              {allowDownload ? <XCircle className="w-4 h-4" /> : <Download className="w-4 h-4" />}
               {allowDownload ? "Disable Downloads" : "Enable Downloads"}
             </DropdownMenuItem>
             <DropdownMenuSeparator />
