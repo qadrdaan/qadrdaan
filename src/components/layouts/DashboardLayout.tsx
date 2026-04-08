@@ -1,27 +1,56 @@
 import { ReactNode, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SponsoredPost from "@/components/SponsoredPost";
+import BirthdaysWidget from "@/components/BirthdaysWidget";
+import MemoriesWidget from "@/components/MemoriesWidget";
 import {
   LayoutDashboard, FileText, Image, BookOpen, Wallet, BarChart3,
-  Users, Bell, Settings, BadgeCheck, MessageCircle, Sparkles, ChevronDown, LogOut, User
+  Users, Bell, Settings, BadgeCheck, MessageCircle, Sparkles
 } from "lucide-react";
 
-const profileNavLinks = [
-  { href: "/profile", label: "Overview", icon: LayoutDashboard },
-  { href: "/poetry", label: "Posts", icon: FileText },
-  { href: "/videos", label: "Media", icon: Image },
-  { href: "/books", label: "Books", icon: BookOpen },
-  { href: "/wallet", label: "Wallet", icon: Wallet },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
-  { href: "/poets", label: "Followers", icon: Users },
-  { href: "/messages", label: "Messages", icon: MessageCircle },
-  { href: "/bookmarks", label: "Notifications", icon: Bell },
-  { href: "/settings", label: "Settings", icon: Settings },
-  { href: "/profile#frames", label: "Profile Frames", icon: Sparkles },
+const sidebarGroups = [
+  {
+    label: null,
+    items: [
+      { href: "/profile", label: "Overview", icon: LayoutDashboard },
+    ],
+  },
+  {
+    label: "Content",
+    items: [
+      { href: "/poetry", label: "Posts", icon: FileText },
+      { href: "/videos", label: "Media", icon: Image },
+      { href: "/books", label: "Books", icon: BookOpen },
+    ],
+  },
+  {
+    label: "Monetization",
+    items: [
+      { href: "/wallet", label: "Wallet & Gifts", icon: Wallet },
+      { href: "/analytics", label: "Analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "Social",
+    items: [
+      { href: "/poets", label: "Followers", icon: Users },
+      { href: "/messages", label: "Messages", icon: MessageCircle },
+      { href: "/bookmarks", label: "Notifications", icon: Bell },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { href: "/settings", label: "Settings", icon: Settings },
+      { href: "/profile#frames", label: "Profile Frames", icon: Sparkles },
+    ],
+  },
 ];
+
+const allLinks = sidebarGroups.flatMap(g => g.items);
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -40,7 +69,7 @@ const DashboardLayout = ({ children, profileData, isOwnProfile = true, suggested
       <Navbar />
       <div className="pt-20">
         <div className="container mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_260px] xl:grid-cols-[240px_1fr_280px] gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_280px] xl:grid-cols-[240px_1fr_300px] gap-6">
             {/* Left Sidebar */}
             <aside className="hidden lg:block sticky top-24 self-start">
               {profileData && (
@@ -64,19 +93,28 @@ const DashboardLayout = ({ children, profileData, isOwnProfile = true, suggested
                 </div>
               )}
 
-              <nav className="space-y-0.5">
-                {profileNavLinks.map((l) => {
-                  const active = location.pathname === l.href || (l.href.includes('#') && location.pathname + location.hash === l.href);
-                  return (
-                    <Link key={l.href} to={l.href}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-body text-sm font-medium transition-colors ${
-                        active ? "bg-primary/10 text-primary" : "text-foreground/70 hover:bg-muted hover:text-foreground"
-                      }`}>
-                      <l.icon className="w-[18px] h-[18px] shrink-0" />
-                      {l.label}
-                    </Link>
-                  );
-                })}
+              <nav className="space-y-1">
+                {sidebarGroups.map((group, gi) => (
+                  <div key={gi}>
+                    {group.label && (
+                      <p className="px-3 pt-4 pb-1 font-body text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        {group.label}
+                      </p>
+                    )}
+                    {group.items.map((l) => {
+                      const active = location.pathname === l.href || (l.href.includes('#') && location.pathname + location.hash === l.href);
+                      return (
+                        <Link key={l.href} to={l.href}
+                          className={`flex items-center gap-3 px-3 py-2 rounded-xl font-body text-sm font-medium transition-colors ${
+                            active ? "bg-primary/10 text-primary" : "text-foreground/70 hover:bg-muted hover:text-foreground"
+                          }`}>
+                          <l.icon className="w-[18px] h-[18px] shrink-0" />
+                          {l.label}
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ))}
               </nav>
             </aside>
 
@@ -84,23 +122,15 @@ const DashboardLayout = ({ children, profileData, isOwnProfile = true, suggested
             <main className="min-w-0 py-4 lg:py-6">{children}</main>
 
             {/* Right Sidebar */}
-            <aside className="hidden lg:block sticky top-24 self-start space-y-6">
-              {profileData && (
-                <div className="bg-card border border-border rounded-2xl p-5 shadow-sm space-y-3">
-                  <h3 className="font-display text-sm font-bold text-foreground uppercase tracking-wider">Stats</h3>
-                  {[
-                    { label: "Followers", value: profileData.followers_count || 0 },
-                    { label: "Following", value: profileData.following_count || 0 },
-                    { label: "Gifts", value: profileData.total_gifts_received || 0 },
-                    { label: "Books", value: profileData.books_count || 0 },
-                  ].map(s => (
-                    <div key={s.label} className="flex items-center justify-between">
-                      <span className="font-body text-xs text-muted-foreground">{s.label}</span>
-                      <span className="font-display text-sm font-bold text-foreground">{s.value}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <aside className="hidden lg:block sticky top-24 self-start space-y-5">
+              {/* Sponsored Ads */}
+              <SponsoredPost placement="profile" />
+
+              {/* Birthdays */}
+              <BirthdaysWidget />
+
+              {/* Memories */}
+              <MemoriesWidget />
 
               {suggestedUsers.length > 0 && (
                 <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
@@ -122,8 +152,6 @@ const DashboardLayout = ({ children, profileData, isOwnProfile = true, suggested
                   </div>
                 </div>
               )}
-
-              <SponsoredPost placement="profile" />
             </aside>
           </div>
         </div>
@@ -132,7 +160,7 @@ const DashboardLayout = ({ children, profileData, isOwnProfile = true, suggested
       {/* Mobile bottom nav */}
       <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-md border-t border-border">
         <div className="flex items-center justify-around py-2">
-          {[profileNavLinks[0], profileNavLinks[1], profileNavLinks[3], profileNavLinks[7], profileNavLinks[9]].map((l) => {
+          {[allLinks[0], allLinks[1], allLinks[3], allLinks[6], allLinks[8]].map((l) => {
             const active = location.pathname === l.href;
             return (
               <Link key={l.href} to={l.href} className={`flex flex-col items-center gap-0.5 p-1.5 ${active ? "text-primary" : "text-muted-foreground"}`}>

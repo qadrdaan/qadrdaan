@@ -3,7 +3,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Share2, Sparkles, Rocket } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Sparkles, Rocket, Eye, TrendingUp, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -31,13 +31,13 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
     onUpdate?.();
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this post?")) return;
-    const { error } = await supabase.from("poetry_posts").delete().eq("id", post.id);
-    if (error) toast.error("Failed to delete post");
-    else {
-      toast.success("Post deleted");
-      onUpdate?.();
+  const handleShare = () => {
+    const url = `${window.location.origin}/post/${post.id}`;
+    if (navigator.share) {
+      navigator.share({ title: post.title, url });
+    } else {
+      navigator.clipboard.writeText(url);
+      toast.success("Link copied!");
     }
   };
 
@@ -66,7 +66,7 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
         )}
         <div className="flex items-center gap-1">
           {user?.id === post.creator_id && (
-            <button 
+            <button
               onClick={() => navigate(`/boost-post?post=${post.id}`)}
               className="p-2 text-muted-foreground hover:text-accent transition-colors"
               title="Boost Post"
@@ -83,6 +83,19 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
         <p className="font-body text-foreground/85 whitespace-pre-line leading-relaxed mb-5 line-clamp-6">{post.content}</p>
       </Link>
 
+      {/* Public Stats */}
+      <div className="flex items-center gap-4 py-2.5 px-3 mb-3 bg-muted/40 rounded-xl">
+        <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
+          <Eye className="w-3.5 h-3.5" /> {post.impressions_count || 0} Views
+        </span>
+        <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
+          <TrendingUp className="w-3.5 h-3.5" /> {post.engagement_score || 0} Reach
+        </span>
+        <span className="flex items-center gap-1 text-[10px] font-bold text-muted-foreground">
+          <BarChart3 className="w-3.5 h-3.5" /> {(post.likes_count || 0) + (post.comments_count || 0) + (post.shares_count || 0)} Engagements
+        </span>
+      </div>
+
       <div className="flex items-center gap-4 pt-4 border-t border-border">
         <button onClick={handleLike} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${post.is_liked ? "text-secondary" : "text-muted-foreground hover:text-secondary"}`}>
           <Heart className={`w-4 h-4 ${post.is_liked ? "fill-current" : ""}`} /> {post.likes_count}
@@ -90,10 +103,10 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
         <Link to={`/post/${post.id}`} className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
           <MessageCircle className="w-4 h-4" /> {post.comments_count}
         </Link>
-        <button className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-accent transition-colors">
+        <button onClick={handleShare} className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-accent transition-colors">
           <Share2 className="w-4 h-4" /> {post.shares_count || 0}
         </button>
-        
+
         <div className="ml-auto flex items-center gap-2">
           <ReportContent contentType="post" contentId={post.id} reportedUserId={post.creator_id} />
           <SendGift recipientId={post.creator_id} recipientName={post.creator_name || "Poet"} />

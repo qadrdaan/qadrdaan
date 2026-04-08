@@ -34,7 +34,7 @@ const FeedLayout = ({ children, showRightSidebar = true, trendingPoets = [] }: F
       <div className="pt-20">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_280px] xl:grid-cols-[240px_1fr_300px] gap-6">
-            {/* Left Sidebar — minimal nav */}
+            {/* Left Sidebar */}
             <aside className="hidden lg:block sticky top-24 self-start space-y-1">
               {user && (
                 <Link to="/profile" className="flex items-center gap-3 p-3 rounded-2xl hover:bg-muted transition-colors mb-4">
@@ -71,13 +71,16 @@ const FeedLayout = ({ children, showRightSidebar = true, trendingPoets = [] }: F
               {children}
             </main>
 
-            {/* Right Sidebar */}
+            {/* Right Sidebar — Ads first, then Creators */}
             {showRightSidebar && (
-              <aside className="hidden lg:block sticky top-24 self-start space-y-6">
-                {/* Trending poets */}
+              <aside className="hidden lg:block sticky top-24 self-start space-y-5">
+                {/* Sponsored Ads */}
+                <SponsoredPost placement="feed" />
+
+                {/* Creators to Follow */}
                 {trendingPoets.length > 0 && (
                   <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
-                    <h3 className="font-display text-base font-bold text-foreground mb-4 flex items-center gap-2">
+                    <h3 className="font-display text-sm font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-wider">
                       <Flame className="w-4 h-4 text-primary" /> Creators to Follow
                     </h3>
                     <div className="space-y-3">
@@ -102,12 +105,9 @@ const FeedLayout = ({ children, showRightSidebar = true, trendingPoets = [] }: F
                   </div>
                 )}
 
-                {/* Sponsored */}
-                <SponsoredPost placement="feed" />
-
                 {/* Trending tags */}
                 <div className="bg-card border border-border rounded-2xl p-5 shadow-sm">
-                  <h3 className="font-display text-base font-bold text-foreground mb-3">Trending</h3>
+                  <h3 className="font-display text-sm font-bold text-foreground mb-3 uppercase tracking-wider">Trending</h3>
                   <div className="flex flex-wrap gap-2">
                     {["#Poetry", "#Ghazal", "#Urdu", "#Love", "#Mushaira", "#Books"].map(tag => (
                       <span key={tag} className="px-3 py-1 bg-muted text-muted-foreground rounded-full text-xs font-body font-medium hover:bg-primary/10 hover:text-primary cursor-pointer transition-colors">

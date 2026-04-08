@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Check, Lock, Download, Sparkles, Crown } from "lucide-react";
+import { Check, Lock, Download, Sparkles, Crown, Coins } from "lucide-react";
 import { toast } from "sonner";
+import CoinPurchaseModal from "./CoinPurchaseModal";
 
 const FRAMES = [
   { id: 1, name: "Follow Me", price: 0, style: "ring-[5px] ring-purple-500", overlay: "follow-me" },
@@ -34,13 +35,18 @@ interface ProfileFramesProps {
 const ProfileFrames = ({ avatarUrl, displayName, currentFrame, onApply, userCoins = 0 }: ProfileFramesProps) => {
   const [selected, setSelected] = useState(currentFrame);
   const [unlockedFrames, setUnlockedFrames] = useState<number[]>([1, 2, 4, 5, 7, 10, 11, 12, 15]);
+  const [coins, setCoins] = useState(userCoins);
+  const [showCoinModal, setShowCoinModal] = useState(false);
+  const [pendingFrame, setPendingFrame] = useState<typeof FRAMES[0] | null>(null);
 
   const handleSelect = (frame: typeof FRAMES[0]) => {
     if (frame.price > 0 && !unlockedFrames.includes(frame.id)) {
-      if (userCoins < frame.price) {
-        toast.error(`Not enough QadrCoins! Need ${frame.price} QDC`);
+      if (coins < frame.price) {
+        setPendingFrame(frame);
+        setShowCoinModal(true);
         return;
       }
+      setCoins(prev => prev - frame.price);
       toast.success(`Unlocked "${frame.name}" for ${frame.price} QDC!`);
       setUnlockedFrames(prev => [...prev, frame.id]);
     }
@@ -50,6 +56,14 @@ const ProfileFrames = ({ avatarUrl, displayName, currentFrame, onApply, userCoin
   const handleApply = () => {
     onApply(selected);
     toast.success("Frame applied!");
+  };
+
+  const handleCoinPurchaseSuccess = (newBalance: number) => {
+    setCoins(newBalance);
+    if (pendingFrame) {
+      toast.info(`Now try selecting "${pendingFrame.name}" again!`);
+      setPendingFrame(null);
+    }
   };
 
   const renderOverlay = (overlay: string | null) => {
@@ -99,103 +113,125 @@ const ProfileFrames = ({ avatarUrl, displayName, currentFrame, onApply, userCoin
   };
 
   return (
-    <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
-      <div className="flex items-center gap-2 mb-5">
-        <Sparkles className="w-5 h-5 text-secondary" />
-        <h3 className="font-display text-base font-bold text-foreground">Profile Frames</h3>
-      </div>
-
-      {/* Preview */}
-      <div className="flex justify-center mb-6">
-        <div className="relative">
-          {renderOverlay(FRAMES.find(f => f.id === selected)?.overlay || null)}
-          <div className={`w-24 h-24 rounded-full overflow-hidden transition-all duration-300 ${
-            selected === 15 ? '' : FRAMES.find(f => f.id === selected)?.style || ''
-          }`}
-            style={selected === 15 ? {
-              background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)',
-              padding: '4px',
-              borderRadius: '50%',
-            } : undefined}
-          >
-            <div className="w-full h-full rounded-full overflow-hidden bg-muted">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center bg-gradient-brand text-primary-foreground text-2xl font-bold">
-                  {displayName[0]}
-                </div>
-              )}
-            </div>
+    <>
+      <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-secondary" />
+            <h3 className="font-display text-base font-bold text-foreground">Profile Frames</h3>
+          </div>
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-accent/10 rounded-full">
+            <Coins className="w-3.5 h-3.5 text-accent" />
+            <span className="font-body text-xs font-bold text-accent">{coins} QDC</span>
           </div>
         </div>
-      </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 mb-5">
-        {FRAMES.map((frame) => {
-          const isLocked = frame.price > 0 && !unlockedFrames.includes(frame.id);
-          const isActive = selected === frame.id;
-          return (
-            <button
-              key={frame.id}
-              onClick={() => handleSelect(frame)}
-              className="flex flex-col items-center gap-1.5 group relative"
+        {/* Preview */}
+        <div className="flex justify-center mb-6">
+          <div className="relative">
+            {renderOverlay(FRAMES.find(f => f.id === selected)?.overlay || null)}
+            <div className={`w-24 h-24 rounded-full overflow-hidden transition-all duration-300 ${
+              selected === 15 ? '' : FRAMES.find(f => f.id === selected)?.style || ''
+            }`}
+              style={selected === 15 ? {
+                background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)',
+                padding: '4px',
+                borderRadius: '50%',
+              } : undefined}
             >
-              <div className="relative">
-                {renderOverlay(frame.overlay)}
-                <div className={`w-12 h-12 rounded-full overflow-hidden transition-all ${
-                  isActive ? 'scale-110 shadow-lg' : 'opacity-70 group-hover:opacity-100'
-                } ${frame.id === 15 ? '' : frame.style}`}
-                  style={frame.id === 15 ? {
-                    background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)',
-                    padding: '3px',
-                    borderRadius: '50%',
-                  } : undefined}
-                >
-                  <div className="w-full h-full rounded-full overflow-hidden bg-muted">
-                    {avatarUrl ? (
-                      <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-brand text-primary-foreground text-xs font-bold">
-                        {displayName[0]}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {isLocked && (
-                  <div className="absolute inset-0 rounded-full bg-foreground/30 flex items-center justify-center">
-                    <Lock className="w-3.5 h-3.5 text-primary-foreground" />
-                  </div>
-                )}
-                {isActive && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
-                    <Check className="w-2.5 h-2.5 text-primary-foreground" />
+              <div className="w-full h-full rounded-full overflow-hidden bg-muted">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-brand text-primary-foreground text-2xl font-bold">
+                    {displayName[0]}
                   </div>
                 )}
               </div>
-              <span className={`text-[9px] font-bold leading-tight text-center ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
-                {frame.name}
-              </span>
-              {frame.price > 0 && (
-                <span className={`text-[8px] font-bold ${isLocked ? 'text-secondary' : 'text-green-500'}`}>
-                  {isLocked ? `${frame.price} QDC` : '✓'}
+            </div>
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-4 sm:grid-cols-5 gap-3 mb-5">
+          {FRAMES.map((frame) => {
+            const isLocked = frame.price > 0 && !unlockedFrames.includes(frame.id);
+            const isActive = selected === frame.id;
+            return (
+              <button
+                key={frame.id}
+                onClick={() => handleSelect(frame)}
+                className="flex flex-col items-center gap-1.5 group relative"
+              >
+                <div className="relative">
+                  {renderOverlay(frame.overlay)}
+                  <div className={`w-12 h-12 rounded-full overflow-hidden transition-all ${
+                    isActive ? 'scale-110 shadow-lg' : 'opacity-70 group-hover:opacity-100'
+                  } ${frame.id === 15 ? '' : frame.style}`}
+                    style={frame.id === 15 ? {
+                      background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)',
+                      padding: '3px',
+                      borderRadius: '50%',
+                    } : undefined}
+                  >
+                    <div className="w-full h-full rounded-full overflow-hidden bg-muted">
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-brand text-primary-foreground text-xs font-bold">
+                          {displayName[0]}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  {isLocked && (
+                    <div className="absolute inset-0 rounded-full bg-foreground/30 flex items-center justify-center">
+                      <Lock className="w-3.5 h-3.5 text-primary-foreground" />
+                    </div>
+                  )}
+                  {isActive && (
+                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full flex items-center justify-center">
+                      <Check className="w-2.5 h-2.5 text-primary-foreground" />
+                    </div>
+                  )}
+                </div>
+                <span className={`text-[9px] font-bold leading-tight text-center ${isActive ? 'text-primary' : 'text-muted-foreground'}`}>
+                  {frame.name}
                 </span>
-              )}
-            </button>
-          );
-        })}
+                {frame.price > 0 && (
+                  <span className={`text-[8px] font-bold ${isLocked ? 'text-secondary' : 'text-green-500'}`}>
+                    {isLocked ? `${frame.price} QDC` : '✓'}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Apply */}
+        <div className="flex gap-3">
+          <button
+            onClick={handleApply}
+            disabled={selected === currentFrame}
+            className="flex-1 py-2.5 bg-primary text-primary-foreground font-display text-sm font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
+          >
+            Apply Frame
+          </button>
+          <button
+            onClick={() => setShowCoinModal(true)}
+            className="px-4 py-2.5 bg-accent/10 text-accent font-display text-sm font-bold rounded-xl hover:bg-accent/20 transition-colors flex items-center gap-2"
+          >
+            <Coins className="w-4 h-4" /> Recharge
+          </button>
+        </div>
       </div>
 
-      {/* Apply */}
-      <button
-        onClick={handleApply}
-        disabled={selected === currentFrame}
-        className="w-full py-2.5 bg-primary text-primary-foreground font-display text-sm font-bold rounded-xl hover:opacity-90 transition-opacity disabled:opacity-50"
-      >
-        Apply Frame
-      </button>
-    </div>
+      <CoinPurchaseModal
+        isOpen={showCoinModal}
+        onClose={() => setShowCoinModal(false)}
+        onSuccess={handleCoinPurchaseSuccess}
+      />
+    </>
   );
 };
 
