@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   MoreHorizontal, Pin, EyeOff, Bookmark, Flag, Pencil, Trash2, BarChart3,
-  ThumbsUp, ThumbsDown, Bell, BellOff, HelpCircle, Clock, UserMinus, Ban, Download, DownloadOff
+  ThumbsUp, ThumbsDown, Bell, HelpCircle, Clock, UserMinus, Ban, Download, XCircle
 } from "lucide-react";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
