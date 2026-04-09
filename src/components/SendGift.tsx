@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Gift, X, PlusCircle, Coins } from "lucide-react";
 import CoinPurchaseModal from "./CoinPurchaseModal";
 
+// Creator receives 60%, platform takes 40%
+const CREATOR_SHARE = 0.60;
+
 const GIFT_TYPES = [
   { type: "rose", emoji: "🌹", label: "Rose", description: "A token of appreciation", cost: 1 },
   { type: "star", emoji: "⭐", label: "Star", description: "You shine bright!", cost: 5 },
@@ -52,7 +55,7 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
     if (!gift) { toast.error("Invalid gift type"); return; }
 
     if (balance < gift.cost) {
-      toast.error(`Insufficient coins! You need ${gift.cost} coins.`);
+      toast.error(`Insufficient coins! You need ${gift.cost} QDC.`);
       setPurchaseOpen(true);
       return;
     }
@@ -70,6 +73,7 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
       return;
     }
 
+    // coin_cost sent to DB triggers wallet update (creator gets share via DB trigger)
     const { error } = await supabase.from("gifts").insert({
       sender_id: user.id,
       recipient_id: recipientId,
@@ -83,7 +87,8 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
       toast.error(error.message);
       await supabase.from("user_balances").update({ coins: balance }).eq("user_id", user.id);
     } else {
-      toast.success(`${gift.emoji} ${gift.label} sent to ${recipientName}!`);
+      const creatorEarns = Math.floor(gift.cost * CREATOR_SHARE);
+      toast.success(`${gift.emoji} ${gift.label} sent! Creator receives ${creatorEarns} QDC.`);
       setOpen(false);
       setSelected(null);
       setMessage("");
@@ -106,10 +111,10 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
         Send Gift
       </button>
 
-      <CoinPurchaseModal 
-        isOpen={purchaseOpen} 
-        onClose={() => setPurchaseOpen(false)} 
-        onSuccess={(newBal) => setBalance(newBal)} 
+      <CoinPurchaseModal
+        isOpen={purchaseOpen}
+        onClose={() => setPurchaseOpen(false)}
+        onSuccess={(newBal) => setBalance(newBal)}
       />
 
       <AnimatePresence>
@@ -137,20 +142,24 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
                 </button>
               </div>
 
-              <div className="mb-5 px-4 py-3 bg-muted/50 border border-border rounded-2xl flex items-center justify-between">
+              <div className="mb-4 px-4 py-3 bg-muted/50 border border-border rounded-2xl flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Coins className="w-5 h-5 text-accent" />
                   <p className="font-body text-sm text-muted-foreground">
-                    Balance: <span className="font-bold text-foreground">{balance} coins</span>
+                    Balance: <span className="font-bold text-foreground">{balance} QDC</span>
                   </p>
                 </div>
-                <button 
+                <button
                   onClick={() => setPurchaseOpen(true)}
                   className="text-xs font-bold text-primary uppercase tracking-wider flex items-center gap-1 hover:underline"
                 >
                   <PlusCircle className="w-3.5 h-3.5" /> Buy Coins
                 </button>
               </div>
+
+              <p className="text-[10px] text-muted-foreground font-body mb-3 text-center">
+                Creator receives 60% · Platform retains 40%
+              </p>
 
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {GIFT_TYPES.map((gift) => (
@@ -167,7 +176,7 @@ const SendGift = ({ recipientId, recipientName, eventId, onGiftSent }: SendGiftP
                     <p className="font-body text-sm font-bold text-foreground">{gift.label}</p>
                     <p className="font-body text-[10px] text-muted-foreground mb-2">{gift.description}</p>
                     <p className={`font-body text-xs font-bold ${balance < gift.cost ? 'text-destructive' : 'text-secondary'}`}>
-                      {gift.cost} coins
+                      {gift.cost} QDC
                     </p>
                   </button>
                 ))}

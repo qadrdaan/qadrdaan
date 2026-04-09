@@ -7,11 +7,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 
+const PROCESSING_FEE = 0.04; // 4%
+
 const PACKAGES = [
-  { id: 'pkg1', price: 1, coins: 100, bonus: 0, label: '$1' },
-  { id: 'pkg2', price: 5, coins: 600, bonus: 100, label: '$5', popular: true },
-  { id: 'pkg3', price: 10, coins: 1250, bonus: 250, label: '$10' },
-  { id: 'pkg4', price: 20, coins: 2500, bonus: 500, label: '$20' },
+  { id: 'pkg1', basePrice: 1, coins: 100, bonus: 0 },
+  { id: 'pkg2', basePrice: 5, coins: 600, bonus: 100, popular: true },
+  { id: 'pkg3', basePrice: 10, coins: 1250, bonus: 250 },
+  { id: 'pkg4', basePrice: 20, coins: 2500, bonus: 500 },
 ];
 
 interface CoinPurchaseModalProps {
@@ -29,8 +31,10 @@ const CoinPurchaseModal = ({ isOpen, onClose, onSuccess }: CoinPurchaseModalProp
     if (!user) return;
     setLoading(true);
 
+    const fee = +(pkg.basePrice * PROCESSING_FEE).toFixed(2);
+    const totalCharge = +(pkg.basePrice + fee).toFixed(2);
+
     try {
-      // 1. Get current balance
       const { data: balanceData } = await supabase
         .from("user_balances")
         .select("coins")
@@ -38,20 +42,17 @@ const CoinPurchaseModal = ({ isOpen, onClose, onSuccess }: CoinPurchaseModalProp
         .maybeSingle();
 
       const currentCoins = balanceData?.coins ?? 0;
-      const newTotal = currentCoins + pkg.coins;
+      const newTotal = currentCoins + pkg.coins + (pkg.bonus || 0);
 
-      // 2. Update balance
       const { error: updateError } = await supabase
         .from("user_balances")
         .upsert({ user_id: user.id, coins: newTotal }, { onConflict: 'user_id' });
-
       if (updateError) throw updateError;
 
-      // 3. Record transaction
       await supabase.from("coin_purchases").insert({
         user_id: user.id,
-        amount: pkg.coins,
-        price: pkg.price,
+        amount: pkg.coins + (pkg.bonus || 0),
+        price: totalCharge,
         payment_method: "simulated_card",
         status: "completed"
       });
@@ -84,7 +85,7 @@ const CoinPurchaseModal = ({ isOpen, onClose, onSuccess }: CoinPurchaseModalProp
                 <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
                   <Coins className="w-6 h-6 text-accent" />
                 </div>
-                <h2 className="font-display text-xl font-bold text-foreground">Buy Coins</h2>
+                <h2 className="font-display text-xl font-bold text-foreground">Buy QadrCoins</h2>
               </div>
               <button onClick={onClose} className="p-2 hover:bg-muted rounded-full transition-colors">
                 <X className="w-5 h-5" />
@@ -93,7 +94,7 @@ const CoinPurchaseModal = ({ isOpen, onClose, onSuccess }: CoinPurchaseModalProp
 
             <div className="p-6">
               {purchased ? (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, scale: 0.5 }}
                   animate={{ opacity: 1, scale: 1 }}
                   className="py-12 text-center"
@@ -105,36 +106,46 @@ const CoinPurchaseModal = ({ isOpen, onClose, onSuccess }: CoinPurchaseModalProp
                   <p className="font-body text-muted-foreground">Your balance has been updated.</p>
                 </motion.div>
               ) : (
-                <div className="grid grid-cols-2 gap-4">
-                  {PACKAGES.map((pkg) => (
-                    <button
-                      key={pkg.id}
-                      onClick={() => handlePurchase(pkg)}
-                      disabled={loading}
-                      className={`relative p-5 rounded-2xl border-2 text-center transition-all group ${
-                        pkg.popular 
-                          ? "border-primary bg-primary/5 shadow-lg shadow-primary/5" 
-                          : "border-border hover:border-primary/40 bg-card"
-                      }`}
-                    >
-                      {pkg.popular && (
-                        <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
-                          Best Value
-                        </span>
-                      )}
-                      <p className="font-display text-2xl font-bold text-foreground mb-1">{pkg.coins}</p>
-                      <p className="font-body text-xs text-muted-foreground mb-3">Coins</p>
-                      {pkg.bonus > 0 && (
-                        <div className="flex items-center justify-center gap-1 text-[10px] font-bold text-secondary uppercase mb-3">
-                          <Sparkles className="w-3 h-3" /> Bonus {pkg.bonus}
-                        </div>
-                      )}
-                      <div className="py-2 bg-muted group-hover:bg-primary group-hover:text-white rounded-xl font-bold text-sm transition-colors">
-                        {pkg.label}
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <p className="text-xs text-muted-foreground font-body mb-4 text-center">
+                    A 4% processing fee applies to all purchases.
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {PACKAGES.map((pkg) => {
+                      const fee = +(pkg.basePrice * PROCESSING_FEE).toFixed(2);
+                      const total = +(pkg.basePrice + fee).toFixed(2);
+                      return (
+                        <button
+                          key={pkg.id}
+                          onClick={() => handlePurchase(pkg)}
+                          disabled={loading}
+                          className={`relative p-5 rounded-2xl border-2 text-center transition-all group ${
+                            pkg.popular
+                              ? "border-primary bg-primary/5 shadow-lg shadow-primary/5"
+                              : "border-border hover:border-primary/40 bg-card"
+                          }`}
+                        >
+                          {pkg.popular && (
+                            <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-primary text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
+                              Best Value
+                            </span>
+                          )}
+                          <p className="font-display text-2xl font-bold text-foreground mb-1">{pkg.coins + (pkg.bonus || 0)}</p>
+                          <p className="font-body text-xs text-muted-foreground mb-1">QDC</p>
+                          {pkg.bonus > 0 && (
+                            <div className="flex items-center justify-center gap-1 text-[10px] font-bold text-secondary uppercase mb-2">
+                              <Sparkles className="w-3 h-3" /> +{pkg.bonus} bonus
+                            </div>
+                          )}
+                          <div className="py-2 bg-muted group-hover:bg-primary group-hover:text-white rounded-xl font-bold text-sm transition-colors">
+                            ${total}
+                          </div>
+                          <p className="text-[9px] text-muted-foreground mt-1">(incl. ${fee} fee)</p>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
               )}
             </div>
 
@@ -142,7 +153,7 @@ const CoinPurchaseModal = ({ isOpen, onClose, onSuccess }: CoinPurchaseModalProp
               <div className="p-6 bg-muted/30 border-t border-border flex items-center gap-3">
                 <CreditCard className="w-5 h-5 text-muted-foreground" />
                 <p className="text-[10px] font-body text-muted-foreground leading-tight">
-                  Secure payment processed via qadrdaan. By purchasing, you agree to our Terms of Service regarding digital goods.
+                  Secure payment processed via Qadrdaan. 4% processing fee included. By purchasing, you agree to our Terms of Service.
                 </p>
               </div>
             )}

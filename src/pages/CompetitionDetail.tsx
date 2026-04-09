@@ -3,9 +3,10 @@ import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import Navbar from "@/components/Navbar";
+import SendGift from "@/components/SendGift";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { Trophy, ThumbsUp, Award, Medal, Crown, Star, Clock, Users, PenLine } from "lucide-react";
+import { Trophy, ThumbsUp, Award, Medal, Crown, Star, Clock, Users, PenLine, Gift } from "lucide-react";
 import { format } from "date-fns";
 
 interface Competition {
@@ -33,6 +34,7 @@ interface Entry {
   display_name?: string;
   has_voted?: boolean;
   award_type?: string | null;
+  gifts_received?: number;
 }
 
 const awardIcons: Record<string, { icon: any; label: string; color: string }> = {
@@ -57,6 +59,7 @@ const CompetitionDetail = () => {
   const canVote = competition?.status === "voting" || competition?.status === "active";
   const isEnded = competition?.status === "ended";
   const hasSubmitted = entries.some((e) => e.user_id === user?.id);
+  const minParticipants = 2;
 
   const fetchCompetition = async () => {
     const { data } = await supabase.from("competitions").select("*").eq("id", id!).single();
@@ -72,31 +75,26 @@ const CompetitionDetail = () => {
 
     if (!entriesData) return setEntries([]);
 
-    // Enrich with profile names
     const userIds = [...new Set(entriesData.map((e) => e.user_id))];
     const { data: profiles } = await supabase.from("profiles").select("user_id, display_name").in("user_id", userIds);
     const profileMap = Object.fromEntries((profiles || []).map((p) => [p.user_id, p.display_name]));
 
-    // Get user votes
     let votedEntryIds: string[] = [];
     if (user) {
-      const { data: votes } = await supabase
-        .from("competition_votes")
-        .select("entry_id")
-        .eq("user_id", user.id);
+      const { data: votes } = await supabase.from("competition_votes").select("entry_id").eq("user_id", user.id);
       votedEntryIds = (votes || []).map((v) => v.entry_id);
     }
 
-    // Get awards
     const { data: awards } = await supabase.from("competition_awards").select("entry_id, award_type").eq("competition_id", id!);
     const awardMap = Object.fromEntries((awards || []).map((a) => [a.entry_id, a.award_type]));
 
     setEntries(
-      entriesData.map((e, i) => ({
+      entriesData.map((e) => ({
         ...e,
         display_name: profileMap[e.user_id] || "Unknown Poet",
         has_voted: votedEntryIds.includes(e.id),
         award_type: awardMap[e.id] || null,
+        gifts_received: 0,
       }))
     );
   };
@@ -150,6 +148,9 @@ const CompetitionDetail = () => {
     }
   };
 
+  // Determine auto winner (highest votes)
+  const winner = isEnded && entries.length >= minParticipants ? entries[0] : null;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
@@ -177,7 +178,7 @@ const CompetitionDetail = () => {
       <Navbar />
       <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
         {/* Header */}
-        <div className="bg-gradient-emerald rounded-2xl p-8 mb-8 text-primary-foreground">
+        <div className="bg-gradient-to-br from-primary/10 to-secondary/10 border border-border rounded-2xl p-8 mb-8">
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-2 mb-3">
@@ -186,17 +187,34 @@ const CompetitionDetail = () => {
                   {competition.status === "active" ? "Accepting Entries" : competition.status === "voting" ? "Voting Open" : competition.status === "ended" ? "Ended" : "Upcoming"}
                 </span>
               </div>
-              <h1 className="font-display text-3xl font-bold mb-2">{competition.title}</h1>
-              {competition.description && <p className="font-body text-primary-foreground/80 max-w-xl">{competition.description}</p>}
+              <h1 className="font-display text-3xl font-bold text-foreground mb-2">{competition.title}</h1>
+              {competition.description && <p className="font-body text-muted-foreground max-w-xl">{competition.description}</p>}
             </div>
           </div>
-          <div className="flex flex-wrap gap-4 mt-6 text-sm font-body text-primary-foreground/70">
+          <div className="flex flex-wrap gap-4 mt-6 text-sm font-body text-muted-foreground">
             {competition.theme && <span className="flex items-center gap-1"><PenLine className="w-4 h-4" /> {competition.theme}</span>}
             <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Entries by {format(new Date(competition.entry_deadline), "MMM d, yyyy")}</span>
             <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> Voting by {format(new Date(competition.voting_deadline), "MMM d, yyyy")}</span>
-            <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {entries.length} entries</span>
+            <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {entries.length} entries (min {minParticipants})</span>
           </div>
         </div>
+
+        {/* Winner Banner */}
+        {winner && (
+          <div className="mb-8 p-6 bg-accent/10 border border-accent/30 rounded-2xl text-center">
+            <Crown className="w-10 h-10 text-accent mx-auto mb-2" />
+            <h3 className="font-display text-xl font-bold text-foreground">🏆 Winner: {winner.display_name}</h3>
+            <p className="font-body text-sm text-muted-foreground">"{winner.title}" — {winner.votes_count} votes</p>
+          </div>
+        )}
+
+        {entries.length < minParticipants && canSubmit && (
+          <div className="mb-6 p-4 bg-muted/50 border border-border rounded-xl text-center">
+            <p className="text-sm font-body text-muted-foreground">
+              Minimum {minParticipants} participants required. {minParticipants - entries.length} more needed.
+            </p>
+          </div>
+        )}
 
         {/* Submit Entry */}
         {canSubmit && !hasSubmitted && (
@@ -227,7 +245,7 @@ const CompetitionDetail = () => {
                   <button
                     onClick={handleSubmitEntry}
                     disabled={submitting}
-                    className="px-6 py-2.5 rounded-lg bg-gradient-gold text-primary font-body font-bold text-sm shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50"
+                    className="px-6 py-2.5 rounded-lg bg-primary text-white font-body font-bold text-sm hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
                     {submitting ? "Submitting..." : "Submit Poem"}
                   </button>
@@ -263,7 +281,7 @@ const CompetitionDetail = () => {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-start gap-4 flex-1">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center font-display font-bold text-lg ${
-                        i === 0 ? "bg-gradient-gold text-primary" : i === 1 ? "bg-muted text-muted-foreground" : i === 2 ? "bg-secondary/20 text-secondary" : "bg-muted text-muted-foreground"
+                        i === 0 ? "bg-accent/20 text-accent" : i === 1 ? "bg-muted text-muted-foreground" : i === 2 ? "bg-secondary/20 text-secondary" : "bg-muted text-muted-foreground"
                       }`}>
                         {i + 1}
                       </div>
@@ -298,6 +316,13 @@ const CompetitionDetail = () => {
                         <span className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-body text-muted-foreground bg-muted">
                           <ThumbsUp className="w-4 h-4" /> {entry.votes_count}
                         </span>
+                      )}
+                      {/* Gift button for entries */}
+                      {user && user.id !== entry.user_id && (
+                        <SendGift
+                          recipientId={entry.user_id}
+                          recipientName={entry.display_name || "Poet"}
+                        />
                       )}
                       {isOrganizer && isEnded && !entry.award_type && (
                         <div className="flex gap-1 mt-2">
