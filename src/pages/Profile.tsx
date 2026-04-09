@@ -18,7 +18,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
-  const [currentFrame, setCurrentFrame] = useState(1);
+  
   const [form, setForm] = useState({ display_name: "", bio: "", language: "", country: "" });
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
