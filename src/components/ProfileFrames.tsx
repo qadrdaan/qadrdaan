@@ -1,9 +1,20 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Check, Lock, Download, Sparkles, Crown, Coins } from "lucide-react";
-import { toast } from "sonner";
-import CoinPurchaseModal from "./CoinPurchaseModal";
+import { Clock } from "lucide-react";
 
+const ProfileFrames = () => {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 text-center">
+      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mb-6">
+        <Clock className="w-10 h-10 text-muted-foreground" />
+      </div>
+      <h2 className="font-display text-2xl font-bold text-foreground mb-2">Coming Soon</h2>
+      <p className="font-body text-sm text-muted-foreground max-w-sm">
+        Profile Frames are being redesigned with exciting new styles. Stay tuned for the launch!
+      </p>
+    </div>
+  );
+};
+
+export default ProfileFrames;
 const FRAMES = [
   { id: 1, name: "Follow Me", price: 0, style: "ring-[5px] ring-purple-500", overlay: "follow-me" },
   { id: 2, name: "Social Hearts", price: 0, style: "ring-[5px] ring-pink-400 ring-offset-2 ring-offset-pink-100", overlay: null },
