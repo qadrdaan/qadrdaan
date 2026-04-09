@@ -18,7 +18,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const [editing, setEditing] = useState(false);
   const [photoDialogOpen, setPhotoDialogOpen] = useState(false);
-  const [currentFrame, setCurrentFrame] = useState(1);
+  
   const [form, setForm] = useState({ display_name: "", bio: "", language: "", country: "" });
   const [saving, setSaving] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
@@ -164,12 +164,7 @@ const Profile = () => {
         <ProfileAboutSection profile={profile} isOwnProfile={true} onUpdate={refreshProfile} />
         <FeaturedPosts userId={user!.id} isOwnProfile={true} />
         <div id="frames">
-          <ProfileFrames
-            avatarUrl={profile.avatar_url}
-            displayName={profile.display_name || "P"}
-            currentFrame={currentFrame}
-            onApply={setCurrentFrame}
-          />
+          <ProfileFrames />
         </div>
         <PromotionObligation />
         <ProfileWall userId={user!.id} isOwnProfile={true} />
