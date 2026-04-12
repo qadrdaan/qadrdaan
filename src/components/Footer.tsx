@@ -7,7 +7,7 @@ const Footer = () => (
         <div>
           <h3 className="font-display text-xl font-bold text-primary-foreground mb-4">Qadrdaan</h3>
           <p className="font-body text-sm text-primary-foreground/50 leading-relaxed">
-            The world's largest digital stage for poetry, literature, and mushaira culture.
+            The world's largest Social Media Platform.
           </p>
         </div>
         {[
