@@ -25,4 +25,4 @@ npm i
 npm run dev
 ```
 
-© 2026 qadrdaan. All rights reserved.
+© 2026 qadrdaan. All rights reserved. 
