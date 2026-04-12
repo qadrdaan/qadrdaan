@@ -65,7 +65,7 @@ const Footer = () => (
       </div>
       <div className="mt-12 pt-8 border-t border-gold/10 text-center">
         <p className="font-body text-xs text-primary-foreground/30">
-          © 2026 Qadrdaan. All rights reserved. A Product By Solution Chief.
+           Copyright © 2026 Qadrdaan. All rights reserved. A Product By Solution Chief.
         </p>
       </div>
     </div>
