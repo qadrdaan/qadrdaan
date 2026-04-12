@@ -50,7 +50,7 @@ const Contact = () => {
             </div>
             <div className="flex items-center gap-3">
               <MapPin className="w-5 h-5 text-secondary" />
-              <span className="font-body text-foreground">Pakistan</span>
+              <span className="font-body text-foreground">Lahore, Pakistan</span>
             </div>
           </div>
 
