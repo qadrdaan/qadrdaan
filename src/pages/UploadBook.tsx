@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { Upload, BookOpen, Image } from "lucide-react";
+import { CURRENCIES } from "@/lib/currencies";
 
 const CATEGORIES = ["Ghazal", "Nazm", "Hamd", "Naat", "Prose", "Essay", "Novel", "Short Story", "Other"];
 const LANGUAGES = ["Urdu", "Hindi", "Punjabi", "English", "Arabic", "Persian", "Other"];
@@ -24,6 +25,8 @@ const UploadBook = () => {
     category: "",
     isFree: true,
     price: "",
+    salePrice: "",
+    currencyCode: "USD",
   });
 
   useEffect(() => {
@@ -79,6 +82,8 @@ const UploadBook = () => {
 
       // Insert book record
       const bookPrice = form.isFree ? 0 : parseFloat(form.price) || 0;
+      const salePriceVal = !form.isFree && form.salePrice ? parseFloat(form.salePrice) : null;
+      const currency = CURRENCIES.find((c) => c.code === form.currencyCode) || CURRENCIES[0];
       const { error: insertErr } = await supabase.from("books").insert({
         creator_id: user.id,
         title: form.title,
@@ -90,7 +95,10 @@ const UploadBook = () => {
         file_format: fileExt,
         is_free: form.isFree,
         price: bookPrice,
-      });
+        sale_price: salePriceVal,
+        currency_code: currency.code,
+        currency_symbol: currency.symbol,
+      } as any);
       if (insertErr) throw insertErr;
 
       toast.success("Book published successfully!");
@@ -233,16 +241,49 @@ const UploadBook = () => {
                 </label>
               </div>
               {!form.isFree && (
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Enter price (e.g. 4.99)"
-                  required
-                />
+                <div className="space-y-3">
+                  <div>
+                    <label className="block font-body text-xs text-muted-foreground mb-1">Currency</label>
+                    <select
+                      value={form.currencyCode}
+                      onChange={(e) => setForm({ ...form, currencyCode: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      {CURRENCIES.map((c, i) => (
+                        <option key={`${c.code}-${i}`} value={c.code}>
+                          {c.country} — {c.code} ({c.symbol})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-body text-xs text-muted-foreground mb-1">Regular price *</label>
+                      <input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={form.price}
+                        onChange={(e) => setForm({ ...form, price: e.target.value })}
+                        className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                        placeholder="4.99"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-body text-xs text-muted-foreground mb-1">Sale price (optional)</label>
+                      <input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={form.salePrice}
+                        onChange={(e) => setForm({ ...form, salePrice: e.target.value })}
+                        className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                        placeholder="2.99"
+                      />
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 

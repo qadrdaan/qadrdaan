@@ -380,52 +380,79 @@ export type Database = {
       books: {
         Row: {
           category: string | null
+          comment_permission: string
           cover_url: string | null
           created_at: string
           creator_id: string
+          currency_code: string
+          currency_symbol: string
+          deleted_at: string | null
           description: string | null
+          display_date: string | null
           downloads_count: number
           file_format: string | null
           file_url: string | null
           id: string
+          is_deleted: boolean
           is_free: boolean
+          is_hidden: boolean
           language: string | null
+          notifications_off: boolean
           preview_pages: number
           price: number
+          sale_price: number | null
           title: string
           updated_at: string
         }
         Insert: {
           category?: string | null
+          comment_permission?: string
           cover_url?: string | null
           created_at?: string
           creator_id: string
+          currency_code?: string
+          currency_symbol?: string
+          deleted_at?: string | null
           description?: string | null
+          display_date?: string | null
           downloads_count?: number
           file_format?: string | null
           file_url?: string | null
           id?: string
+          is_deleted?: boolean
           is_free?: boolean
+          is_hidden?: boolean
           language?: string | null
+          notifications_off?: boolean
           preview_pages?: number
           price?: number
+          sale_price?: number | null
           title: string
           updated_at?: string
         }
         Update: {
           category?: string | null
+          comment_permission?: string
           cover_url?: string | null
           created_at?: string
           creator_id?: string
+          currency_code?: string
+          currency_symbol?: string
+          deleted_at?: string | null
           description?: string | null
+          display_date?: string | null
           downloads_count?: number
           file_format?: string | null
           file_url?: string | null
           id?: string
+          is_deleted?: boolean
           is_free?: boolean
+          is_hidden?: boolean
           language?: string | null
+          notifications_off?: boolean
           preview_pages?: number
           price?: number
+          sale_price?: number | null
           title?: string
           updated_at?: string
         }
@@ -1289,17 +1316,23 @@ export type Database = {
       poetry_posts: {
         Row: {
           category: string | null
+          comment_permission: string
           comments_count: number
           content: string
           created_at: string
           creator_id: string
+          deleted_at: string | null
+          display_date: string | null
           engagement_score: number
           gifts_count: number
           id: string
           impressions_count: number
+          is_deleted: boolean
           is_editor_pick: boolean
+          is_hidden: boolean
           language: string | null
           likes_count: number
+          notifications_off: boolean
           shares_count: number
           title: string
           total_reading_time: number
@@ -1307,17 +1340,23 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          comment_permission?: string
           comments_count?: number
           content: string
           created_at?: string
           creator_id: string
+          deleted_at?: string | null
+          display_date?: string | null
           engagement_score?: number
           gifts_count?: number
           id?: string
           impressions_count?: number
+          is_deleted?: boolean
           is_editor_pick?: boolean
+          is_hidden?: boolean
           language?: string | null
           likes_count?: number
+          notifications_off?: boolean
           shares_count?: number
           title: string
           total_reading_time?: number
@@ -1325,17 +1364,23 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          comment_permission?: string
           comments_count?: number
           content?: string
           created_at?: string
           creator_id?: string
+          deleted_at?: string | null
+          display_date?: string | null
           engagement_score?: number
           gifts_count?: number
           id?: string
           impressions_count?: number
+          is_deleted?: boolean
           is_editor_pick?: boolean
+          is_hidden?: boolean
           language?: string | null
           likes_count?: number
+          notifications_off?: boolean
           shares_count?: number
           title?: string
           total_reading_time?: number
@@ -1938,13 +1983,19 @@ export type Database = {
       videos: {
         Row: {
           category: string | null
+          comment_permission: string
           created_at: string
           creator_id: string
+          deleted_at: string | null
           description: string | null
+          display_date: string | null
           duration_seconds: number | null
           id: string
+          is_deleted: boolean
+          is_hidden: boolean
           language: string | null
           likes_count: number
+          notifications_off: boolean
           thumbnail_url: string | null
           title: string
           updated_at: string
@@ -1953,13 +2004,19 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          comment_permission?: string
           created_at?: string
           creator_id: string
+          deleted_at?: string | null
           description?: string | null
+          display_date?: string | null
           duration_seconds?: number | null
           id?: string
+          is_deleted?: boolean
+          is_hidden?: boolean
           language?: string | null
           likes_count?: number
+          notifications_off?: boolean
           thumbnail_url?: string | null
           title: string
           updated_at?: string
@@ -1968,13 +2025,19 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          comment_permission?: string
           created_at?: string
           creator_id?: string
+          deleted_at?: string | null
           description?: string | null
+          display_date?: string | null
           duration_seconds?: number | null
           id?: string
+          is_deleted?: boolean
+          is_hidden?: boolean
           language?: string | null
           likes_count?: number
+          notifications_off?: boolean
           thumbnail_url?: string | null
           title?: string
           updated_at?: string

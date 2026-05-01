@@ -22,6 +22,8 @@ const Books = () => {
     let query = supabase
       .from("books")
       .select("*")
+      .eq("is_deleted", false)
+      .eq("is_hidden", false)
       .order("created_at", { ascending: false });
 
     if (filter.language) query = query.eq("language", filter.language);
@@ -136,7 +138,7 @@ const Books = () => {
                       <span>{(book.profiles as any)?.display_name || "Unknown"}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <div className="flex gap-2">
+                      <div className="flex gap-2 flex-wrap">
                         {book.language && (
                           <span className="px-2 py-0.5 text-xs font-body bg-muted rounded-full text-muted-foreground">
                             {book.language}
@@ -148,9 +150,23 @@ const Books = () => {
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Download className="w-3 h-3" />
-                        <span>{book.downloads_count}</span>
+                      <div className="flex items-center gap-2 text-xs">
+                        {book.is_free ? (
+                          <span className="font-semibold text-secondary">Free</span>
+                        ) : (() => {
+                          const sym = (book as any).currency_symbol || "$";
+                          const sale = (book as any).sale_price;
+                          const reg = Number(book.price);
+                          if (sale && Number(sale) > 0 && Number(sale) < reg) {
+                            return (
+                              <span className="flex items-center gap-1 font-semibold text-foreground">
+                                {sym}{Number(sale).toFixed(2)}
+                                <span className="line-through text-muted-foreground font-normal">{sym}{reg.toFixed(2)}</span>
+                              </span>
+                            );
+                          }
+                          return <span className="font-semibold text-foreground">{sym}{reg.toFixed(2)}</span>;
+                        })()}
                       </div>
                     </div>
                   </div>
