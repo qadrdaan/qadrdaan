@@ -241,16 +241,49 @@ const UploadBook = () => {
                 </label>
               </div>
               {!form.isFree && (
-                <input
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={form.price}
-                  onChange={(e) => setForm({ ...form, price: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
-                  placeholder="Enter price (e.g. 4.99)"
-                  required
-                />
+                <div className="space-y-3">
+                  <div>
+                    <label className="block font-body text-xs text-muted-foreground mb-1">Currency</label>
+                    <select
+                      value={form.currencyCode}
+                      onChange={(e) => setForm({ ...form, currencyCode: e.target.value })}
+                      className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                    >
+                      {CURRENCIES.map((c, i) => (
+                        <option key={`${c.code}-${i}`} value={c.code}>
+                          {c.country} — {c.code} ({c.symbol})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-body text-xs text-muted-foreground mb-1">Regular price *</label>
+                      <input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={form.price}
+                        onChange={(e) => setForm({ ...form, price: e.target.value })}
+                        className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                        placeholder="4.99"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block font-body text-xs text-muted-foreground mb-1">Sale price (optional)</label>
+                      <input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={form.salePrice}
+                        onChange={(e) => setForm({ ...form, salePrice: e.target.value })}
+                        className="w-full px-4 py-3 rounded-lg bg-background border border-border text-foreground font-body focus:outline-none focus:ring-2 focus:ring-ring"
+                        placeholder="2.99"
+                      />
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
 
