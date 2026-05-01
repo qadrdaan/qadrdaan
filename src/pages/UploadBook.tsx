@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import { Upload, BookOpen, Image } from "lucide-react";
+import { CURRENCIES } from "@/lib/currencies";
 
 const CATEGORIES = ["Ghazal", "Nazm", "Hamd", "Naat", "Prose", "Essay", "Novel", "Short Story", "Other"];
 const LANGUAGES = ["Urdu", "Hindi", "Punjabi", "English", "Arabic", "Persian", "Other"];
@@ -24,6 +25,8 @@ const UploadBook = () => {
     category: "",
     isFree: true,
     price: "",
+    salePrice: "",
+    currencyCode: "USD",
   });
 
   useEffect(() => {
@@ -79,6 +82,8 @@ const UploadBook = () => {
 
       // Insert book record
       const bookPrice = form.isFree ? 0 : parseFloat(form.price) || 0;
+      const salePriceVal = !form.isFree && form.salePrice ? parseFloat(form.salePrice) : null;
+      const currency = CURRENCIES.find((c) => c.code === form.currencyCode) || CURRENCIES[0];
       const { error: insertErr } = await supabase.from("books").insert({
         creator_id: user.id,
         title: form.title,
@@ -90,7 +95,10 @@ const UploadBook = () => {
         file_format: fileExt,
         is_free: form.isFree,
         price: bookPrice,
-      });
+        sale_price: salePriceVal,
+        currency_code: currency.code,
+        currency_symbol: currency.symbol,
+      } as any);
       if (insertErr) throw insertErr;
 
       toast.success("Book published successfully!");
