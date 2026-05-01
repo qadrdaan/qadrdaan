@@ -22,6 +22,8 @@ const Books = () => {
     let query = supabase
       .from("books")
       .select("*")
+      .eq("is_deleted", false)
+      .eq("is_hidden", false)
       .order("created_at", { ascending: false });
 
     if (filter.language) query = query.eq("language", filter.language);
