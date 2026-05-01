@@ -18,7 +18,7 @@ const PoetryFeed = () => {
 
   const fetchPosts = useCallback(async () => {
     setLoading(true);
-    let query = supabase.from("poetry_posts").select("*");
+    let query = supabase.from("poetry_posts").select("*").eq("is_deleted", false).eq("is_hidden", false);
 
     if (feedType === "trending") {
       query = query.order("engagement_score", { ascending: false });
