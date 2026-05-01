@@ -189,7 +189,20 @@ const BookDetail = () => {
                   ? "Downloading..."
                   : book.is_free
                     ? "Download Free"
-                    : `Buy for $${Number(book.price).toFixed(2)}`}
+                    : (() => {
+                        const sym = (book as any).currency_symbol || "$";
+                        const sale = (book as any).sale_price;
+                        const reg = Number(book.price);
+                        if (sale && Number(sale) > 0 && Number(sale) < reg) {
+                          return (
+                            <span className="flex items-center gap-2">
+                              Buy for {sym}{Number(sale).toFixed(2)}
+                              <span className="line-through opacity-60 text-sm">{sym}{reg.toFixed(2)}</span>
+                            </span>
+                          ) as any;
+                        }
+                        return `Buy for ${sym}${reg.toFixed(2)}`;
+                      })()}
               </button>
               <button
                 onClick={handleBookmark}
