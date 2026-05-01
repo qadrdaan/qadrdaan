@@ -57,6 +57,7 @@ import CreatorHub from "./pages/CreatorHub";
 import Shorts from "./pages/Shorts";
 import Messages from "./pages/Messages";
 import ProfileSettings from "./pages/ProfileSettings";
+import Trash from "./pages/Trash";
 
 const queryClient = new QueryClient();
 
@@ -120,6 +121,7 @@ const App = () => (
             <Route path="/creator-hub" element={<CreatorHub />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/settings" element={<ProfileSettings />} />
+            <Route path="/trash" element={<Trash />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
