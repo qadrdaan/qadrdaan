@@ -58,6 +58,7 @@ import Shorts from "./pages/Shorts";
 import Messages from "./pages/Messages";
 import ProfileSettings from "./pages/ProfileSettings";
 import Trash from "./pages/Trash";
+import ResetPassword from "./pages/ResetPassword";
 
 const queryClient = new QueryClient();
 
