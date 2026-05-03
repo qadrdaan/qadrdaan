@@ -30,19 +30,23 @@ interface SponsoredPostProps {
   placement?: string;
 }
 
+const HIDE_KEY = "qadrdaan_ad_hidden_until";
+
 const SponsoredPost = ({ placement = "feed" }: SponsoredPostProps) => {
   const { user, profile } = useAuth();
   const [ad, setAd] = useState<AdData | null>(null);
   const [hidden, setHidden] = useState(false);
-  const [hiddenUntil, setHiddenUntil] = useState<number | null>(null);
   const [advertiserName, setAdvertiserName] = useState("");
 
   useEffect(() => {
-    // Check if temporarily hidden
-    if (hiddenUntil && Date.now() < hiddenUntil) {
+    // Check persisted suppression (2-hour Hide Ad)
+    const stored = localStorage.getItem(HIDE_KEY);
+    if (stored && Date.now() < parseInt(stored, 10)) {
       setHidden(true);
       return;
     }
+    if (stored) localStorage.removeItem(HIDE_KEY);
+
     const fetchAd = async () => {
       try {
         const { data, error } = await supabase.functions.invoke("serve-ad", {
@@ -67,7 +71,7 @@ const SponsoredPost = ({ placement = "feed" }: SponsoredPostProps) => {
       }
     };
     fetchAd();
-  }, [placement, user, profile, hiddenUntil]);
+  }, [placement, user, profile]);
 
   const handleClick = async () => {
     if (!ad) return;
@@ -82,8 +86,9 @@ const SponsoredPost = ({ placement = "feed" }: SponsoredPostProps) => {
   };
 
   const handleHideTemporary = () => {
+    const until = Date.now() + 2 * 60 * 60 * 1000; // 2 hours
+    localStorage.setItem(HIDE_KEY, String(until));
     setHidden(true);
-    setHiddenUntil(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
     toast.success("Ad hidden for 2 hours");
   };
 
