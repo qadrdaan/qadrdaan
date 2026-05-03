@@ -123,6 +123,7 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/settings" element={<ProfileSettings />} />
             <Route path="/trash" element={<Trash />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
