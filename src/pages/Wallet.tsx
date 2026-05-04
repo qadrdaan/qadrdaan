@@ -162,31 +162,37 @@ const Wallet = () => {
         </div>
 
         {tab === "overview" && (
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-card border border-border rounded-3xl p-8">
-              <h3 className="font-display text-xl font-bold mb-6">Earnings Breakdown</h3>
-              <div className="space-y-4">
-                {[
-                  { label: "Gifts & Mushaira", val: w.gift_earnings, icon: Gift, color: "text-secondary" },
-                  { label: "Book Sales", val: w.book_earnings, icon: BookOpen, color: "text-primary" },
-                  { label: "Fan Club", val: w.fan_club_earnings, icon: DollarSign, color: "text-accent" },
-                  { label: "Ad Revenue", val: w.ad_earnings, icon: TrendingUp, color: "text-green-500" },
-                ].map(item => (
-                  <div key={item.label} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                      <item.icon className={`w-5 h-5 ${item.color}`} />
-                      <span className="font-body text-sm font-bold">{item.label}</span>
-                    </div>
-                    <span className="font-display font-bold">${toDollars(item.val)}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <MonetizationGate />
+              <ReinvestmentTracker />
             </div>
-            <div className="bg-gradient-brand rounded-3xl p-8 text-white shadow-brand flex flex-col justify-center">
-              <PlusCircle className="w-12 h-12 mb-4" />
-              <h3 className="font-display text-2xl font-bold mb-2">Need more coins?</h3>
-              <p className="font-body text-sm text-white/80 mb-6">Top up your balance to send gifts and support your favorite poets.</p>
-              <button onClick={() => navigate('/gift-shop')} className="w-full py-3 bg-white text-primary rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white/90 transition-all">Buy Coins Now</button>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-card border border-border rounded-3xl p-8">
+                <h3 className="font-display text-xl font-bold mb-6">Earnings Breakdown</h3>
+                <div className="space-y-4">
+                  {[
+                    { label: "Gifts & Mushaira", val: w.gift_earnings, icon: Gift, color: "text-secondary" },
+                    { label: "Book Sales", val: w.book_earnings, icon: BookOpen, color: "text-primary" },
+                    { label: "Fan Club", val: w.fan_club_earnings, icon: DollarSign, color: "text-accent" },
+                    { label: "Ad Revenue", val: w.ad_earnings, icon: TrendingUp, color: "text-green-500" },
+                  ].map(item => (
+                    <div key={item.label} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <item.icon className={`w-5 h-5 ${item.color}`} />
+                        <span className="font-body text-sm font-bold">{item.label}</span>
+                      </div>
+                      <span className="font-display font-bold">${toDollars(item.val)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-gradient-brand rounded-3xl p-8 text-white shadow-brand flex flex-col justify-center">
+                <PlusCircle className="w-12 h-12 mb-4" />
+                <h3 className="font-display text-2xl font-bold mb-2">Need more coins?</h3>
+                <p className="font-body text-sm text-white/80 mb-6">Top up your balance to send gifts and support your favorite poets.</p>
+                <button onClick={() => navigate('/gift-shop')} className="w-full py-3 bg-white text-primary rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white/90 transition-all">Buy Coins Now</button>
+              </div>
             </div>
           </div>
         )}
