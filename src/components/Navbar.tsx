@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import { Menu, X, ChevronDown, LogOut, User, Settings } from "lucide-react";
+import { Menu, X, ChevronDown, LogOut, User, Settings, Home } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
 import SearchBar from "@/components/SearchBar";
 import Logo from "@/components/Logo";
 
-const mainLinks = [
-  { href: "/poetry", label: "Poetry" },
+const mainLinks: { href: string; label: string; icon?: any }[] = [
+  { href: "/poetry", label: "Home", icon: Home },
   { href: "/shorts", label: "Shorts" },
   { href: "/books", label: "Books" },
   { href: "/videos", label: "Videos" },
@@ -66,7 +66,10 @@ const Navbar = () => {
         {/* Desktop nav */}
         <div className="hidden lg:flex items-center gap-4 xl:gap-6 font-body text-sm text-foreground/80">
           {mainLinks.map((l) => (
-            <Link key={l.href} to={l.href} className="hover:text-primary transition-colors whitespace-nowrap font-medium">{l.label}</Link>
+            <Link key={l.href} to={l.href} className="hover:text-primary transition-colors whitespace-nowrap font-medium flex items-center gap-1.5" title={l.label}>
+              {l.icon ? <l.icon className="w-4 h-4" /> : null}
+              {l.icon ? <span className="sr-only">{l.label}</span> : l.label}
+            </Link>
           ))}
 
           <div className="relative" onMouseEnter={() => setMoreOpen(true)} onMouseLeave={() => setMoreOpen(false)}>
