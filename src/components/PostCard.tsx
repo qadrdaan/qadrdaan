@@ -3,13 +3,14 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, MessageCircle, Share2, Sparkles, Rocket, Eye, TrendingUp, BarChart3 } from 'lucide-react';
+import { MessageCircle, Share2, Sparkles, Rocket, Eye, TrendingUp, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import SendGift from './SendGift';
 import ReportContent from './ReportContent';
 import PostContextMenu from './PostContextMenu';
+import ReactionPicker, { ReactionType } from './ReactionPicker';
 
 interface PostCardProps {
   post: any;
@@ -21,12 +22,15 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const handleLike = async () => {
-    if (!user) { toast.error("Sign in to like"); return; }
-    if (post.is_liked) {
+  const handleReact = async (type: ReactionType | null) => {
+    if (!user) { toast.error("Sign in to react"); return; }
+    if (type === null) {
       await supabase.from("post_likes").delete().eq("post_id", post.id).eq("user_id", user.id);
     } else {
-      await supabase.from("post_likes").insert({ post_id: post.id, user_id: user.id });
+      await supabase.from("post_likes").upsert(
+        { post_id: post.id, user_id: user.id, reaction_type: type } as any,
+        { onConflict: "post_id,user_id" }
+      );
     }
     onUpdate?.();
   };
@@ -97,9 +101,11 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
       </div>
 
       <div className="flex items-center gap-4 pt-4 border-t border-border">
-        <button onClick={handleLike} className={`flex items-center gap-1.5 text-xs font-bold transition-colors ${post.is_liked ? "text-secondary" : "text-muted-foreground hover:text-secondary"}`}>
-          <Heart className={`w-4 h-4 ${post.is_liked ? "fill-current" : ""}`} /> {post.likes_count}
-        </button>
+        <ReactionPicker
+          active={post.is_liked ? (post.user_reaction as ReactionType) || "heart" : null}
+          count={post.likes_count || 0}
+          onReact={handleReact}
+        />
         <Link to={`/post/${post.id}`} className="flex items-center gap-1.5 text-xs font-bold text-muted-foreground hover:text-primary transition-colors">
           <MessageCircle className="w-4 h-4" /> {post.comments_count}
         </Link>

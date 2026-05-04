@@ -11,6 +11,8 @@ import {
   ArrowDownToLine, Clock, CheckCircle, XCircle, DollarSign,
   PlusCircle, History, CreditCard, Info, BadgeCheck
 } from "lucide-react";
+import MonetizationGate from "@/components/MonetizationGate";
+import ReinvestmentTracker from "@/components/ReinvestmentTracker";
 
 interface WalletData {
   total_earnings: number;
@@ -41,6 +43,9 @@ const Wallet = () => {
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [tab, setTab] = useState<"overview" | "history" | "withdraw">("overview");
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [paymentDetails, setPaymentDetails] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -157,31 +162,37 @@ const Wallet = () => {
         </div>
 
         {tab === "overview" && (
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-card border border-border rounded-3xl p-8">
-              <h3 className="font-display text-xl font-bold mb-6">Earnings Breakdown</h3>
-              <div className="space-y-4">
-                {[
-                  { label: "Gifts & Mushaira", val: w.gift_earnings, icon: Gift, color: "text-secondary" },
-                  { label: "Book Sales", val: w.book_earnings, icon: BookOpen, color: "text-primary" },
-                  { label: "Fan Club", val: w.fan_club_earnings, icon: DollarSign, color: "text-accent" },
-                  { label: "Ad Revenue", val: w.ad_earnings, icon: TrendingUp, color: "text-green-500" },
-                ].map(item => (
-                  <div key={item.label} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                      <item.icon className={`w-5 h-5 ${item.color}`} />
-                      <span className="font-body text-sm font-bold">{item.label}</span>
-                    </div>
-                    <span className="font-display font-bold">${toDollars(item.val)}</span>
-                  </div>
-                ))}
-              </div>
+          <div className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <MonetizationGate />
+              <ReinvestmentTracker />
             </div>
-            <div className="bg-gradient-brand rounded-3xl p-8 text-white shadow-brand flex flex-col justify-center">
-              <PlusCircle className="w-12 h-12 mb-4" />
-              <h3 className="font-display text-2xl font-bold mb-2">Need more coins?</h3>
-              <p className="font-body text-sm text-white/80 mb-6">Top up your balance to send gifts and support your favorite poets.</p>
-              <button onClick={() => navigate('/gift-shop')} className="w-full py-3 bg-white text-primary rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white/90 transition-all">Buy Coins Now</button>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="bg-card border border-border rounded-3xl p-8">
+                <h3 className="font-display text-xl font-bold mb-6">Earnings Breakdown</h3>
+                <div className="space-y-4">
+                  {[
+                    { label: "Gifts & Mushaira", val: w.gift_earnings, icon: Gift, color: "text-secondary" },
+                    { label: "Book Sales", val: w.book_earnings, icon: BookOpen, color: "text-primary" },
+                    { label: "Fan Club", val: w.fan_club_earnings, icon: DollarSign, color: "text-accent" },
+                    { label: "Ad Revenue", val: w.ad_earnings, icon: TrendingUp, color: "text-green-500" },
+                  ].map(item => (
+                    <div key={item.label} className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl">
+                      <div className="flex items-center gap-3">
+                        <item.icon className={`w-5 h-5 ${item.color}`} />
+                        <span className="font-body text-sm font-bold">{item.label}</span>
+                      </div>
+                      <span className="font-display font-bold">${toDollars(item.val)}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-gradient-brand rounded-3xl p-8 text-white shadow-brand flex flex-col justify-center">
+                <PlusCircle className="w-12 h-12 mb-4" />
+                <h3 className="font-display text-2xl font-bold mb-2">Need more coins?</h3>
+                <p className="font-body text-sm text-white/80 mb-6">Top up your balance to send gifts and support your favorite poets.</p>
+                <button onClick={() => navigate('/gift-shop')} className="w-full py-3 bg-white text-primary rounded-xl font-bold uppercase text-xs tracking-widest hover:bg-white/90 transition-all">Buy Coins Now</button>
+              </div>
             </div>
           </div>
         )}
@@ -221,17 +232,45 @@ const Wallet = () => {
           <div className="max-w-md mx-auto space-y-6">
             <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
               <h3 className="font-display text-xl font-bold mb-2">Withdraw Funds</h3>
-              <p className="font-body text-sm text-muted-foreground mb-6">Minimum withdrawal is $5.00 (500 coins).</p>
-              
+              <p className="font-body text-sm text-muted-foreground mb-6">Minimum withdrawal is <strong>$20.00</strong>. Manual admin review (1–3 business days).</p>
+
               <div className="space-y-4">
                 <div>
                   <label className="block font-body text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Amount (USD)</label>
-                  <input 
-                    type="number" 
-                    value={withdrawAmount} 
+                  <input
+                    type="number"
+                    min={20}
+                    value={withdrawAmount}
                     onChange={e => setWithdrawAmount(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border focus:ring-2 focus:ring-primary/20 outline-none font-display text-lg font-bold"
-                    placeholder="0.00"
+                    placeholder="20.00"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-1">Available: ${toDollars(w.available_balance)}</p>
+                </div>
+
+                <div>
+                  <label className="block font-body text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Payment Method</label>
+                  <select
+                    value={paymentMethod}
+                    onChange={e => setPaymentMethod(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border outline-none font-body text-sm"
+                  >
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="paypal">PayPal</option>
+                    <option value="jazzcash">JazzCash</option>
+                    <option value="easypaisa">Easypaisa</option>
+                    <option value="wise">Wise</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block font-body text-xs font-bold text-muted-foreground uppercase tracking-widest mb-2">Account Details</label>
+                  <textarea
+                    value={paymentDetails}
+                    onChange={e => setPaymentDetails(e.target.value)}
+                    rows={3}
+                    placeholder="Account number / email / IBAN..."
+                    className="w-full px-4 py-3 rounded-xl bg-muted/50 border border-border outline-none font-body text-sm"
                   />
                 </div>
 
@@ -246,9 +285,55 @@ const Wallet = () => {
                   </div>
                 </div>
 
-                <button className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all">Request Withdrawal</button>
+                <button
+                  disabled={submitting}
+                  onClick={async () => {
+                    if (!user) return;
+                    if (amountNum < 20) { toast.error("Minimum withdrawal is $20"); return; }
+                    if (amountNum * COIN_RATE > w.available_balance) { toast.error("Insufficient balance"); return; }
+                    if (!paymentDetails.trim()) { toast.error("Add account details"); return; }
+                    setSubmitting(true);
+                    const { error } = await supabase.from("withdrawal_requests").insert({
+                      user_id: user.id,
+                      amount: amountNum,
+                      payment_method: paymentMethod,
+                      payment_details: { details: paymentDetails, fee_percent: feePercent, net: finalAmount } as any,
+                      status: "pending",
+                    });
+                    setSubmitting(false);
+                    if (error) { toast.error(error.message); return; }
+                    toast.success("Withdrawal request submitted for admin review!");
+                    setWithdrawAmount(""); setPaymentDetails("");
+                    fetchHistory();
+                  }}
+                  className="w-full py-4 bg-primary text-white rounded-2xl font-bold uppercase text-xs tracking-widest shadow-brand hover:opacity-90 transition-all disabled:opacity-50"
+                >
+                  {submitting ? "Submitting..." : "Request Withdrawal"}
+                </button>
               </div>
             </div>
+
+            {/* Recent withdrawal requests */}
+            {withdrawals.length > 0 && (
+              <div className="bg-card border border-border rounded-2xl p-5">
+                <h4 className="font-display text-sm font-bold uppercase tracking-wider mb-3">Your Requests</h4>
+                <div className="space-y-2">
+                  {withdrawals.slice(0, 5).map((w: any) => (
+                    <div key={w.id} className="flex items-center justify-between text-xs p-3 bg-muted/30 rounded-xl">
+                      <div>
+                        <p className="font-bold">${Number(w.amount).toFixed(2)} · {w.payment_method}</p>
+                        <p className="text-[10px] text-muted-foreground">{new Date(w.created_at).toLocaleDateString()}</p>
+                      </div>
+                      <span className={`px-2 py-1 rounded-full font-bold uppercase text-[10px] ${
+                        w.status === "approved" ? "bg-green-500/20 text-green-700" :
+                        w.status === "rejected" ? "bg-destructive/20 text-destructive" :
+                        "bg-amber-500/20 text-amber-700"
+                      }`}>{w.status}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="bg-accent/5 border border-accent/20 rounded-2xl p-4 flex gap-3">
               <div className="w-5 h-5 text-accent shrink-0">
