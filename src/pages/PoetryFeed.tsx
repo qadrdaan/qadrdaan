@@ -6,8 +6,9 @@ import FeedLayout from "@/components/layouts/FeedLayout";
 import PostCard from "@/components/PostCard";
 import CreatePostBox from "@/components/CreatePostBox";
 import SponsoredPost from "@/components/SponsoredPost";
-import { TrendingUp, Sparkles, Globe, PenLine } from "lucide-react";
+import { TrendingUp, Sparkles, Globe } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import StoriesBar from "@/components/StoriesBar";
 
 const PoetryFeed = () => {
   const { user } = useAuth();
@@ -35,16 +36,17 @@ const PoetryFeed = () => {
       const { data: profiles } = await supabase.from("profiles").select("user_id, display_name").in("user_id", creatorIds);
       const nameMap = new Map(profiles?.map((p: any) => [p.user_id, p.display_name]) || []);
 
-      let likedIds = new Set();
+      let likedMap = new Map<string, string>();
       if (user) {
-        const { data: likes } = await supabase.from("post_likes").select("post_id").eq("user_id", user.id);
-        likedIds = new Set(likes?.map((l: any) => l.post_id) || []);
+        const { data: likes } = await supabase.from("post_likes").select("post_id, reaction_type").eq("user_id", user.id);
+        likedMap = new Map((likes || []).map((l: any) => [l.post_id, l.reaction_type || "heart"]));
       }
 
       setPosts(postsData.map((p: any) => ({
         ...p,
         creator_name: nameMap.get(p.creator_id) || "Unknown",
-        is_liked: likedIds.has(p.id)
+        is_liked: likedMap.has(p.id),
+        user_reaction: likedMap.get(p.id) || null,
       })));
     }
     setLoading(false);
@@ -66,6 +68,7 @@ const PoetryFeed = () => {
 
   return (
     <FeedLayout trendingPoets={trendingPoets}>
+      <StoriesBar />
       {/* Unified create post + tabs area */}
       {user && <CreatePostBox onPostCreated={fetchPosts} />}
 
