@@ -1457,18 +1457,21 @@ export type Database = {
           created_at: string
           id: string
           post_id: string
+          reaction_type: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           post_id: string
+          reaction_type?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           post_id?: string
+          reaction_type?: string
           user_id?: string
         }
         Relationships: [
@@ -1759,6 +1762,106 @@ export type Database = {
             columns: ["room_id"]
             isOneToOne: false
             referencedRelation: "video_mushaira_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stories: {
+        Row: {
+          background_color: string | null
+          caption: string | null
+          created_at: string
+          creator_id: string
+          expires_at: string
+          id: string
+          media_type: string
+          media_url: string | null
+          reactions_count: number
+          views_count: number
+        }
+        Insert: {
+          background_color?: string | null
+          caption?: string | null
+          created_at?: string
+          creator_id: string
+          expires_at?: string
+          id?: string
+          media_type?: string
+          media_url?: string | null
+          reactions_count?: number
+          views_count?: number
+        }
+        Update: {
+          background_color?: string | null
+          caption?: string | null
+          created_at?: string
+          creator_id?: string
+          expires_at?: string
+          id?: string
+          media_type?: string
+          media_url?: string | null
+          reactions_count?: number
+          views_count?: number
+        }
+        Relationships: []
+      }
+      story_reactions: {
+        Row: {
+          created_at: string
+          id: string
+          reaction_type: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          reaction_type: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          reaction_type?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_reactions_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      story_views: {
+        Row: {
+          created_at: string
+          id: string
+          story_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          story_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          story_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "story_views_story_id_fkey"
+            columns: ["story_id"]
+            isOneToOne: false
+            referencedRelation: "stories"
             referencedColumns: ["id"]
           },
         ]
