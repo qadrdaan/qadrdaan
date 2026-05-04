@@ -11,6 +11,8 @@ import {
   ArrowDownToLine, Clock, CheckCircle, XCircle, DollarSign,
   PlusCircle, History, CreditCard, Info, BadgeCheck
 } from "lucide-react";
+import MonetizationGate from "@/components/MonetizationGate";
+import ReinvestmentTracker from "@/components/ReinvestmentTracker";
 
 interface WalletData {
   total_earnings: number;
@@ -41,6 +43,9 @@ const Wallet = () => {
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [tab, setTab] = useState<"overview" | "history" | "withdraw">("overview");
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("bank_transfer");
+  const [paymentDetails, setPaymentDetails] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
