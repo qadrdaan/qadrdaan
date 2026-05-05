@@ -66,6 +66,29 @@ const PoetryFeed = () => {
     fetchTrendingPoets();
   }, [fetchPosts]);
 
+  // Pull-to-refresh: swipe down at top of page reloads feed
+  useEffect(() => {
+    let startY = 0;
+    let pulling = false;
+    const onTouchStart = (e: TouchEvent) => {
+      if (window.scrollY <= 0) { startY = e.touches[0].clientY; pulling = true; }
+    };
+    const onTouchMove = (e: TouchEvent) => {
+      if (!pulling) return;
+      const dy = e.touches[0].clientY - startY;
+      if (dy > 80) { pulling = false; fetchPosts(); }
+    };
+    const onTouchEnd = () => { pulling = false; };
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+    };
+  }, [fetchPosts]);
+
   return (
     <FeedLayout trendingPoets={trendingPoets}>
       <StoriesBar />
