@@ -37,22 +37,30 @@ const SearchBar = () => {
   const hasResults = results.profiles.length > 0 || results.posts.length > 0 || results.books.length > 0;
 
   return (
-    <div ref={ref} className="relative hidden md:block">
-      <div className="flex items-center bg-primary-foreground/10 rounded-lg px-3 py-1.5">
-        <Search className="w-4 h-4 text-primary-foreground/50 mr-2" />
-        <input
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-          onFocus={() => setOpen(true)}
-          placeholder="Search..."
-          className="bg-transparent text-sm text-primary-foreground font-body placeholder:text-primary-foreground/40 focus:outline-none w-40"
-        />
-        {query && (
-          <button onClick={() => { setQuery(""); setOpen(false); }} className="text-primary-foreground/50 hover:text-primary-foreground">
-            <X className="w-3.5 h-3.5" />
+    <div ref={ref} className="relative">
+      {!open ? (
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Search"
+          className="p-2 rounded-full hover:bg-muted transition-colors text-foreground/80 hover:text-primary"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+      ) : (
+        <div className="flex items-center bg-muted rounded-lg px-3 py-1.5 animate-in fade-in slide-in-from-right-2 duration-150">
+          <Search className="w-4 h-4 text-muted-foreground mr-2" />
+          <input
+            autoFocus
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search poets, posts, books..."
+            className="bg-transparent text-sm text-foreground font-body placeholder:text-muted-foreground focus:outline-none w-44 sm:w-56"
+          />
+          <button onClick={() => { setQuery(""); setOpen(false); }} className="text-muted-foreground hover:text-foreground ml-1">
+            <X className="w-4 h-4" />
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {open && query.trim() && (
         <div className="absolute top-full mt-2 left-0 w-72 bg-card border border-border rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto">
