@@ -13,7 +13,6 @@ const mainLinks: { href: string; label: string; icon?: any }[] = [
   { href: "/books", label: "Books" },
   { href: "/videos", label: "Videos" },
   { href: "/poets", label: "Poets" },
-  { href: "/discover", label: "Discover" },
 ];
 
 const moreLinks = [
