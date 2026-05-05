@@ -33,6 +33,11 @@ const NotificationBell = () => {
     };
     fetch();
 
+    // Ask for browser notification permission once
+    if (typeof Notification !== "undefined" && Notification.permission === "default") {
+      Notification.requestPermission().catch(() => {});
+    }
+
     const channel = supabase
       .channel("notifications")
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
@@ -40,6 +45,13 @@ const NotificationBell = () => {
           const n = payload.new as Notification;
           setNotifications((prev) => [n, ...prev].slice(0, 20));
           setUnreadCount((c) => c + 1);
+          // Show system push notification
+          try {
+            if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+              const notif = new Notification(n.title, { body: n.message || "", icon: "/placeholder.svg", tag: n.id });
+              notif.onclick = () => { window.focus(); if (n.reference_type === "post" && n.reference_id) window.location.href = `/post/${n.reference_id}`; };
+            }
+          } catch {}
         }
       ).subscribe();
 
