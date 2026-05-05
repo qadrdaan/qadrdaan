@@ -16,6 +16,7 @@ const mainLinks: { href: string; label: string; icon?: any }[] = [
 ];
 
 const moreLinks = [
+  { href: "/discover", label: "Discover" },
   { href: "/mushairas", label: "Mushairas" },
   { href: "/competitions", label: "Competitions" },
   { href: "/challenges", label: "Challenges" },
