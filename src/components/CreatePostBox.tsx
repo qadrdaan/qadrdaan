@@ -24,6 +24,8 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [showVideoSection, setShowVideoSection] = useState(false);
+  const [location, setLocation] = useState("");
+  const [feeling, setFeeling] = useState("");
   const videoInputRef = useRef<HTMLInputElement>(null);
   const thumbInputRef = useRef<HTMLInputElement>(null);
 
