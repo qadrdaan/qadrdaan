@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import NotificationBell from "@/components/NotificationBell";
 import SearchBar from "@/components/SearchBar";
 import Logo from "@/components/Logo";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 const mainLinks: { href: string; label: string; icon?: any }[] = [
   { href: "/poetry", label: "Home", icon: Home },
