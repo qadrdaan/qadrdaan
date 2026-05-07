@@ -243,6 +243,10 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
         </div>
       )}
 
+      <div className="mt-3 px-1">
+        <LocationFeelingPicker location={location} feeling={feeling} onLocationChange={setLocation} onFeelingChange={setFeeling} />
+      </div>
+
       <div className="flex items-center justify-between pt-3 mt-3 border-t border-border">
         <div className="flex gap-1">
           <button className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-primary flex items-center gap-1.5 text-xs font-bold">
