@@ -93,6 +93,7 @@ const PoetryFeed = () => {
   return (
     <FeedLayout trendingPoets={trendingPoets}>
       <StoriesBar />
+      <VerseOfTheDay />
       {/* Unified create post + tabs area */}
       {user && <CreatePostBox onPostCreated={fetchPosts} />}
 
