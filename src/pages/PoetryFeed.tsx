@@ -9,6 +9,7 @@ import SponsoredPost from "@/components/SponsoredPost";
 import { TrendingUp, Sparkles, Globe } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StoriesBar from "@/components/StoriesBar";
+import VerseOfTheDay from "@/components/VerseOfTheDay";
 
 const PoetryFeed = () => {
   const { user } = useAuth();
