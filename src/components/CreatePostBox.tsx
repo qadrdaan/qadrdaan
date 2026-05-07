@@ -127,6 +127,8 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
       setThumbPreview(null);
       setTags([]);
       setShowVideoSection(false);
+      setLocation("");
+      setFeeling("");
       setUploadProgress(0);
       onPostCreated();
     } catch (err: any) {
