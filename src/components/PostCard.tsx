@@ -102,7 +102,7 @@ const PostCard = ({ post, onUpdate, showDelete }: PostCardProps) => {
 
       <div className="flex items-center gap-4 pt-4 border-t border-border">
         <ReactionPicker
-          active={post.is_liked ? (post.user_reaction as ReactionType) || "heart" : null}
+          active={post.is_liked ? (post.user_reaction as ReactionType) || "like" : null}
           count={post.likes_count || 0}
           onReact={handleReact}
         />
