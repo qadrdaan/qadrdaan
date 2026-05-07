@@ -152,12 +152,14 @@ const VideoDetail = () => {
         {/* Video Player */}
         <div className="bg-foreground">
           <div className="max-w-5xl mx-auto">
-            <video
+            <VideoWithWatermark
               src={video.video_url}
-              controls
+              poster={video.thumbnail_url || undefined}
+              creatorHandle={creatorName.replace(/\s+/g, "").toLowerCase()}
+              creatorId={video.creator_id}
+              uploadDate={video.created_at}
               autoPlay
               className="w-full aspect-video"
-              poster={video.thumbnail_url || undefined}
             />
           </div>
         </div>
