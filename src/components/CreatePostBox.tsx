@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Image as ImageIcon, Video, Mic, Send, Loader2, X, Upload, Tag } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import LocationFeelingPicker from '@/components/LocationFeelingPicker';
 
 interface CreatePostBoxProps {
   onPostCreated: () => void;
