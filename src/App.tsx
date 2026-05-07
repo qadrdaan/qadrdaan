@@ -59,6 +59,10 @@ import Messages from "./pages/Messages";
 import ProfileSettings from "./pages/ProfileSettings";
 import Trash from "./pages/Trash";
 import ResetPassword from "./pages/ResetPassword";
+import NotificationSettings from "./pages/NotificationSettings";
+import UserGuide from "./pages/UserGuide";
+import RefundPolicy from "./pages/RefundPolicy";
+import CreatorTiers from "./pages/CreatorTiers";
 
 const queryClient = new QueryClient();
 
