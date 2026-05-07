@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import SendGift from "@/components/SendGift";
+import VideoWithWatermark from "@/components/VideoWithWatermark";
 import { Heart, Eye, User, Calendar, Globe, Tag, Send, Bookmark, BookmarkPlus } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -151,12 +152,14 @@ const VideoDetail = () => {
         {/* Video Player */}
         <div className="bg-foreground">
           <div className="max-w-5xl mx-auto">
-            <video
+            <VideoWithWatermark
               src={video.video_url}
-              controls
+              poster={video.thumbnail_url || undefined}
+              creatorHandle={creatorName.replace(/\s+/g, "").toLowerCase()}
+              creatorId={video.creator_id}
+              uploadDate={video.created_at}
               autoPlay
               className="w-full aspect-video"
-              poster={video.thumbnail_url || undefined}
             />
           </div>
         </div>

@@ -9,6 +9,7 @@ import SponsoredPost from "@/components/SponsoredPost";
 import { TrendingUp, Sparkles, Globe } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StoriesBar from "@/components/StoriesBar";
+import VerseOfTheDay from "@/components/VerseOfTheDay";
 
 const PoetryFeed = () => {
   const { user } = useAuth();
@@ -92,6 +93,7 @@ const PoetryFeed = () => {
   return (
     <FeedLayout trendingPoets={trendingPoets}>
       <StoriesBar />
+      <VerseOfTheDay />
       {/* Unified create post + tabs area */}
       {user && <CreatePostBox onPostCreated={fetchPosts} />}
 

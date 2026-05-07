@@ -799,6 +799,30 @@ export type Database = {
         }
         Relationships: []
       }
+      creator_tiers: {
+        Row: {
+          monthly_benefit_credit: number
+          points: number
+          tier: Database["public"]["Enums"]["creator_tier"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          monthly_benefit_credit?: number
+          points?: number
+          tier?: Database["public"]["Enums"]["creator_tier"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          monthly_benefit_credit?: number
+          points?: number
+          tier?: Database["public"]["Enums"]["creator_tier"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       creator_wallets: {
         Row: {
           ad_earnings: number
@@ -1143,6 +1167,42 @@ export type Database = {
           },
         ]
       }
+      mentorship_sessions: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          mentee_id: string
+          mentor_id: string
+          price_coins: number
+          scheduled_at: string
+          status: string
+          topic: string | null
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          mentee_id: string
+          mentor_id: string
+          price_coins?: number
+          scheduled_at: string
+          status?: string
+          topic?: string | null
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          mentee_id?: string
+          mentor_id?: string
+          price_coins?: number
+          scheduled_at?: string
+          status?: string
+          topic?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -1238,6 +1298,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          comments: boolean
+          competitions: boolean
+          follows: boolean
+          gifts: boolean
+          mushaira: boolean
+          preferred_language: string
+          reactions: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comments?: boolean
+          competitions?: boolean
+          follows?: boolean
+          gifts?: boolean
+          mushaira?: boolean
+          preferred_language?: string
+          reactions?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comments?: boolean
+          competitions?: boolean
+          follows?: boolean
+          gifts?: boolean
+          mushaira?: boolean
+          preferred_language?: string
+          reactions?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string
@@ -1324,6 +1420,7 @@ export type Database = {
           deleted_at: string | null
           display_date: string | null
           engagement_score: number
+          feeling: string | null
           gifts_count: number
           id: string
           impressions_count: number
@@ -1332,6 +1429,7 @@ export type Database = {
           is_hidden: boolean
           language: string | null
           likes_count: number
+          location: string | null
           notifications_off: boolean
           shares_count: number
           title: string
@@ -1348,6 +1446,7 @@ export type Database = {
           deleted_at?: string | null
           display_date?: string | null
           engagement_score?: number
+          feeling?: string | null
           gifts_count?: number
           id?: string
           impressions_count?: number
@@ -1356,6 +1455,7 @@ export type Database = {
           is_hidden?: boolean
           language?: string | null
           likes_count?: number
+          location?: string | null
           notifications_off?: boolean
           shares_count?: number
           title: string
@@ -1372,6 +1472,7 @@ export type Database = {
           deleted_at?: string | null
           display_date?: string | null
           engagement_score?: number
+          feeling?: string | null
           gifts_count?: number
           id?: string
           impressions_count?: number
@@ -1380,6 +1481,7 @@ export type Database = {
           is_hidden?: boolean
           language?: string | null
           likes_count?: number
+          location?: string | null
           notifications_off?: boolean
           shares_count?: number
           title?: string
@@ -2013,6 +2115,36 @@ export type Database = {
         }
         Relationships: []
       }
+      verse_of_the_day: {
+        Row: {
+          author: string | null
+          content: string
+          created_at: string
+          display_date: string
+          id: string
+          source_language: string
+          translations: Json
+        }
+        Insert: {
+          author?: string | null
+          content: string
+          created_at?: string
+          display_date: string
+          id?: string
+          source_language?: string
+          translations?: Json
+        }
+        Update: {
+          author?: string | null
+          content?: string
+          created_at?: string
+          display_date?: string
+          id?: string
+          source_language?: string
+          translations?: Json
+        }
+        Relationships: []
+      }
       video_comments: {
         Row: {
           content: string
@@ -2320,6 +2452,7 @@ export type Database = {
         | "event_promotion"
       app_role: "admin" | "moderator" | "user"
       competition_status: "upcoming" | "active" | "voting" | "ended"
+      creator_tier: "bronze" | "silver" | "gold" | "platinum"
       mushaira_status: "upcoming" | "live" | "ended" | "cancelled"
       mushaira_type: "open" | "curated" | "themed" | "international"
     }
@@ -2478,6 +2611,7 @@ export const Constants = {
       ],
       app_role: ["admin", "moderator", "user"],
       competition_status: ["upcoming", "active", "voting", "ended"],
+      creator_tier: ["bronze", "silver", "gold", "platinum"],
       mushaira_status: ["upcoming", "live", "ended", "cancelled"],
       mushaira_type: ["open", "curated", "themed", "international"],
     },

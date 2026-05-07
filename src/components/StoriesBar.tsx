@@ -193,17 +193,14 @@ const StoriesBar = () => {
                 </div>
               </div>
               <div className="flex items-center justify-center gap-2 mt-4 bg-white/10 backdrop-blur rounded-full p-2">
-                {REACTIONS.map(r => {
-                  const Icon = r.icon;
-                  return (
-                    <button key={r.type} onClick={() => reactToStory(r.type)}
-                      title={r.label}
-                      className={`p-2 rounded-full hover:scale-125 transition-transform ${r.color}`}
-                    >
-                      <Icon className="w-6 h-6 fill-current" />
-                    </button>
-                  );
-                })}
+                {REACTIONS.map(r => (
+                  <button key={r.type} onClick={() => reactToStory(r.type)}
+                    title={r.label}
+                    className="text-2xl p-2 rounded-full hover:scale-150 transition-transform leading-none"
+                  >
+                    {r.emoji}
+                  </button>
+                ))}
               </div>
             </motion.div>
           </motion.div>

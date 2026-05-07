@@ -59,6 +59,10 @@ import Messages from "./pages/Messages";
 import ProfileSettings from "./pages/ProfileSettings";
 import Trash from "./pages/Trash";
 import ResetPassword from "./pages/ResetPassword";
+import NotificationSettings from "./pages/NotificationSettings";
+import UserGuide from "./pages/UserGuide";
+import RefundPolicy from "./pages/RefundPolicy";
+import CreatorTiers from "./pages/CreatorTiers";
 
 const queryClient = new QueryClient();
 
@@ -124,6 +128,10 @@ const App = () => (
             <Route path="/settings" element={<ProfileSettings />} />
             <Route path="/trash" element={<Trash />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/notification-settings" element={<NotificationSettings />} />
+            <Route path="/user-guide" element={<UserGuide />} />
+            <Route path="/refund" element={<RefundPolicy />} />
+            <Route path="/creator-tiers" element={<CreatorTiers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

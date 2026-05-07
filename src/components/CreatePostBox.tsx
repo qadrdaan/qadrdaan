@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Image as ImageIcon, Video, Mic, Send, Loader2, X, Upload, Tag } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import LocationFeelingPicker from '@/components/LocationFeelingPicker';
 
 interface CreatePostBoxProps {
   onPostCreated: () => void;
@@ -23,6 +24,8 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [showVideoSection, setShowVideoSection] = useState(false);
+  const [location, setLocation] = useState("");
+  const [feeling, setFeeling] = useState("");
   const videoInputRef = useRef<HTMLInputElement>(null);
   const thumbInputRef = useRef<HTMLInputElement>(null);
 
@@ -108,7 +111,9 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
           content: content.trim(),
           title: content.split('\n')[0].substring(0, 50) || "Untitled Post",
           category: "quote",
-          language: profile?.language || "Urdu"
+          language: profile?.language || "Urdu",
+          location: location || null,
+          feeling: feeling || null,
         });
         if (error) throw error;
       }
@@ -122,6 +127,8 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
       setThumbPreview(null);
       setTags([]);
       setShowVideoSection(false);
+      setLocation("");
+      setFeeling("");
       setUploadProgress(0);
       onPostCreated();
     } catch (err: any) {
@@ -235,6 +242,10 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
           </p>
         </div>
       )}
+
+      <div className="mt-3 px-1">
+        <LocationFeelingPicker location={location} feeling={feeling} onLocationChange={setLocation} onFeelingChange={setFeeling} />
+      </div>
 
       <div className="flex items-center justify-between pt-3 mt-3 border-t border-border">
         <div className="flex gap-1">
