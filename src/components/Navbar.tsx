@@ -138,6 +138,21 @@ const Navbar = () => {
                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors font-body">
                         <Settings className="w-4 h-4" /> Settings
                       </Link>
+                      <Link to="/notification-settings" onClick={() => setAvatarOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors font-body">
+                        🔔 Notifications
+                      </Link>
+                      <Link to="/creator-tiers" onClick={() => setAvatarOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors font-body">
+                        🏆 Creator Tier
+                      </Link>
+                      <Link to="/user-guide" onClick={() => setAvatarOpen(false)}
+                        className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors font-body">
+                        📖 User Guide
+                      </Link>
+                      <div className="border-t border-border my-1 px-2 py-1">
+                        <LanguageSwitcher inline />
+                      </div>
                       <button onClick={() => { setAvatarOpen(false); handleSignOut(); }}
                         className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors font-body w-full text-left">
                         <LogOut className="w-4 h-4" /> Sign Out
