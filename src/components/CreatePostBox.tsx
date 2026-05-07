@@ -111,7 +111,9 @@ const CreatePostBox = ({ onPostCreated }: CreatePostBoxProps) => {
           content: content.trim(),
           title: content.split('\n')[0].substring(0, 50) || "Untitled Post",
           category: "quote",
-          language: profile?.language || "Urdu"
+          language: profile?.language || "Urdu",
+          location: location || null,
+          feeling: feeling || null,
         });
         if (error) throw error;
       }
