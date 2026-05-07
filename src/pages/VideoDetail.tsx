@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { toast } from "sonner";
 import Navbar from "@/components/Navbar";
 import SendGift from "@/components/SendGift";
+import VideoWithWatermark from "@/components/VideoWithWatermark";
 import { Heart, Eye, User, Calendar, Globe, Tag, Send, Bookmark, BookmarkPlus } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
