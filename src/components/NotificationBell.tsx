@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { subscribeUserToPush } from "@/lib/push";
 import { Bell } from "lucide-react";
 
 interface Notification {
@@ -33,10 +34,15 @@ const NotificationBell = () => {
     };
     fetch();
 
-    // Ask for browser notification permission once
-    if (typeof Notification !== "undefined" && Notification.permission === "default") {
-      Notification.requestPermission().catch(() => {});
-    }
+    // Ask for browser notification permission, then subscribe to web push
+    (async () => {
+      if (typeof Notification !== "undefined" && Notification.permission === "default") {
+        try { await Notification.requestPermission(); } catch {}
+      }
+      if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+        try { await subscribeUserToPush(user.id, supabase); } catch {}
+      }
+    })();
 
     const channel = supabase
       .channel("notifications")
