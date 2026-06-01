@@ -185,6 +185,25 @@ const Auth = () => {
             />
           </div>
 
+          {!isLogin && (
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                className="mt-1 w-4 h-4 accent-secondary"
+                required
+              />
+              <span className="font-body text-xs text-muted-foreground leading-relaxed">
+                I have read and agree to the{" "}
+                <a href="/terms" target="_blank" rel="noreferrer" className="text-secondary hover:underline font-semibold">Terms of Service</a>,{" "}
+                <a href="/privacy" target="_blank" rel="noreferrer" className="text-secondary hover:underline font-semibold">Privacy Policy</a>, and{" "}
+                <a href="/refund" target="_blank" rel="noreferrer" className="text-secondary hover:underline font-semibold">Refund Policy</a> of Qadrdaan.
+              </span>
+            </label>
+          )}
+
+
           <button
             type="submit"
             disabled={loading}
