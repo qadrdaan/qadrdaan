@@ -63,14 +63,9 @@ const Auth = () => {
         return;
       }
 
-      // Check if CNIC already exists
-      const { data: existingProfile } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("cnic", cnicClean)
-        .maybeSingle();
-
-      if (existingProfile) {
+      // Check if CNIC already exists (via SECURITY DEFINER RPC; cnic column is not readable)
+      const { data: exists } = await supabase.rpc("cnic_exists" as any, { _cnic: cnicClean });
+      if (exists) {
         toast.error("An account with this CNIC already exists. Only one account per CNIC is allowed.");
         setLoading(false);
         return;
