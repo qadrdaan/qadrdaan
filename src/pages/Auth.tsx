@@ -13,6 +13,7 @@ const Auth = () => {
   const [displayName, setDisplayName] = useState("");
   const [cnic, setCnic] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { session } = useAuth();
