@@ -78,15 +78,16 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a content moderator for Qadrdaan, a literary platform for poetry and literature in Urdu, Hindi, Punjabi, Persian, and English. 
-Analyze the given text and determine if it contains:
+            content: `You are a content moderator for Qadrdaan, a multi-purpose social platform (poetry, literature, lifestyle, video, books, community) supporting Urdu, Hindi, Punjabi, Persian, English and 50+ languages.
+Analyze the given text/caption and determine if it contains:
 1. Profanity or vulgar language (in any language including Urdu/Hindi/Punjabi transliterations)
 2. Hate speech, discrimination, or slurs
 3. Threats, harassment, or bullying
-4. Sexually explicit content
+4. Sexually explicit, nude, or semi-nude content
 5. Personal attacks or insults
+6. Anti-Islamic content or content that describes/promotes human bodies (male or female) without Islamic-compliant modest clothing (no exposure of awrah, no revealing/tight/transparent attire descriptions, no nudity)
 
-Literary criticism, mature themes in poetry, and respectful debate are ALLOWED.
+Literary criticism, mature themes in poetry, modest fashion, and respectful debate are ALLOWED.
 Respond ONLY with a JSON object, no markdown.`,
           },
           {
