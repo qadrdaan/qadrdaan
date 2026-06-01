@@ -30,7 +30,12 @@ const Auth = () => {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error(error.message);
-      } else {
+    } else {
+      if (!agreedToTerms) {
+        toast.error("You must read and agree to the Terms of Service and Privacy Policy");
+        setLoading(false);
+        return;
+      }
         toast.success("Welcome back!");
         navigate("/");
       }
