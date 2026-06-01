@@ -77,8 +77,8 @@ const GiftShop = () => {
       navigate("/auth");
       return;
     }
-    if (coins <= 0) {
-      toast.error("Enter a valid coin amount");
+    if (coins < 100) {
+      toast.error("Minimum purchase is 100 coins");
       return;
     }
 
@@ -219,7 +219,7 @@ const GiftShop = () => {
             Custom Amount
           </h3>
           <p className="font-body text-sm text-muted-foreground mb-4">
-            Buy any number of coins. Rate: 100 coins = $1 (+ 10% processing fee).
+            Buy any number of coins (minimum 100). Rate: 100 coins = $1 (+ 10% processing fee).
           </p>
           <div className="flex flex-col md:flex-row gap-4 items-end">
             <div className="flex-1 w-full">
@@ -228,7 +228,7 @@ const GiftShop = () => {
               </label>
               <input
                 type="number"
-                min={1}
+                min={100}
                 step={1}
                 value={customCoins}
                 onChange={(e) => setCustomCoins(e.target.value)}
@@ -244,7 +244,7 @@ const GiftShop = () => {
             </div>
             <button
               onClick={() => handlePurchase(customCoinsNum, customBasePrice)}
-              disabled={loading || customCoinsNum <= 0}
+              disabled={loading || customCoinsNum < 100}
               className="px-6 py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50"
             >
               {loading ? "Processing..." : "Buy Coins"}
