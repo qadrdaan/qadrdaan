@@ -11,13 +11,13 @@ const RefundPolicy = () => (
       <div className="prose prose-sm max-w-none font-body space-y-5 text-foreground/90">
         <section>
           <h2 className="font-display text-xl font-bold text-foreground">1. Coin Purchases</h2>
-          <p>Coin purchases made via Easypaisa (0092 302 4771572) are <strong>non-refundable once credited</strong> to your wallet, except in the following cases:</p>
+          <p>Coin purchases processed through our secure payment gateway are <strong>non-refundable once credited</strong> to your wallet, except in the following cases:</p>
           <ul className="list-disc pl-6 space-y-1">
-            <li>Duplicate charge confirmed by Easypaisa transaction logs</li>
+            <li>Duplicate charge confirmed by the payment gateway</li>
             <li>Payment captured but coins never credited within 24 hours</li>
             <li>Account terminated by Qadrdaan before any coins were spent</li>
           </ul>
-          <p>Refunds in approved cases are issued back to the original Easypaisa wallet within 7 business days.</p>
+          <p>Refunds in approved cases are issued back to the original payment method within 7 business days.</p>
         </section>
 
         <section>
@@ -48,14 +48,14 @@ const RefundPolicy = () => (
 
         <section>
           <h2 className="font-display text-xl font-bold text-foreground">6. Ad Campaigns</h2>
-          <p>Unspent ad balance can be refunded to your Easypaisa wallet (minimum $20). Funds already spent on impressions or clicks are non-refundable.</p>
+          <p>Unspent ad balance can be refunded to the original payment method (minimum $20). Funds already spent on impressions or clicks are non-refundable.</p>
         </section>
 
         <section>
           <h2 className="font-display text-xl font-bold text-foreground">7. How to request a refund</h2>
           <ol className="list-decimal pl-6 space-y-1">
             <li>Email <a href="mailto:support@qadrdaan.com" className="text-primary font-bold">support@qadrdaan.com</a> with your transaction ID.</li>
-            <li>Include screenshots of the issue and your Easypaisa receipt.</li>
+            <li>Include screenshots of the issue and the payment receipt.</li>
             <li>Our team reviews within 3 business days and replies via email.</li>
           </ol>
         </section>
