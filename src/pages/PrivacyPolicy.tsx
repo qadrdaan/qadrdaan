@@ -5,7 +5,7 @@ import { Camera, Mic, Bell, FolderOpen, MapPin, Contact, Wifi, Vibrate } from "l
 
 const sections = [
   { title: "Information We Collect", content: "We collect information you provide directly — name, email, CNIC (for age & duplicate-account prevention), date of birth, profile details, and content you publish (poetry, books, videos, comments). We also collect usage data (pages viewed, reading time, reactions, device model, OS, IP-derived country) to improve recommendations and detect abuse." },
-  { title: "How We Use Your Information", content: "To deliver and personalize the feed, process Easypaisa coin purchases & creator withdrawals, send notifications you've opted into, enforce community guidelines via AI moderation (Gemini), and improve the platform. We never sell personal data to third parties." },
+  { title: "How We Use Your Information", content: "To deliver and personalize the feed, process coin purchases & creator withdrawals through secure payment gateways, send notifications you've opted into, enforce community guidelines via AI moderation (Gemini), and improve the platform. We never sell personal data to third parties." },
   { title: "Content You Publish", content: "Poetry, books, videos and other works remain your intellectual property. By publishing on Qadrdaan you grant us a non-exclusive license to host, display, translate and distribute that content within the platform and its embeds." },
   { title: "Data Security", content: "Data is encrypted in transit (TLS) and at rest. Row-Level Security policies isolate user data. Withdrawals above PKR-equivalent thresholds require manual admin review. No system is 100% secure — report suspected breaches to security@qadrdaan.com." },
   { title: "Cookies & Tracking", content: "Essential cookies maintain your session. Analytics cookies measure aggregate engagement. You can clear them anytime in your browser settings." },
@@ -69,7 +69,7 @@ const PrivacyPolicy = () => (
           <div>
             <h2 className="font-display text-xl font-bold text-foreground mb-3">Contact</h2>
             <p className="font-body text-muted-foreground leading-relaxed">
-              Privacy questions: privacy@qadrdaan.com · Easypaisa billing: 0092 302 4771572 · Postal: Qadrdaan, Pakistan.
+              Privacy questions: privacy@qadrdaan.com · Billing & support: support@qadrdaan.com · Postal: Qadrdaan, Pakistan.
             </p>
           </div>
         </div>
