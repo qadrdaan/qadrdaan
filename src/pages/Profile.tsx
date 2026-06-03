@@ -11,7 +11,7 @@ import PromotionObligation from "@/components/PromotionObligation";
 import ProfilePhotoDialog from "@/components/ProfilePhotoDialog";
 import ProfileAboutSection from "@/components/ProfileAboutSection";
 import FeaturedPosts from "@/components/FeaturedPosts";
-import ProfileFrames from "@/components/ProfileFrames";
+
 
 const Profile = () => {
   const { user, profile, loading, refreshProfile } = useAuth();
@@ -163,9 +163,6 @@ const Profile = () => {
       <div className="space-y-6">
         <ProfileAboutSection profile={profile} isOwnProfile={true} onUpdate={refreshProfile} />
         <FeaturedPosts userId={user!.id} isOwnProfile={true} />
-        <div id="frames">
-          <ProfileFrames />
-        </div>
         <PromotionObligation />
         <ProfileWall userId={user!.id} isOwnProfile={true} />
       </div>
