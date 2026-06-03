@@ -45,7 +45,7 @@ const TIERS = [
     bg: "from-fuchsia-500/15 to-purple-700/15",
     threshold: 20000,
     monthly: 2000,
-    perks: ["Featured on home", "10% withdrawal fee", "2,000 free promo coins/month", "Custom profile frame", "Dedicated success manager", "Annual Mushaira invite"],
+    perks: ["Featured on home", "10% withdrawal fee", "2,000 free promo coins/month", "Custom avatar style", "Dedicated success manager", "Annual Mushaira invite"],
   },
 ];
 
