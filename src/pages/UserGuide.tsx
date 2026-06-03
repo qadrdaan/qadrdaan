@@ -9,9 +9,9 @@ const SECTIONS: { icon: any; title: string; body: string; cta?: { label: string;
   { icon: Video,      title: "Videos & Shorts",      body: "Upload long-form (16:9) or Shorts (9:16). Every video carries an invisible creator-ID watermark to prevent piracy. Earn from views and gifts.", cta: { label: "Upload video", to: "/upload-video" } },
   { icon: Mic2,       title: "Live Mushaira Rooms",  body: "Up to 30 WebRTC seats. Audience joins free, performers queue up, scoreboard shows live gifts. Followers get a 🔴 push when you go live.", cta: { label: "Browse rooms", to: "/video-rooms" } },
   { icon: Trophy,     title: "Competitions & Challenges", body: "Submit an entry, gather votes + gifts before deadline. The system auto-awards a gold medal hourly when voting closes." },
-  { icon: Gift,       title: "Gifts & Coins",        body: "Buy coins via Easypaisa (0092 302 4771572). Send roses, crowns, or moons to creators. Creators receive 60%, platform retains 40% (with 40% reinvest obligation)." },
+  { icon: Gift,       title: "Gifts & Coins",        body: "Buy coins via secure payment gateway. Send roses, crowns, or moons to creators. Creators receive 60%, platform retains 40% (with 40% reinvest obligation)." },
   { icon: Coins,      title: "Reinvestment Tracker", body: "After receiving gifts, you must spend at least 40% of those coins on ads or post boosts. The tracker on your wallet shows your live obligation." },
-  { icon: WalletIcon, title: "Wallet & Withdrawals", body: "Cash out once you hit $20. Verified poets pay 12% fee, standard 15%, new accounts (<30 days) 18%. Manual review takes 1–3 business days." },
+  { icon: WalletIcon, title: "Wallet & Withdrawals", body: "Cash out once you hit $20. Processed via your selected payment gateway within 1–3 business days." },
   { icon: Sparkles,   title: "Monetization Eligibility", body: "Hit 8,000 followers AND 400,000 reading-minutes in 60 days to unlock ad-share earnings." },
   { icon: Users,      title: "Fan Clubs",            body: "1,000 followers required. Set $3/mo subscription. Members access exclusive posts and private chat." },
   { icon: BookMarked, title: "Verification (Blue Badge)", body: "Refer 100 active users (CNIC-locked) OR get manually approved by admin. Verification reduces withdrawal fees by 3%." },
@@ -54,7 +54,7 @@ const UserGuide = () => (
       <div className="mt-10 p-5 bg-gradient-to-br from-primary/10 to-secondary/10 border border-border rounded-2xl">
         <h3 className="font-display text-lg font-bold text-foreground mb-2">Need more help?</h3>
         <p className="font-body text-sm text-muted-foreground mb-3">
-          Email <a href="mailto:support@qadrdaan.com" className="text-primary font-bold">support@qadrdaan.com</a> or message us on Easypaisa-listed WhatsApp <a href="tel:+923024771572" className="text-primary font-bold">0092 302 4771572</a>.
+          Email <a href="mailto:support@qadrdaan.com" className="text-primary font-bold">support@qadrdaan.com</a> and our team will get back to you within 1–2 business days.
         </p>
       </div>
     </section>

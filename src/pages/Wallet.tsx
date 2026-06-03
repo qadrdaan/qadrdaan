@@ -232,7 +232,7 @@ const Wallet = () => {
           <div className="max-w-md mx-auto space-y-6">
             <div className="bg-card border border-border rounded-3xl p-8 shadow-sm">
               <h3 className="font-display text-xl font-bold mb-2">Withdraw Funds</h3>
-              <p className="font-body text-sm text-muted-foreground mb-6">Minimum withdrawal is <strong>$20.00</strong>. Manual admin review (1–3 business days).</p>
+              <p className="font-body text-sm text-muted-foreground mb-6">Minimum withdrawal is <strong>$20.00</strong>. Processed via your selected payment gateway (1–3 business days).</p>
 
               <div className="space-y-4">
                 <div>
@@ -257,8 +257,6 @@ const Wallet = () => {
                   >
                     <option value="bank_transfer">Bank Transfer</option>
                     <option value="paypal">PayPal</option>
-                    <option value="jazzcash">JazzCash</option>
-                    <option value="easypaisa">Easypaisa</option>
                     <option value="wise">Wise</option>
                   </select>
                 </div>
@@ -274,16 +272,18 @@ const Wallet = () => {
                   />
                 </div>
 
-                <div className="p-4 bg-muted/30 rounded-2xl space-y-2">
-                  <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
-                    <span className="text-muted-foreground">Withdrawal Fee ({feePercent}%)</span>
-                    <span className="text-destructive">-${feeAmount.toFixed(2)}</span>
+                {amountNum >= 20 && amountNum * COIN_RATE <= w.available_balance && (
+                  <div className="p-4 bg-muted/30 rounded-2xl space-y-2">
+                    <div className="flex justify-between text-xs font-bold uppercase tracking-wider">
+                      <span className="text-muted-foreground">Withdrawal Fee ({feePercent}%)</span>
+                      <span className="text-destructive">-${feeAmount.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm font-bold">
+                      <span className="text-foreground">You Receive</span>
+                      <span className="text-green-600">${finalAmount.toFixed(2)}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between text-sm font-bold">
-                    <span className="text-foreground">You Receive</span>
-                    <span className="text-green-600">${finalAmount.toFixed(2)}</span>
-                  </div>
-                </div>
+                )}
 
                 <button
                   disabled={submitting}

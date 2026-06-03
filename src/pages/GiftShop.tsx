@@ -18,30 +18,26 @@ const COIN_PACKAGES = [
 ];
 
 const GIFT_TYPES = [
-  { type: "rose", emoji: "🌹", label: "Rose", cost: 1, description: "A token of appreciation" },
-  { type: "tulip", emoji: "🌷", label: "Tulip", cost: 2, description: "Spring blossom" },
-  { type: "sunflower", emoji: "🌻", label: "Sunflower", cost: 3, description: "Warmth & joy" },
-  { type: "bouquet", emoji: "💐", label: "Bouquet", cost: 4, description: "A floral tribute" },
-  { type: "star", emoji: "⭐", label: "Star", cost: 5, description: "You shine bright!" },
-  { type: "tea", emoji: "🍵", label: "Chai", cost: 5, description: "A warm cup of chai" },
-  { type: "sweets", emoji: "🍬", label: "Mithai", cost: 6, description: "Sweet appreciation" },
-  { type: "cake", emoji: "🎂", label: "Cake", cost: 8, description: "Celebrate them" },
-  { type: "balloon", emoji: "🎈", label: "Balloon", cost: 8, description: "Floating cheer" },
-  { type: "crown", emoji: "👑", label: "Crown", cost: 10, description: "The king/queen of poetry" },
-  { type: "trophy", emoji: "🏆", label: "Trophy", cost: 12, description: "True champion" },
-  { type: "medal", emoji: "🏅", label: "Medal", cost: 12, description: "Award of honor" },
-  { type: "guitar", emoji: "🎸", label: "Guitar", cost: 15, description: "Music of the soul" },
-  { type: "book", emoji: "📖", label: "Book", cost: 15, description: "A literary gift" },
-  { type: "pen", emoji: "🖋️", label: "Golden Pen", cost: 18, description: "For your craft" },
-  { type: "moon", emoji: "🌙", label: "Crescent", cost: 20, description: "Guiding light" },
-  { type: "lantern", emoji: "🏮", label: "Lantern", cost: 20, description: "Glowing tribute" },
-  { type: "fire", emoji: "🔥", label: "Fire", cost: 22, description: "Pure passion" },
-  { type: "diamond", emoji: "💎", label: "Diamond", cost: 25, description: "Truly priceless" },
-  { type: "gem", emoji: "💍", label: "Ring", cost: 30, description: "Precious gesture" },
-  { type: "rocket", emoji: "🚀", label: "Rocket", cost: 40, description: "To the stars" },
-  { type: "yacht", emoji: "🛥️", label: "Yacht", cost: 60, description: "Lavish admiration" },
-  { type: "car", emoji: "🏎️", label: "Sports Car", cost: 80, description: "Top-tier gift" },
-  { type: "castle", emoji: "🏰", label: "Castle", cost: 150, description: "Royalty status" },
+  { type: "daad",          emoji: "❤️", label: "داد",          cost: 5,        description: "Crystal heart of appreciation" },
+  { type: "qalam",         emoji: "✒️", label: "قلم",          cost: 20,       description: "Golden fountain pen" },
+  { type: "kitaab",        emoji: "📖", label: "کتاب",         cost: 50,       description: "Glowing leather-bound book" },
+  { type: "ghazal",        emoji: "🌺", label: "غزل",          cost: 100,      description: "Red rose on poetry pages" },
+  { type: "deewan",        emoji: "📚", label: "دیوان",        cost: 250,      description: "Stack of classic poetry" },
+  { type: "mushaira",      emoji: "🎤", label: "مشاعرہ",       cost: 500,      description: "Golden mic on the stage" },
+  { type: "chiragh_adab",  emoji: "🪔", label: "چراغِ ادب",     cost: 1000,     description: "Eternal lamp of literature" },
+  { type: "makhtoota",     emoji: "📜", label: "مخطوطہ",       cost: 2000,     description: "Illuminated ancient scroll" },
+  { type: "taj_adab",      emoji: "👑", label: "تاجِ ادب",      cost: 5000,     description: "Royal crown of poetry" },
+  { type: "fakhr_qalam",   emoji: "🎖️", label: "فخرِ قلم",     cost: 10000,    description: "Literary medal of honor" },
+  { type: "shaheen_fikr",  emoji: "🦅", label: "شاہینِ فکر",    cost: 15000,    description: "Eagle of intellect" },
+  { type: "sitara_adab",   emoji: "⭐", label: "ستارۂ ادب",    cost: 20000,    description: "Radiant literary star" },
+  { type: "khazana_adab",  emoji: "🗝️", label: "خزانۂ ادب",   cost: 30000,    description: "Treasure chest of books" },
+  { type: "safeer_qadrdan",emoji: "🌍", label: "سفیرِ قدردان", cost: 50000,    description: "Globe of literary ambassadorship" },
+  { type: "nishaan",       emoji: "🏆", label: "نشانِ قدردان", cost: 75000,    description: "Crystal & gold trophy" },
+  { type: "sultan_sukhan", emoji: "🤴", label: "سلطانِ سخن",   cost: 100000,   description: "Throne of poetry" },
+  { type: "qasr_adab",     emoji: "🏰", label: "قصرِ ادب",     cost: 150000,   description: "Palace of literature" },
+  { type: "mohsin_adab",   emoji: "🌟", label: "محسنِ ادب",    cost: 250000,   description: "Celestial literary emblem" },
+  { type: "waqar",         emoji: "💠", label: "وقارِ قدردان", cost: 500000,   description: "Rare sapphire of honor" },
+  { type: "kehkashan",     emoji: "🌌", label: "کہکشاںِ ادب", cost: 1000000,  description: "Galaxy — the ultimate honor" },
 ];
 
 const GiftShop = () => {
@@ -116,14 +112,14 @@ const GiftShop = () => {
       user_id: user.id,
       amount: coins,
       price: total,
-      payment_method: "manual",
+      payment_method: "gateway",
       status: "pending",
     });
 
     if (purchaseError) {
       toast.error("Failed to record purchase");
     } else {
-      toast.success(`Purchase request submitted for ${coins} coins. You'll be contacted for payment.`);
+      toast.success(`Purchase of ${coins} coins initiated. Complete checkout in the secure payment gateway.`);
       fetchBalance();
       setCustomCoins("");
     }
@@ -282,7 +278,7 @@ const GiftShop = () => {
         </div>
 
         <p className="font-body text-sm text-muted-foreground text-center mt-10">
-          Note: Manual payment confirmation required. You'll be contacted for payment details after request.
+          All payments are securely processed through our integrated payment gateway.
         </p>
       </section>
       <Footer />

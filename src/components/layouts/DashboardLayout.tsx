@@ -8,7 +8,7 @@ import BirthdaysWidget from "@/components/BirthdaysWidget";
 import MemoriesWidget from "@/components/MemoriesWidget";
 import {
   LayoutDashboard, FileText, Image, BookOpen, Wallet, BarChart3,
-  Users, Bell, Settings, BadgeCheck, MessageCircle, Sparkles, Trash2
+  Users, Bell, Settings, BadgeCheck, MessageCircle, Trash2
 } from "lucide-react";
 
 const sidebarGroups = [
@@ -45,7 +45,6 @@ const sidebarGroups = [
     label: "Account",
     items: [
       { href: "/settings", label: "Settings", icon: Settings },
-      { href: "/profile#frames", label: "Profile Frames", icon: Sparkles },
       { href: "/trash", label: "Trash", icon: Trash2 },
     ],
   },
