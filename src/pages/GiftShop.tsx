@@ -7,9 +7,29 @@ import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Coins, Gift, ShoppingCart, Sparkles } from "lucide-react";
+import daadIcon from "@/assets/gifts/daad.png";
+import qalamIcon from "@/assets/gifts/qalam.png";
+import kitaabIcon from "@/assets/gifts/kitaab.png";
+import ghazalIcon from "@/assets/gifts/ghazal.png";
+import deewanIcon from "@/assets/gifts/deewan.png";
+import mushairaIcon from "@/assets/gifts/mushaira.png";
+import chiraghIcon from "@/assets/gifts/chiragh.png";
+import makhtootaIcon from "@/assets/gifts/makhtoota.png";
+import tajIcon from "@/assets/gifts/taj.png";
+import fakhrIcon from "@/assets/gifts/fakhr.png";
+import shaheenIcon from "@/assets/gifts/shaheen.png";
+import sitaraIcon from "@/assets/gifts/sitara.png";
+import khazanaIcon from "@/assets/gifts/khazana.png";
+import safeerIcon from "@/assets/gifts/safeer.png";
+import nishaanIcon from "@/assets/gifts/nishaan.png";
+import sultanIcon from "@/assets/gifts/sultan.png";
+import qasrIcon from "@/assets/gifts/qasr.png";
+import mohsinIcon from "@/assets/gifts/mohsin.png";
+import waqarIcon from "@/assets/gifts/waqar.png";
+import kehkashanIcon from "@/assets/gifts/kehkashan.png";
 
-const PROCESSING_FEE_RATE = 0.10; // 10%
-const COIN_RATE = 100; // 100 coins per $1
+const PROCESSING_FEE_RATE = 0.1;
+const COIN_RATE = 100;
 
 const COIN_PACKAGES = [
   { coins: 100, basePrice: 1.0, popular: false },
@@ -18,26 +38,26 @@ const COIN_PACKAGES = [
 ];
 
 const GIFT_TYPES = [
-  { type: "daad",          emoji: "❤️", label: "داد",          cost: 5,        description: "Crystal heart of appreciation" },
-  { type: "qalam",         emoji: "✒️", label: "قلم",          cost: 20,       description: "Golden fountain pen" },
-  { type: "kitaab",        emoji: "📖", label: "کتاب",         cost: 50,       description: "Glowing leather-bound book" },
-  { type: "ghazal",        emoji: "🌺", label: "غزل",          cost: 100,      description: "Red rose on poetry pages" },
-  { type: "deewan",        emoji: "📚", label: "دیوان",        cost: 250,      description: "Stack of classic poetry" },
-  { type: "mushaira",      emoji: "🎤", label: "مشاعرہ",       cost: 500,      description: "Golden mic on the stage" },
-  { type: "chiragh_adab",  emoji: "🪔", label: "چراغِ ادب",     cost: 1000,     description: "Eternal lamp of literature" },
-  { type: "makhtoota",     emoji: "📜", label: "مخطوطہ",       cost: 2000,     description: "Illuminated ancient scroll" },
-  { type: "taj_adab",      emoji: "👑", label: "تاجِ ادب",      cost: 5000,     description: "Royal crown of poetry" },
-  { type: "fakhr_qalam",   emoji: "🎖️", label: "فخرِ قلم",     cost: 10000,    description: "Literary medal of honor" },
-  { type: "shaheen_fikr",  emoji: "🦅", label: "شاہینِ فکر",    cost: 15000,    description: "Eagle of intellect" },
-  { type: "sitara_adab",   emoji: "⭐", label: "ستارۂ ادب",    cost: 20000,    description: "Radiant literary star" },
-  { type: "khazana_adab",  emoji: "🗝️", label: "خزانۂ ادب",   cost: 30000,    description: "Treasure chest of books" },
-  { type: "safeer_qadrdan",emoji: "🌍", label: "سفیرِ قدردان", cost: 50000,    description: "Globe of literary ambassadorship" },
-  { type: "nishaan",       emoji: "🏆", label: "نشانِ قدردان", cost: 75000,    description: "Crystal & gold trophy" },
-  { type: "sultan_sukhan", emoji: "🤴", label: "سلطانِ سخن",   cost: 100000,   description: "Throne of poetry" },
-  { type: "qasr_adab",     emoji: "🏰", label: "قصرِ ادب",     cost: 150000,   description: "Palace of literature" },
-  { type: "mohsin_adab",   emoji: "🌟", label: "محسنِ ادب",    cost: 250000,   description: "Celestial literary emblem" },
-  { type: "waqar",         emoji: "💠", label: "وقارِ قدردان", cost: 500000,   description: "Rare sapphire of honor" },
-  { type: "kehkashan",     emoji: "🌌", label: "کہکشاںِ ادب", cost: 1000000,  description: "Galaxy — the ultimate honor" },
+  { type: "daad", label: "داد", cost: 5, description: "Crystal heart of appreciation", image: daadIcon },
+  { type: "qalam", label: "قلم", cost: 20, description: "Golden fountain pen", image: qalamIcon },
+  { type: "kitaab", label: "کتاب", cost: 50, description: "Glowing leather-bound book", image: kitaabIcon },
+  { type: "ghazal", label: "غزل", cost: 100, description: "Red rose on poetry pages", image: ghazalIcon },
+  { type: "deewan", label: "دیوان", cost: 250, description: "Stack of classic poetry", image: deewanIcon },
+  { type: "mushaira", label: "مشاعرہ", cost: 500, description: "Golden mic on the stage", image: mushairaIcon },
+  { type: "chiragh_adab", label: "چراغِ ادب", cost: 1000, description: "Eternal lamp of literature", image: chiraghIcon },
+  { type: "makhtoota", label: "مخطوطہ", cost: 2000, description: "Illuminated ancient scroll", image: makhtootaIcon },
+  { type: "taj_adab", label: "تاجِ ادب", cost: 5000, description: "Royal crown of poetry", image: tajIcon },
+  { type: "fakhr_qalam", label: "فخرِ قلم", cost: 10000, description: "Literary medal of honor", image: fakhrIcon },
+  { type: "shaheen_fikr", label: "شاہینِ فکر", cost: 15000, description: "Eagle of intellect", image: shaheenIcon },
+  { type: "sitara_adab", label: "ستارۂ ادب", cost: 20000, description: "Radiant literary star", image: sitaraIcon },
+  { type: "khazana_adab", label: "خزانۂ ادب", cost: 30000, description: "Treasure chest of books", image: khazanaIcon },
+  { type: "safeer_qadrdan", label: "سفیرِ قدردان", cost: 50000, description: "Globe of literary ambassadorship", image: safeerIcon },
+  { type: "nishaan", label: "نشانِ قدردان", cost: 75000, description: "Crystal & gold trophy", image: nishaanIcon },
+  { type: "sultan_sukhan", label: "سلطانِ سخن", cost: 100000, description: "Throne of poetry", image: sultanIcon },
+  { type: "qasr_adab", label: "قصرِ ادب", cost: 150000, description: "Palace of literature", image: qasrIcon },
+  { type: "mohsin_adab", label: "محسنِ ادب", cost: 250000, description: "Celestial literary emblem", image: mohsinIcon },
+  { type: "waqar", label: "وقارِ قدردان", cost: 500000, description: "Rare sapphire of honor", image: waqarIcon },
+  { type: "kehkashan", label: "کہکشاںِ ادب", cost: 1000000, description: "Galaxy — the ultimate honor", image: kehkashanIcon },
 ];
 
 const GiftShop = () => {
@@ -73,6 +93,7 @@ const GiftShop = () => {
       navigate("/auth");
       return;
     }
+
     if (coins < 100) {
       toast.error("Minimum purchase is 100 coins");
       return;
@@ -81,34 +102,7 @@ const GiftShop = () => {
     setLoading(true);
     const { total } = calculateTotals(basePrice);
 
-    const { data: existingBalance } = await supabase
-      .from("user_balances")
-      .select("id, coins")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (existingBalance) {
-      const { error: updateError } = await supabase
-        .from("user_balances")
-        .update({ coins: existingBalance.coins + coins })
-        .eq("user_id", user.id);
-      if (updateError) {
-        toast.error("Failed to update balance");
-        setLoading(false);
-        return;
-      }
-    } else {
-      const { error: insertError } = await supabase
-        .from("user_balances")
-        .insert({ user_id: user.id, coins });
-      if (insertError) {
-        toast.error("Failed to create balance");
-        setLoading(false);
-        return;
-      }
-    }
-
-    const { error: purchaseError } = await supabase.from("coin_purchases").insert({
+    const { error } = await supabase.from("coin_purchases").insert({
       user_id: user.id,
       amount: coins,
       price: total,
@@ -116,14 +110,15 @@ const GiftShop = () => {
       status: "pending",
     });
 
-    if (purchaseError) {
-      toast.error("Failed to record purchase");
-    } else {
-      toast.success(`Purchase of ${coins} coins initiated. Complete checkout in the secure payment gateway.`);
-      fetchBalance();
-      setCustomCoins("");
-    }
     setLoading(false);
+
+    if (error) {
+      toast.error("Failed to create purchase request");
+      return;
+    }
+
+    toast.success(`Purchase created for ${coins} coins. Secure checkout will be connected to the payment gateway.`);
+    setCustomCoins("");
   };
 
   const customCoinsNum = Math.max(0, parseInt(customCoins || "0", 10));
@@ -139,7 +134,7 @@ const GiftShop = () => {
             Gift Shop
           </h1>
           <p className="font-body text-lg text-muted-foreground max-w-2xl mx-auto">
-            Purchase coins to send gifts to your favorite creators
+            Purchase coins to send premium collectible gifts to your favorite creators
           </p>
           <p className="font-body text-xs text-muted-foreground mt-2">
             A 10% processing fee is added to every purchase.
@@ -152,7 +147,6 @@ const GiftShop = () => {
           )}
         </div>
 
-        {/* Coin Packages */}
         <div className="mb-12">
           <h2 className="font-display text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
             <ShoppingCart className="w-6 h-6 text-secondary" />
@@ -178,25 +172,17 @@ const GiftShop = () => {
                     </span>
                   )}
                   <Coins className="w-12 h-12 mx-auto mb-4 text-secondary group-hover:scale-110 transition-transform" />
-                  <h3 className="font-display text-3xl font-bold text-foreground mb-1">
-                    {pkg.coins}
-                  </h3>
+                  <h3 className="font-display text-3xl font-bold text-foreground mb-1">{pkg.coins}</h3>
                   <p className="font-body text-sm text-muted-foreground mb-4">Coins</p>
-                  <p className="font-display text-2xl font-bold text-secondary">
-                    ${pkg.basePrice.toFixed(2)}
-                  </p>
-                  <p className="font-body text-[11px] text-muted-foreground mb-1">
-                    + ${fee.toFixed(2)} processing fee
-                  </p>
-                  <p className="font-body text-sm font-semibold text-foreground mb-5">
-                    Total: ${total.toFixed(2)}
-                  </p>
+                  <p className="font-display text-2xl font-bold text-secondary">${pkg.basePrice.toFixed(2)}</p>
+                  <p className="font-body text-[11px] text-muted-foreground mb-1">+ ${fee.toFixed(2)} processing fee</p>
+                  <p className="font-body text-sm font-semibold text-foreground mb-5">Total: ${total.toFixed(2)}</p>
                   <button
                     onClick={() => handlePurchase(pkg.coins, pkg.basePrice)}
                     disabled={loading}
                     className="w-full py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50"
                   >
-                    {loading ? "Processing..." : "Request Purchase"}
+                    {loading ? "Processing..." : "Create Purchase"}
                   </button>
                 </motion.div>
               );
@@ -204,7 +190,6 @@ const GiftShop = () => {
           </div>
         </div>
 
-        {/* Custom Amount */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -234,21 +219,18 @@ const GiftShop = () => {
             </div>
             <div className="text-left md:text-right">
               <p className="font-body text-xs text-muted-foreground">Base ${customBasePrice.toFixed(2)} + fee ${customTotals.fee.toFixed(2)}</p>
-              <p className="font-display text-xl font-bold text-secondary">
-                Total: ${customTotals.total.toFixed(2)}
-              </p>
+              <p className="font-display text-xl font-bold text-secondary">Total: ${customTotals.total.toFixed(2)}</p>
             </div>
             <button
               onClick={() => handlePurchase(customCoinsNum, customBasePrice)}
               disabled={loading || customCoinsNum < 100}
               className="px-6 py-3 font-body font-semibold bg-gradient-gold rounded-lg text-primary shadow-gold hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              {loading ? "Processing..." : "Buy Coins"}
+              {loading ? "Processing..." : "Create Purchase"}
             </button>
           </div>
         </motion.div>
 
-        {/* Gift Types */}
         <div>
           <h2 className="font-display text-2xl font-bold text-foreground mb-6 flex items-center gap-2">
             <Gift className="w-6 h-6 text-secondary" />
@@ -263,14 +245,21 @@ const GiftShop = () => {
                 whileHover={{ y: -6, scale: 1.04 }}
                 className="bg-card border border-border rounded-2xl p-5 text-center hover:border-secondary hover:shadow-gold transition-colors cursor-pointer"
               >
-                <span className="text-5xl block mb-3">{gift.emoji}</span>
-                <h3 className="font-display text-base font-bold text-foreground mb-1">
-                  {gift.label}
-                </h3>
+                <div className="aspect-square mb-3 rounded-2xl bg-muted/30 flex items-center justify-center overflow-hidden">
+                  <img
+                    src={gift.image}
+                    alt={gift.label}
+                    loading="lazy"
+                    width={1024}
+                    height={1024}
+                    className="w-full h-full object-contain p-2"
+                  />
+                </div>
+                <h3 className="font-display text-base font-bold text-foreground mb-1">{gift.label}</h3>
                 <p className="font-body text-xs text-muted-foreground mb-3 min-h-[32px]">{gift.description}</p>
                 <div className="flex items-center justify-center gap-1.5 font-body text-secondary font-semibold text-sm">
                   <Coins className="w-4 h-4" />
-                  {gift.cost} coins
+                  {gift.cost.toLocaleString()} coins
                 </div>
               </motion.div>
             ))}
